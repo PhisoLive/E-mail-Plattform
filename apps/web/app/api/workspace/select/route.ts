@@ -1,3 +1,4 @@
+import { defaults } from "@ep/config/defaults";
 import { workspaceService } from "@ep/core";
 import { z } from "zod";
 import { isSameOrigin } from "../../../../server/origin";
@@ -28,7 +29,7 @@ export async function POST(request: Request): Promise<Response> {
   const response = Response.json({ ok: true, role });
   response.headers.append(
     "set-cookie",
-    `${workspaceCookie}=${parsed.data.workspaceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 365}${secure ? "; Secure" : ""}`,
+    `${workspaceCookie}=${parsed.data.workspaceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${defaults.cookies.preferenceDays * 24 * 60 * 60}${secure ? "; Secure" : ""}`,
   );
   return response;
 }

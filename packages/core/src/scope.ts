@@ -64,9 +64,13 @@ export async function withUser<T>(
   fn: (scope: UserScope) => Promise<T>,
 ): Promise<T> {
   const callbacks: Array<() => Promise<void> | void> = [];
-  const result = await ctx.deps.db.transaction(async (tx) =>
-    fn({ tx, ctx, userId: ctx.userId, afterCommit: (callback) => callbacks.push(callback) }),
-  );
+  const result = await ctx.deps.db.transaction(async (tx) => {
+    // Same database role as tenant work (ENTSCHEIDUNGEN E-028); `app.user_id` lets row level
+    // security (phase 14) restrict user-level queries to the user's own memberships.
+    await tx.execute(sql`set local role ep_app`);
+    await tx.execute(sql`select set_config('app.user_id', ${ctx.userId}, true)`);
+    return fn({ tx, ctx, userId: ctx.userId, afterCommit: (callback) => callbacks.push(callback) });
+  });
   await runAfterCommit(callbacks);
   return result;
 }

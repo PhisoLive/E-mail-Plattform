@@ -1,4 +1,4 @@
-import type { MailSendMode } from "@ep/config/env";
+import { isLocalSandboxHost, type MailSendMode } from "@ep/config/env";
 import { appError, err, normalizeEmail, ok, type Result } from "@ep/core";
 import addressparser from "nodemailer/lib/addressparser";
 
@@ -60,7 +60,8 @@ export function checkSendAllowed(policy: SendPolicy, attempt: SendAttempt): Resu
     }
     case "sandbox": {
       const endpoint = endpointKey(attempt.transportHost, attempt.transportPort);
-      return policy.sandboxEndpoints.map((entry) => entry.toLowerCase()).includes(endpoint)
+      return isLocalSandboxHost(attempt.transportHost) &&
+        policy.sandboxEndpoints.map((entry) => entry.toLowerCase()).includes(endpoint)
         ? ok(true)
         : err(appError("SEND_BLOCKED_BY_MODE", { mode: "sandbox" }));
     }

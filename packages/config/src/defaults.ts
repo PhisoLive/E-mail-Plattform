@@ -274,6 +274,10 @@ export const defaults = {
       general: { max: 100, windowSeconds: 60 },
     },
   },
+  /** Lifetime of preference cookies (active workspace, theme, sidebar). */
+  cookies: {
+    preferenceDays: 365,
+  },
 
   queues: {
     concurrency: {

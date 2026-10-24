@@ -23,6 +23,8 @@ export type AuthAuditAction =
   | "auth.sign_in"
   | "auth.sign_in_magic_link"
   | "auth.sign_in_two_factor"
+  | "auth.sign_in_email_verification"
+  | "auth.sign_in_passkey"
   | "auth.sign_out"
   | "auth.two_factor_enabled"
   | "auth.two_factor_disabled"

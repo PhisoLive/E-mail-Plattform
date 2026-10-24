@@ -63,6 +63,22 @@ Die erste Abnahme (`docs/berichte/phase-00-abnahme.md`) ergab „nein“. Zusät
 
 Hinweis zur Oberfläche: Kopfzeile bei 360 px und die Beschriftung der Navigation werden mit der neuen App-Schale in Phase 1 ersetzt (Seitenleiste mit `aria-current`).
 
+## Nachbesserung nach der Nachabnahme
+
+Die zweite unabhängige Prüfung (`docs/berichte/phase-00-nachabnahme.md`, Commit 04f8348) ergab „Abgenommen: ja, mit Auflage“ und sieben leichte Befunde. Alle sind behoben:
+
+| Befund | Behebung | Nachweis |
+| --- | --- | --- |
+| N1 E2E „Magic Link umgeht die Zwei-Faktor-Anmeldung nicht“ unzuverlässig (zwei Navigationen kollidierten) | `createWorkspace()` in `e2e/helpers.ts` wartet auf die Weiterleitung der App, bevor der Test weiter navigiert | `pnpm test:e2e:prod --repeat-each 10 -g "Magic Link umgeht"` → 10 passed |
+| N2 Sandbox nahm echte SMTP-Hosts an, wenn sie in `SANDBOX_MAIL_ENDPOINTS` standen | `isLocalSandboxHost()`: nur Loopback und Compose-Dienstnamen; Start-Prüfung und Versand-Schutzschalter (E-034) | `env.test.ts` „may only name local sandboxes …“, `send-guard.test.ts` „sandbox refuses a real SMTP host even when it is listed by mistake“ |
+| N3 Einladungstoken über `?next=%2Feinladung%2F…` im Request-Log | Ignore-Muster `/einladung/i` und `/token/i` erfassen auch die URL-kodierte Form | `curl "http://127.0.0.1:4300/login?next=%2Feinladung%2Fgeheimtoken123"` → kein Eintrag im Dev-Log, `/login?next=%2Fstart` wird protokolliert |
+| N4 Anmeldung nach E-Mail-Bestätigung, Passkey-Anmeldung und Passwort-Reset ohne Audit | After-Hook: `auth.sign_in_email_verification`, `auth.sign_in_passkey`; `onPasswordReset` schreibt `auth.password_reset` | E2E Haupt-Ablauf erwartet `auth.sign_in_email_verification` in `audit_logs` |
+| N5 `withUser` ohne Rolle `ep_app` | `withUser` wechselt in `ep_app` und setzt `app.user_id` (E-036) | `packages/core/src/scope.int.test.ts` (2 Tests) |
+| N6 Umgebungstrennung als Sperrliste | Positivliste aus den Zod-Schemas je App; Web/Edge verweigern den Start mit KI- oder S3-Schlüsseln (E-035) | `env.test.ts` „passes each app only the platform variables of its own schema“, „refuses to start web and edge with the worker's provider keys“ |
+| N7 Cookie-Laufzeit fest im Code | `defaults.cookies.preferenceDays` | `apps/web/app/api/workspace/select/route.ts` |
+
+Letzter Lauf nach dieser Nachbesserung: `pnpm lint` 0, `pnpm typecheck` 0, `pnpm test` 22 Dateien / 89 Tests passed, `pnpm test:e2e` 7 passed, `pnpm test:e2e:prod` 7 passed.
+
 ## Offene Punkte
 
 - **Testcontainers** sind durch einen Compose-Test-Stack ersetzt (E-003).
@@ -73,4 +89,4 @@ Hinweis zur Oberfläche: Kopfzeile bei 360 px und die Beschriftung der Navigatio
 
 ## Abweichungen
 
-Alle Abweichungen stehen mit Begründung in `docs/ENTSCHEIDUNGEN.md` (E-001 bis E-025). Die wichtigsten: Compose statt Testcontainers (E-003), eigene Arbeitsbereichs-Tabellen statt Better-Auth-Organisationen (E-005), zusätzliche Tabellen `entity_events` und `platform_secrets` (E-006, E-007), Magic Link nur ohne 2FA (E-018), Zugangsprüfung je Seite (E-019).
+Alle Abweichungen stehen mit Begründung in `docs/ENTSCHEIDUNGEN.md` (E-001 bis E-036). Die wichtigsten: Compose statt Testcontainers (E-003), eigene Arbeitsbereichs-Tabellen statt Better-Auth-Organisationen (E-005), zusätzliche Tabellen `entity_events` und `platform_secrets` (E-006, E-007), Magic Link nur ohne 2FA (E-018), Zugangsprüfung je Seite (E-019).

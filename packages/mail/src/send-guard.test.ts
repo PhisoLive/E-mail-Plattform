@@ -57,6 +57,17 @@ describe("MAIL_SEND_MODE guard", () => {
     ).toThrow(SendBlockedError);
   });
 
+  it("sandbox refuses a real SMTP host even when it is listed by mistake", () => {
+    const misconfigured: SendPolicy = { ...sandbox, sandboxEndpoints: ["smtp.gmail.com:587"] };
+    expect(
+      checkSendAllowed(misconfigured, {
+        transportHost: "smtp.gmail.com",
+        transportPort: 587,
+        recipients: ["echte.person@gmail.com"],
+      }).ok,
+    ).toBe(false);
+  });
+
   it("allowlist only lets listed addresses and domains through – also inside address lists", () => {
     const policy: SendPolicy = {
       mode: "allowlist",

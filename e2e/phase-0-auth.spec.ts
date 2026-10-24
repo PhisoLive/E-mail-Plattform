@@ -37,6 +37,7 @@ test("Registrieren → Anmelden → 2FA → Arbeitsbereich → Mitglied einladen
   // Sign-ins and the 2FA activation are in the audit log (concept chapter 16).
   expect(await auditActions(owner.email)).toEqual(
     expect.arrayContaining([
+      "auth.sign_in_email_verification",
       "auth.sign_in",
       "auth.two_factor_enabled",
       "auth.sign_in_two_factor",

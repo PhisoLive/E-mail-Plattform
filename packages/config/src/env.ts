@@ -107,6 +107,17 @@ export type WebEnv = z.infer<typeof webEnvSchema>;
 export type WorkerEnv = z.infer<typeof workerEnvSchema>;
 export type EdgeEnv = z.infer<typeof edgeEnvSchema>;
 
+/**
+ * Mail sandboxes run locally: loopback addresses or single-label Compose service names such as
+ * `greenmail` or `mailpit`. A real SMTP host (anything with a dot) is never a sandbox.
+ */
+export function isLocalSandboxHost(host: string): boolean {
+  const normalized = host.trim().toLowerCase();
+  if (normalized === "localhost" || normalized === "::1" || normalized === "[::1]") return true;
+  if (/^127(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(normalized)) return true;
+  return /^[a-z][a-z0-9-]{0,62}$/.test(normalized);
+}
+
 export class EnvError extends Error {
   constructor(public readonly issues: string[]) {
     super(`Invalid environment:\n${issues.map((issue) => `  - ${issue}`).join("\n")}`);
@@ -125,9 +136,12 @@ export function checkSendModeSafety(
 ): string[] {
   const issues: string[] = [];
   for (const endpoint of env.SANDBOX_MAIL_ENDPOINTS ?? []) {
+    const safe = endpoint.replace(/[^a-z0-9.:-]/g, "?");
     if (!/^[a-z0-9.-]+:\d{1,5}$/.test(endpoint)) {
+      issues.push(`SANDBOX_MAIL_ENDPOINTS entries must be host:port (got "${safe}")`);
+    } else if (!isLocalSandboxHost(endpoint.slice(0, endpoint.lastIndexOf(":")))) {
       issues.push(
-        `SANDBOX_MAIL_ENDPOINTS entries must be host:port (got "${endpoint.replace(/[^a-z0-9.:-]/g, "?")}")`,
+        `SANDBOX_MAIL_ENDPOINTS may only name local sandboxes (loopback or Compose service names), got "${safe}"`,
       );
     }
   }
@@ -148,23 +162,63 @@ export function checkSendModeSafety(
 export type AppName = "web" | "edge" | "worker";
 
 /**
- * Secrets an app must never receive (concept chapter 16): only the worker holds the master key
- * and the sealed-box secret key; the worker and the edge service do not need the auth secret.
+ * Secrets an app must never receive (concept chapter 16): only the worker holds the master key,
+ * the sealed-box secret key and the keys for S3 and the AI provider; the worker and the edge
+ * service do not need the auth secret. An app refuses to start when one of them is set.
  */
 export const forbiddenSecrets: Record<AppName, readonly string[]> = {
-  web: ["MASTER_KEY", "SEALED_BOX_SECRET_KEY"],
-  edge: ["MASTER_KEY", "SEALED_BOX_SECRET_KEY", "BETTER_AUTH_SECRET"],
+  web: [
+    "MASTER_KEY",
+    "SEALED_BOX_SECRET_KEY",
+    "S3_ACCESS_KEY_ID",
+    "S3_SECRET_ACCESS_KEY",
+    "ANTHROPIC_API_KEY",
+  ],
+  edge: [
+    "MASTER_KEY",
+    "SEALED_BOX_SECRET_KEY",
+    "BETTER_AUTH_SECRET",
+    "S3_ACCESS_KEY_ID",
+    "S3_SECRET_ACCESS_KEY",
+    "ANTHROPIC_API_KEY",
+  ],
   worker: ["BETTER_AUTH_SECRET"],
 };
 
-/** Copy of an environment without the secrets the given app must not see. */
+/** Tooling variables an app reads itself (build directory and E2E mode of the web app). */
+const appTooling: Record<AppName, readonly string[]> = {
+  web: ["NEXT_DIST_DIR", "E2E_WEB_MODE"],
+  edge: [],
+  worker: [],
+};
+
+function schemaKeys(app: AppName): string[] {
+  const schema = { web: webEnvSchema, edge: edgeEnvSchema, worker: workerEnvSchema }[app];
+  return Object.keys(schema.shape);
+}
+
+/**
+ * Copy of an environment for one app: platform variables only from the app's own schema
+ * (positive list), everything else of the platform removed. Variables the platform does not
+ * know (PATH, HOME, NODE_OPTIONS, …) stay so the process can run.
+ */
 export function envForApp(
   app: AppName,
   source: Record<string, string | undefined>,
 ): Record<string, string> {
+  const platform = new Set([
+    ...schemaKeys("web"),
+    ...schemaKeys("edge"),
+    ...schemaKeys("worker"),
+    ...Object.keys(toolingEnvSchema.shape),
+  ]);
+  const own = new Set([...schemaKeys(app), ...appTooling[app]]);
   const result: Record<string, string> = {};
   for (const [key, value] of Object.entries(source)) {
-    if (value !== undefined && !forbiddenSecrets[app].includes(key)) result[key] = value;
+    if (value === undefined) continue;
+    if (platform.has(key) && !own.has(key)) continue;
+    if (forbiddenSecrets[app].includes(key)) continue;
+    result[key] = value;
   }
   return result;
 }

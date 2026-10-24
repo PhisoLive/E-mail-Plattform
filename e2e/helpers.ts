@@ -51,6 +51,9 @@ export async function createWorkspace(page: Page, name: string): Promise<void> {
   await expect(page.getByRole("heading", { name: "Dein Arbeitsbereich" })).toBeVisible();
   await page.getByLabel("Name des Arbeitsbereichs").fill(name);
   await page.getByRole("button", { name: "Arbeitsbereich anlegen" }).click();
+  // The form navigates on its own (full page load); wait for it so the next goto does not race.
+  await page.waitForURL((url) => !url.pathname.startsWith("/willkommen"));
+  await page.waitForLoadState("load");
 }
 
 /** Enables TOTP 2FA in the profile settings and returns the secret. */

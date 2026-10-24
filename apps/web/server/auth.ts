@@ -35,6 +35,11 @@ function auditAction(path: string, hadTwoFactorChallenge: boolean): AuthAuditAct
       return "auth.sign_in";
     case "/magic-link/verify":
       return "auth.sign_in_magic_link";
+    case "/verify-email":
+      // autoSignInAfterVerification creates a session with the confirmation link.
+      return "auth.sign_in_email_verification";
+    case "/passkey/verify-authentication":
+      return "auth.sign_in_passkey";
     case "/two-factor/verify-totp":
     case "/two-factor/verify-backup-code":
       return hadTwoFactorChallenge ? "auth.sign_in_two_factor" : "auth.two_factor_enabled";
@@ -124,6 +129,14 @@ function createAuth() {
       requireEmailVerification: true,
       autoSignIn: false,
       resetPasswordTokenExpiresIn: limits.resetPasswordMinutes * minute,
+      onPasswordReset: async ({ user: target }, request) => {
+        const hash = requestIpHash(request?.headers);
+        await recordAuthEvent(core.deps, {
+          userId: target.id,
+          action: "auth.password_reset",
+          ...(hash ? { ipHash: hash } : {}),
+        });
+      },
       sendResetPassword: async ({ user: target, url }) => {
         await mailer.send({
           to: target.email,
