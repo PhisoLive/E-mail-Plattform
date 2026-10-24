@@ -1,0 +1,1 @@
+ALTER TABLE "sender_profiles" ADD COLUMN "supervisory_board_chair" text;

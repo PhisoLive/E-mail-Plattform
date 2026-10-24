@@ -1,10 +1,11 @@
-import { auditLogs, senderProfiles, workspaceMembers } from "@ep/db";
+import { auditLogs, senderProfiles, user, workspaceMembers } from "@ep/db";
 import { createTestDeps, createTestUser, createTestWorkspace, userContext } from "@ep/testing";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
 import {
   createWorkspace,
   getMembershipRole,
+  getUserProfile,
   getWorkspace,
   listMyWorkspaces,
   updateWorkspace,
@@ -92,6 +93,23 @@ describe("workspace service", () => {
     expect(await updateWorkspace(memberCtx, { name: "Neu" })).toEqual({
       ok: false,
       error: { code: "FORBIDDEN" },
+    });
+  });
+
+  it("reads the platform role and 2FA state fresh from the database", async () => {
+    const someone = await createTestUser(deps, { twoFactorEnabled: false });
+    const ctx = userContext(deps, someone);
+    expect(await getUserProfile(ctx)).toMatchObject({
+      platformRole: "user",
+      twoFactorEnabled: false,
+    });
+    await deps.db
+      .update(user)
+      .set({ platformRole: "platform_admin", twoFactorEnabled: true })
+      .where(eq(user.id, someone.id));
+    expect(await getUserProfile(ctx)).toMatchObject({
+      platformRole: "platform_admin",
+      twoFactorEnabled: true,
     });
   });
 });

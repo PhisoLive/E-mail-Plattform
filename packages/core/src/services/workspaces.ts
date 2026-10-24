@@ -195,17 +195,34 @@ export async function updateWorkspace(
   });
 }
 
-/** Display name and e-mail of the current user (for the UI shell). */
-export async function getUserProfile(
-  ctx: UserContext,
-): Promise<{ name: string; email: string; twoFactorEnabled: boolean } | null> {
+/**
+ * Current name, address, 2FA state and platform role of the signed-in user, read fresh from the
+ * database. Better Auth caches the user in its session store; rights must not depend on that copy
+ * (a revoked platform role takes effect with the next request).
+ */
+export async function getUserProfile(ctx: UserContext): Promise<{
+  name: string;
+  email: string;
+  twoFactorEnabled: boolean;
+  platformRole: string;
+} | null> {
   return withUser(ctx, async (scope) => {
     const [row] = await scope.tx
-      .select({ name: user.name, email: user.email, twoFactorEnabled: user.twoFactorEnabled })
+      .select({
+        name: user.name,
+        email: user.email,
+        twoFactorEnabled: user.twoFactorEnabled,
+        platformRole: user.platformRole,
+      })
       .from(user)
       .where(eq(user.id, scope.userId));
     return row
-      ? { name: row.name, email: row.email, twoFactorEnabled: row.twoFactorEnabled ?? false }
+      ? {
+          name: row.name,
+          email: row.email,
+          twoFactorEnabled: row.twoFactorEnabled ?? false,
+          platformRole: row.platformRole,
+        }
       : null;
   });
 }

@@ -29,6 +29,13 @@
       "when": 1792871015050,
       "tag": "0003_db_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792872726046,
+      "tag": "0004_sender_profile_board",
+      "breakpoints": true
     }
   ]
 }

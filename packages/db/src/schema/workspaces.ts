@@ -104,14 +104,16 @@ export const senderProfiles = pgTable(
     companyName: text("company_name"),
     legalForm: text("legal_form"),
     address: jsonb("address").$type<{
-      street?: string;
-      postalCode?: string;
-      city?: string;
-      country?: string;
+      street?: string | null;
+      postalCode?: string | null;
+      city?: string | null;
+      country?: string | null;
     }>(),
     registerCourt: text("register_court"),
     registerNumber: text("register_number"),
     managingDirectors: text("managing_directors"),
+    /** Chair of the supervisory board – mandatory for AG and eG (§ 80 AktG, § 25a GenG). */
+    supervisoryBoardChair: text("supervisory_board_chair"),
     vatId: text("vat_id"),
     phone: text("phone"),
     website: text("website"),
