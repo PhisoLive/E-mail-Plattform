@@ -22,6 +22,8 @@ const config: NextConfig = {
   // Separate build directory for E2E runs so they can run next to `pnpm dev`.
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
   poweredByHeader: false,
+  // Next would otherwise write an AGENTS.md into the app; rules for agents live in CLAUDE.md.
+  agentRules: false,
   reactStrictMode: true,
   typedRoutes: false,
   serverExternalPackages: [

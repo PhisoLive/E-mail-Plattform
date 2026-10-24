@@ -182,6 +182,10 @@
     "resetPassword": {
       "subject": "Passwort zurücksetzen",
       "text": "Hallo {name},\n\nmit diesem Link setzt du dein Passwort zurück:\n{url}\n\nDer Link gilt eine Stunde. Wenn du das nicht angefordert hast, ignoriere diese E-Mail."
+    },
+    "magicLinkTwoFactor": {
+      "subject": "Anmeldung mit Zwei-Faktor-Code",
+      "text": "Hallo,\n\ndein Konto ist mit der Zwei-Faktor-Anmeldung geschützt. Deshalb schicken wir dir keinen Anmeldelink. Bitte melde dich mit deinem Passwort und dem Code aus deiner Authenticator-App an.\n\nWenn du das nicht warst, kannst du diese E-Mail ignorieren."
     }
   }
 }

@@ -43,6 +43,8 @@ export async function login(page: Page, user: RegisteredUser): Promise<void> {
     await page.getByLabel("Code").fill(totp(user.totpSecret));
     await page.getByRole("button", { name: "Bestätigen" }).click();
   }
+  // Sign-in ends with a full navigation away from /login.
+  await page.waitForURL((url) => !url.pathname.startsWith("/login"));
 }
 
 export async function createWorkspace(page: Page, name: string): Promise<void> {

@@ -1,0 +1,29 @@
+import { workspaceService } from "@ep/core";
+import { z } from "zod";
+import { isSameOrigin } from "../../../../server/origin";
+import { runtime } from "../../../../server/runtime";
+import { sessionFromHeaders, workspaceCookie } from "../../../../server/session";
+
+const body = z.object({ workspaceId: z.uuid() });
+
+/** Switches the active workspace after checking the membership. */
+export async function POST(request: Request): Promise<Response> {
+  if (!isSameOrigin(request)) return new Response("Forbidden", { status: 403 });
+  const session = await sessionFromHeaders(request.headers);
+  if (!session) return Response.json({ error: "UNAUTHENTICATED" }, { status: 401 });
+  const parsed = body.safeParse(await request.json().catch(() => null));
+  if (!parsed.success) return Response.json({ error: "VALIDATION" }, { status: 400 });
+  const role = await workspaceService.getMembershipRole(
+    runtime().core.deps,
+    session.userId,
+    parsed.data.workspaceId,
+  );
+  if (!role) return Response.json({ error: "FORBIDDEN" }, { status: 403 });
+  const secure = new URL(request.url).protocol === "https:";
+  const response = Response.json({ ok: true, role });
+  response.headers.append(
+    "set-cookie",
+    `${workspaceCookie}=${parsed.data.workspaceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 365}${secure ? "; Secure" : ""}`,
+  );
+  return response;
+}
