@@ -1,0 +1,24 @@
+{
+  "name": "email-plattform",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.22.1",
+      "onFail": "download"
+    }
+  },
+  "scripts": {
+    "probe": "node -v"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.3",
+    "@types/node": "^24.19.2",
+    "tsx": "^4.23.15",
+    "turbo": "2.11.10",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  }
+}
