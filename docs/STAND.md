@@ -4,24 +4,17 @@
 
 **Auftrag**: Phasen 0 bis 8 nach `docs/KONZEPT.md` selbstständig bauen (Start-/goal vom 24.10.2026). Zwischen den Phasen keine Abnahme abwarten; Folge-/goal nur ganz am Ende.
 
-**Aktuelle Phase**: 0 – Fundament
+**Aktuelle Phase**: 1 – Design-System und App-Schale
 
-## Erledigt in Phase 0
+## Phase 0 – Fundament (abgeschlossen)
 
-- Repository, `docs/KONZEPT.md` (unverändert), `CLAUDE.md` (wortgleich aus Kapitel 22), Ideenpapier als `docs/IDEENPAPIER.md`.
-- Werkzeuge: pnpm 10.28 + Turborepo, Node 24.22.1 projektbezogen, TypeScript 7, Biome 2.6, Vitest 5.
-- `packages/config`: Zod-Umgebungsvariablen, `defaults.ts` mit allen Startwerten aus Anhang A, Schutzregeln für `MAIL_SEND_MODE`.
-- Compose-Stacks `infra/compose/dev.yml` und `test.yml` (Postgres 18.6, Valkey 8.1, GreenMail 2.1.14, Mailpit 1.32, Rspamd 4.2.3), nur 127.0.0.1, Portprüfung.
-- `packages/db`: komplettes Datenmodell aus Kapitel 4 (65 Tabellen) mit zusammengesetzten Fremdschlüsseln, Migrationen, Seed.
-- `packages/core`: `withWorkspace`, `withUser`, `systemContext` (mit Import-Prüfung), Rechte-Matrix, Audit-Log, Statusmaschinen + `transition()`, Dienste für Arbeitsbereiche, Mitglieder, Einladungen, Logger mit Schwärzung.
-- `packages/crypto`: AES-256-GCM, Umschlag-Verschlüsselung, Sealed Box.
-- `packages/mail`: Versand-Schutzschalter, Systemmails.
-- `apps/edge` (Hono, /health), `apps/worker` (BullMQ, /health, Löschjob-Grundgerüst).
+- Bericht `docs/berichte/phase-00.md`; unabhängige Abnahme `phase-00-abnahme.md` (nein → nachgebessert), Nachabnahme `phase-00-nachabnahme.md` (ja, mit Auflage N1–N4 → alle sieben Befunde N1–N7 behoben, Commit 4d2fd68).
 
-## Nächster Schritt
+## Phase 1 – in Arbeit
 
-- `apps/web`: Next.js 16 + Better Auth (Passwort, Magic Link, 2FA) + tRPC + next-intl; Seiten Registrieren, Anmelden, 2FA, Arbeitsbereich anlegen, Team einladen.
-- Mandantentest-Gerüst für tRPC-Prozeduren, E2E-Tests, `pnpm dev`, GitHub Actions, Bericht Phase 0.
+- Arbeitsbaum: `ep-phase1` im Scratchpad, Zweig `phase1-wip` (wird nach Abschluss in `claude/amazing-carson-fippeq` übernommen).
+- Fertig: Design-Tokens (warme Neutraltöne, Akzent Petrol, Hell/Dunkel per Cookie `ep_theme` + Systemeinstellung), Komponenten in `packages/ui` (Button, Eingaben, Karten, Badges/Ampel, Zustände, Dialog, Drawer, Menü, Tooltip, Reiter, Schalter, Segmente, Toaster, Befehlspalette, `SuggestOrWrite` mit Tests), App-Schale (einklappbare Seitenleiste, mobile Navigation, Befehlspalette Strg/⌘+K, Hilfe), Regeln für Pflichtangaben je Rechtsform (`packages/core/src/sender/legal-forms.ts` + Tests), Migration `0004_sender_profile_board.sql`.
+- Nächster Schritt: Absenderprofil-Dienst + tRPC + Mandantentests, Einstellungsseiten, Startseite, alle Routen aus Kapitel 13, Onboarding-Gerüst, Passwort-vergessen-Seiten, Barrierefreiheits- und 360-px-E2E, Lighthouse-Skript, Abnahme.
 
 ## Offene Punkte
 
@@ -31,5 +24,5 @@
 
 - `pnpm dev` – alles starten (Compose dev + Apps)
 - `pnpm test` – Unit + Integration (startet den Test-Stack automatisch)
-- `pnpm test:e2e` – Playwright
+- `pnpm test:e2e` – Playwright gegen `next dev`; `pnpm test:e2e:prod` gegen den Produktions-Build
 - Docker-Daemon starten, falls nicht aktiv: `dockerd` (in dieser Cloud-Umgebung nötig)
