@@ -72,6 +72,12 @@ importers:
         specifier: 4.6.7
         version: 4.6.7
 
+  packages/crypto:
+    dependencies:
+      libsodium-wrappers:
+        specifier: 0.8.4
+        version: 0.8.4
+
   packages/db:
     dependencies:
       drizzle-orm:
@@ -87,6 +93,22 @@ importers:
       drizzle-kit:
         specifier: 0.31.11
         version: 0.31.11
+
+  packages/mail:
+    dependencies:
+      '@ep/config':
+        specifier: workspace:*
+        version: link:../config
+      '@ep/core':
+        specifier: workspace:*
+        version: link:../core
+      nodemailer:
+        specifier: 10.2.1
+        version: 10.2.1
+    devDependencies:
+      '@ep/testing':
+        specifier: workspace:*
+        version: link:../testing
 
   packages/testing:
     dependencies:
@@ -1145,6 +1167,12 @@ packages:
     resolution: {integrity: sha512-f+Dtubxfpf6KYFq7WVXJoOLn0bk4TJrMrN9SzeE+jrWrCWj7XX3fA6vkryafhADX+GMymRxgDJDOI33COkJc0w==}
     engines: {node: '>=20.0.0'}
 
+  libsodium-wrappers@0.8.4:
+    resolution: {integrity: sha512-mu8aAWucZjTB5O/BtGXtW4e1agy7uHxNYG7zPthmmD1jU43LCDmSWZLN4JhflbdPXj3yDO4lxM1O9hLDgIOXDw==}
+
+  libsodium@0.8.4:
+    resolution: {integrity: sha512-lMcYaRi0zcs7tarATsQUYC7rstliIXZuoq0c6zXSgNtSNtdvBgkSegjWhpMJAXzKX3SUSwIp7+zEsob+j3LuRw==}
+
   lightningcss-android-arm64@1.33.0:
     resolution: {integrity: sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg==}
     engines: {node: '>= 12.0.0'}
@@ -1342,6 +1370,10 @@ packages:
               os: win32
     version: 24.22.1
     hasBin: true
+
+  nodemailer@10.2.1:
+    resolution: {integrity: sha512-ZrDNsPFoDMwefNs7sJwrYiEJ/CG4ClJWDZv05iNJsEBWa8GRDry1QJHTJxsuTAY9eDDKjX4k+q3SxslXJOao7w==}
+    engines: {node: '>=20.0.0'}
 
   obug@3.0.0:
     resolution: {integrity: sha512-5vvB5+W7ePv+p3uqxi+RcW1XAzLW0/hxt3/4X4Lc4qHudzOhmBiBwOY6DRob4WnanAEGvNcLjF+KNOufrUoEQw==}
@@ -2137,6 +2169,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  libsodium-wrappers@0.8.4:
+    dependencies:
+      libsodium: 0.8.4
+
+  libsodium@0.8.4: {}
+
   lightningcss-android-arm64@1.33.0:
     optional: true
 
@@ -2220,6 +2258,8 @@ snapshots:
     optional: true
 
   node@runtime:24.22.1: {}
+
+  nodemailer@10.2.1: {}
 
   obug@3.0.0: {}
 

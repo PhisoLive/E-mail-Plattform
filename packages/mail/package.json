@@ -1,0 +1,21 @@
+{
+  "name": "@ep/mail",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ep/config": "workspace:*",
+    "@ep/core": "workspace:*",
+    "nodemailer": "10.2.1"
+  },
+  "devDependencies": {
+    "@ep/testing": "workspace:*"
+  }
+}
