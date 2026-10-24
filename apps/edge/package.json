@@ -1,0 +1,25 @@
+{
+  "name": "@ep/edge",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/main.ts",
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ep/config": "workspace:*",
+    "@ep/core": "workspace:*",
+    "@ep/db": "workspace:*",
+    "@hono/node-server": "2.1.5",
+    "drizzle-orm": "0.45.4",
+    "hono": "4.13.13",
+    "ioredis": "6.0.0",
+    "pino": "10.4.0"
+  },
+  "devDependencies": {
+    "@ep/testing": "workspace:*",
+    "tsx": "^4.23.15"
+  }
+}
