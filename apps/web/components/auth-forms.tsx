@@ -9,7 +9,8 @@ import { authClient, authErrorKey, safeNext } from "../lib/auth-client";
 
 function useT() {
   const t = useTranslations();
-  return (key: string, values?: Record<string, string>) => t(key as never, values as never);
+  return (key: string, values?: Record<string, string | number>) =>
+    t(key as never, values as never);
 }
 
 /**
@@ -30,7 +31,7 @@ function linkError(params: URLSearchParams, t: (key: string) => string): string 
   return t("auth.errors.linkExpired");
 }
 
-export function LoginForm() {
+export function LoginForm({ magicLinkMinutes }: { magicLinkMinutes: number }) {
   const t = useT();
   const router = useRouter();
   const params = useSearchParams();
@@ -77,7 +78,7 @@ export function LoginForm() {
     });
     setPending(null);
     if (failure) setError(t(authErrorKey(failure.code, failure.status)));
-    else setInfo(t("auth.login.magicLinkSent", { email }));
+    else setInfo(t("auth.login.magicLinkSent", { email, minutes: magicLinkMinutes }));
   }
 
   return (
@@ -110,6 +111,12 @@ export function LoginForm() {
               onChange={(event) => setPassword(event.target.value)}
             />
           </Field>
+          <Link
+            href="/passwort-vergessen"
+            className="-mt-2 self-end text-[13px] text-text-muted underline-offset-4 hover:text-text hover:underline"
+          >
+            {t("auth.login.forgot")}
+          </Link>
           <Button type="submit" loading={pending === "password"}>
             {t("auth.login.submit")}
           </Button>

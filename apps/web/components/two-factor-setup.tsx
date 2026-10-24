@@ -1,7 +1,9 @@
 "use client";
 
-import { Alert, Button, Card, CardBody, CardHeader, Field, Input } from "@ep/ui";
+import { Alert, Button, buttonClasses, Card, CardBody, CardHeader, Field, Input } from "@ep/ui";
+import { ShieldCheck } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import QRCode from "qrcode";
@@ -60,7 +62,10 @@ export function TwoFactorSetup({ enabled, required }: { enabled: boolean; requir
 
   return (
     <Card>
-      <CardHeader title={t("settings.profile.twoFactorTitle")} />
+      <CardHeader
+        icon={<ShieldCheck aria-hidden="true" />}
+        title={t("settings.profile.twoFactorTitle")}
+      />
       <CardBody className="flex flex-col gap-4">
         {error ? <Alert tone="danger">{error}</Alert> : null}
         {step === "done" ? (
@@ -68,6 +73,13 @@ export function TwoFactorSetup({ enabled, required }: { enabled: boolean; requir
             <Alert tone="success">
               {justEnabled ? t("settings.profile.enabled") : t("settings.profile.twoFactorOn")}
             </Alert>
+            {justEnabled && required ? (
+              <div>
+                <Link href="/willkommen" className={buttonClasses()}>
+                  {t("settings.profile.continueSetup")}
+                </Link>
+              </div>
+            ) : null}
             {justEnabled && backupCodes.length > 0 ? (
               <div className="flex flex-col gap-2">
                 <p className="text-sm">{t("settings.profile.backupCodes")}</p>

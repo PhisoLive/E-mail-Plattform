@@ -1,10 +1,12 @@
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
+import { HydrationMarker } from "../components/hydration-marker";
+import { parseTheme, themeClass, themeCookie } from "../lib/theme";
 import { TrpcProviders } from "../lib/trpc";
 import "./globals.css";
 
@@ -20,8 +22,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c1d22" },
+    { media: "(prefers-color-scheme: light)", color: "#f9f8f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#16181d" },
   ],
 };
 
@@ -30,11 +32,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // nonce-based CSP: Next.js attaches the per-request nonce from proxy.ts to its scripts,
   // which static pages cannot carry (ENTSCHEIDUNGEN E-026).
   await headers();
+  const theme = themeClass(parseTheme((await cookies()).get(themeCookie)?.value));
   return (
-    <html lang="de" className={`${GeistSans.variable} ${GeistMono.variable}`}>
+    <html
+      lang="de"
+      className={[GeistSans.variable, GeistMono.variable, theme].filter(Boolean).join(" ")}
+    >
       <body className="min-h-dvh bg-bg font-sans text-text antialiased">
         <NextIntlClientProvider>
           <TrpcProviders>{children}</TrpcProviders>
+          <HydrationMarker />
         </NextIntlClientProvider>
       </body>
     </html>

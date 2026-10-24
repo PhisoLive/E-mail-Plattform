@@ -1,4 +1,6 @@
-import { can } from "@ep/core";
+import { defaults } from "@ep/config/defaults";
+import { can } from "@ep/core/permissions";
+import { PageHeader } from "@ep/ui";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { TeamSettings } from "../../../../components/team-settings";
@@ -13,14 +15,13 @@ export default async function TeamPage() {
   const t = await getTranslations("settings.team");
   const { session, active } = await requireAppContext({ path: "/einstellungen/team" });
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-sm text-text-muted">{t("subtitle")}</p>
-      </div>
+    <div className="flex flex-col">
+      <PageHeader title={t("title")} description={t("subtitle")} />
       <TeamSettings
-        currentUserId={session?.userId ?? ""}
-        canManage={active ? can(active.role, "team.manage") : false}
+        currentUserId={session.userId}
+        actorRole={active.role}
+        canManage={can(active.role, "team.manage")}
+        invitationDays={defaults.invitation.expiresDays}
       />
     </div>
   );

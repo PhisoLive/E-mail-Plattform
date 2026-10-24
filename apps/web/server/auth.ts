@@ -129,6 +129,8 @@ function createAuth() {
       requireEmailVerification: true,
       autoSignIn: false,
       resetPasswordTokenExpiresIn: limits.resetPasswordMinutes * minute,
+      // A reset means the old password may be known to someone else: end every session.
+      revokeSessionsOnPasswordReset: true,
       onPasswordReset: async ({ user: target }, request) => {
         const hash = requestIpHash(request?.headers);
         await recordAuthEvent(core.deps, {
@@ -141,7 +143,11 @@ function createAuth() {
         await mailer.send({
           to: target.email,
           subject: emailTranslator("resetPassword.subject"),
-          text: emailTranslator("resetPassword.text", { name: target.name, url }),
+          text: emailTranslator("resetPassword.text", {
+            name: target.name,
+            url,
+            minutes: limits.resetPasswordMinutes,
+          }),
         });
       },
     },
@@ -154,7 +160,11 @@ function createAuth() {
         await mailer.send({
           to: target.email,
           subject: emailTranslator("verify.subject"),
-          text: emailTranslator("verify.text", { name: target.name, url }),
+          text: emailTranslator("verify.text", {
+            name: target.name,
+            url,
+            hours: limits.verificationHours,
+          }),
         });
       },
     },
@@ -241,7 +251,7 @@ function createAuth() {
           await mailer.send({
             to: email,
             subject: emailTranslator("magicLink.subject"),
-            text: emailTranslator("magicLink.text", { url }),
+            text: emailTranslator("magicLink.text", { url, minutes: limits.magicLinkMinutes }),
           });
         },
       }),

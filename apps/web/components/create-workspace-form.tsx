@@ -20,8 +20,9 @@ export function CreateWorkspaceForm() {
     trpc.workspace.create.mutationOptions({
       onSuccess: async (workspace) => {
         await selectWorkspace(workspace.id);
-        // Full navigation: the whole shell changes with the workspace.
-        window.location.assign("/start");
+        // Full navigation: the whole shell changes with the workspace. The onboarding sends
+        // owners to the 2FA setup first (concept chapter 16).
+        window.location.assign("/willkommen?schritt=postfach");
       },
     }),
   );

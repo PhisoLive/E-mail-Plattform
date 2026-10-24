@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
+import { BrandMark } from "../../components/shell/sidebar";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const t = useTranslations("app");
@@ -10,7 +11,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         href="/"
         className="mb-8 flex items-center gap-2 text-lg font-semibold tracking-tight text-text"
       >
-        <span aria-hidden="true" className="inline-block size-7 rounded-md bg-accent" />
+        <BrandMark className="size-7" />
         {t("name")}
       </Link>
       <main id="inhalt" className="w-full max-w-sm">

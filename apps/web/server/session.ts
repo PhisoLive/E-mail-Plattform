@@ -1,5 +1,5 @@
 import "server-only";
-import { ipHash } from "@ep/core";
+import { ipHash, workspaceService } from "@ep/core";
 import { cookies, headers } from "next/headers";
 import { auth } from "./auth";
 import { runtime } from "./runtime";
@@ -12,13 +12,22 @@ export async function sessionFromHeaders(requestHeaders: Headers): Promise<Sessi
   const result = await auth().api.getSession({ headers: requestHeaders });
   if (!result) return null;
   const { user, session } = result;
-  return {
+  // Rights-relevant fields come fresh from the database, not from Better Auth's session cache.
+  const profile = await workspaceService.getUserProfile({
+    kind: "user",
+    deps: runtime().core.deps,
     userId: user.id,
     email: user.email,
-    name: user.name,
     emailVerified: user.emailVerified,
-    twoFactorEnabled: Boolean((user as { twoFactorEnabled?: boolean | null }).twoFactorEnabled),
-    platformRole: String((user as { platformRole?: string | null }).platformRole ?? "user"),
+  });
+  if (!profile) return null;
+  return {
+    userId: user.id,
+    email: profile.email,
+    name: profile.name,
+    emailVerified: user.emailVerified,
+    twoFactorEnabled: profile.twoFactorEnabled,
+    platformRole: profile.platformRole,
     signedInAt: new Date(session.createdAt),
   };
 }

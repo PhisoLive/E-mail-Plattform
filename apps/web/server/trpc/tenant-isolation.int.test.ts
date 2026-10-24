@@ -6,12 +6,14 @@
  * procedure needs its own cross-tenant attempt.
  */
 import { invitationService, workspaceService } from "@ep/core";
-import { invitations, workspaceMembers, workspaces } from "@ep/db";
+import { invitations, senderProfiles, workspaceMembers, workspaces } from "@ep/db";
 import type { SystemMailer } from "@ep/mail";
 import {
   addTestMember,
+  createPlaceholderObjects,
   createTestDeps,
   createTestWorkspace,
+  type PlaceholderObjects,
   type TestUser,
   type TestWorkspace,
   userContext,
@@ -70,6 +72,7 @@ let b: TestWorkspace;
 let aMemberId: string;
 let aInvitationId: string;
 let aInvitationToken: string;
+let aObjects: PlaceholderObjects;
 
 beforeAll(async () => {
   a = await createTestWorkspace(deps, "Arbeitsbereich A");
@@ -87,6 +90,7 @@ beforeAll(async () => {
   if (!invitation.ok) throw new Error("invitation failed");
   aInvitationId = invitation.value.id;
   aInvitationToken = invitation.value.token;
+  aObjects = await createPlaceholderObjects(deps, a);
 });
 
 /** One cross-tenant attempt per procedure: the owner of B attacks A. */
@@ -110,6 +114,50 @@ const cases: Record<string, () => Promise<void>> = {
       .from(workspaces)
       .where(eq(workspaces.id, a.id));
     expect(row?.name).toBe("Arbeitsbereich A");
+  },
+  "workspace.shell": async () => {
+    await expectCode(callerFor(b.owner, a.id).workspace.shell(), "FORBIDDEN");
+    const own = await callerFor(b.owner, b.id).workspace.shell();
+    expect(own.agents.map((agent) => agent.id)).not.toContain(aObjects.agentId);
+  },
+  "workspace.onboarding": async () => {
+    await expectCode(callerFor(b.owner, a.id).workspace.onboarding(), "FORBIDDEN");
+    const own = await callerFor(b.owner, b.id).workspace.onboarding();
+    expect(own.steps.workspace).toBe(true);
+  },
+  "senderProfile.get": async () => {
+    await expectCode(callerFor(b.owner, a.id).senderProfile.get(), "FORBIDDEN");
+    const own = await callerFor(b.owner, b.id).senderProfile.get();
+    expect(own.profile.companyName).toBe("Arbeitsbereich B");
+  },
+  "senderProfile.update": async () => {
+    const hijack = {
+      legalForm: "einzelunternehmen",
+      companyName: "Gekapert",
+      address: { street: "Weg 1", postalCode: "80331", city: "München" },
+    };
+    await expectCode(callerFor(b.owner, a.id).senderProfile.update(hijack), "FORBIDDEN");
+    await callerFor(b.owner, b.id).senderProfile.update(hijack);
+    const [row] = await deps.db
+      .select({ companyName: senderProfiles.companyName })
+      .from(senderProfiles)
+      .where(eq(senderProfiles.workspaceId, a.id));
+    expect(row?.companyName).toBe("Arbeitsbereich A");
+  },
+  "lookup.get": async () => {
+    const kinds = [
+      ["campaign", aObjects.campaignId],
+      ["mailbox", aObjects.mailboxId],
+      ["contact", aObjects.contactId],
+      ["contactList", aObjects.contactListId],
+      ["agent", aObjects.agentId],
+      ["thread", aObjects.threadId],
+      ["conversation", aObjects.conversationId],
+    ] as const;
+    for (const [kind, id] of kinds) {
+      await expectCode(callerFor(b.owner, a.id).lookup.get({ kind, id }), "FORBIDDEN");
+      await expectCode(callerFor(b.owner, b.id).lookup.get({ kind, id }), "NOT_FOUND");
+    }
   },
   "workspace.me": async () => {
     const me = await callerFor(b.owner, a.id).workspace.me();

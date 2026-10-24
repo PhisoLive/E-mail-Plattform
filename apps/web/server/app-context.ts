@@ -1,7 +1,7 @@
 import "server-only";
 import { defaults } from "@ep/config/defaults";
 import type { MemberRole } from "@ep/core";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 import { serverCaller } from "./caller";
 import { currentSession, selectedWorkspaceId } from "./session";
@@ -61,4 +61,19 @@ export async function requireAppContext(guard: PageGuard): Promise<AppContext> {
 /** For the shell: no redirects except a missing session. */
 export async function shellContext(): Promise<AppContext | null> {
   return load();
+}
+
+/**
+ * Guard of the operator area (concept chapter 14): only `platform_admin`, always with 2FA.
+ * Everyone else gets a 404 so the area does not reveal itself.
+ */
+export async function requirePlatformAdmin(path: string): Promise<AppContext> {
+  const context = await requireAppContext({
+    path,
+    allowWithoutWorkspace: true,
+    allowWithoutTwoFactor: true,
+  });
+  if (context.session.platformRole !== "platform_admin") notFound();
+  if (!context.session.twoFactorEnabled) redirect("/einstellungen/profil");
+  return context;
 }

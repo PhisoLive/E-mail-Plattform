@@ -19,7 +19,9 @@
     "copy": "Kopieren",
     "copied": "Kopiert",
     "signOut": "Abmelden",
-    "skipToContent": "Zum Inhalt springen"
+    "skipToContent": "Zum Inhalt springen",
+    "close": "Schließen",
+    "soon": "Bald verfügbar"
   },
   "auth": {
     "login": {
@@ -27,11 +29,12 @@
       "subtitle": "Melde dich an, um deine E-Mails erledigen zu lassen.",
       "submit": "Anmelden",
       "magicLink": "Anmeldelink per E-Mail schicken",
-      "magicLinkSent": "Wir haben dir einen Anmeldelink an {email} geschickt. Er gilt 5 Minuten.",
+      "magicLinkSent": "Wir haben dir einen Anmeldelink an {email} geschickt. Er gilt {minutes} Minuten.",
       "noAccount": "Noch kein Konto?",
       "toRegister": "Jetzt registrieren",
       "invalid": "E-Mail-Adresse oder Passwort stimmen nicht.",
-      "notVerified": "Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir den Link noch einmal geschickt."
+      "notVerified": "Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir den Link noch einmal geschickt.",
+      "forgot": "Passwort vergessen?"
     },
     "register": {
       "title": "Konto anlegen",
@@ -73,6 +76,20 @@
       "passwordTooLong": "Das Passwort ist zu lang.",
       "linkExpired": "Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere einfach einen neuen an.",
       "verifyFailed": "Der Bestätigungslink ist abgelaufen oder ungültig. Melde dich an – wir schicken dir einen neuen."
+    },
+    "reset": {
+      "requestTitle": "Passwort vergessen",
+      "requestText": "Gib deine E-Mail-Adresse ein. Wir schicken dir einen Link, mit dem du ein neues Passwort festlegst.",
+      "requestSubmit": "Link schicken",
+      "sent": "Falls es ein Konto mit {email} gibt, ist der Link unterwegs. Er gilt {minutes} Minuten.",
+      "backToLogin": "Zurück zur Anmeldung",
+      "newTitle": "Neues Passwort",
+      "newText": "Lege ein neues Passwort fest. Danach meldest du dich damit an.",
+      "newPassword": "Neues Passwort",
+      "newSubmit": "Passwort speichern",
+      "done": "Dein Passwort ist geändert. Alle Sitzungen sind abgemeldet.",
+      "toLogin": "Zur Anmeldung",
+      "requestAgain": "Neuen Link anfordern"
     }
   },
   "onboarding": {
@@ -90,15 +107,87 @@
       "countryCH": "Schweiz",
       "countryOther": "Anderes Land",
       "submit": "Arbeitsbereich anlegen"
+    },
+    "flow": {
+      "title": "Willkommen",
+      "progressLabel": "Fortschritt der Einrichtung",
+      "stepOf": "Schritt {step} von {total}",
+      "done": "erledigt",
+      "later": "Später weitermachen",
+      "skip": "Überspringen",
+      "next": "Weiter",
+      "finish": "Zur Startseite",
+      "steps": {
+        "workspace": "Arbeitsbereich",
+        "mailbox": "Postfach",
+        "senderProfile": "Absender",
+        "agent": "Agent",
+        "campaign": "Erster Auftrag"
+      },
+      "mailbox": {
+        "title": "Verbinde dein Postfach",
+        "text": "Deine Mails gehen von deiner eigenen Adresse raus – Antworten landen wie gewohnt bei dir.",
+        "detail": "Wir unterstützen GMX, WEB.DE, T-Online, IONOS, Gmail und jeden Anbieter mit IMAP und SMTP. Das Passwort wird sofort verschlüsselt.",
+        "action": "Postfach verbinden"
+      },
+      "senderProfile": {
+        "title": "Wer schreibt?",
+        "text": "Diese Angaben stehen unter jeder geschäftlichen Mail. Wir fragen nur ab, was für deine Rechtsform Pflicht ist."
+      },
+      "agent": {
+        "title": "Wähle deinen ersten Agenten",
+        "text": "Der Agent schreibt, antwortet und fasst nach – in deinem Ton."
+      },
+      "campaign": {
+        "title": "Dein erster Auftrag",
+        "text": "Sag in einem Satz, was du erreichen willst. Probier es mit einem Beispiel.",
+        "detail": "Zum Beispiel: „Lade unsere Stammkunden zum Sommerfest ein und frag nach einer kurzen Zusage.“ Der Assistent übernimmt den Rest.",
+        "action": "Beispiel ansehen"
+      }
     }
   },
   "start": {
     "title": "Start",
     "greeting": "Hallo {name}",
+    "subtitle": "Was erledigt ist und was auf dich wartet.",
+    "newCampaign": "Neuer Auftrag",
+    "connectMailbox": "Postfach verbinden",
+    "kpiTitle": "Kennzahlen der letzten 30 Tage",
+    "kpiEmpty": "–",
+    "kpis": {
+      "delivered": {
+        "label": "Zugestellt",
+        "hint": "Gesendet und 72 Stunden ohne Rückläufer"
+      },
+      "replies": {
+        "label": "Antworten",
+        "hint": "Kontakte mit einer echten Antwort"
+      },
+      "positive": {
+        "label": "Positive Antworten",
+        "hint": "Interesse, Termin oder Zusage"
+      },
+      "approvals": {
+        "label": "Offene Freigaben",
+        "hint": "Warten auf deine Entscheidung"
+      },
+      "inboxRate": {
+        "label": "Posteingangs-Quote",
+        "hint": "Anteil der Tests im Posteingang"
+      }
+    },
     "doneToday": "Heute erledigt",
-    "doneTodayEmpty": "Heute ist noch nichts passiert. Sobald deine Agenten arbeiten, steht es hier.",
+    "doneTodayEmptyTitle": "Noch nichts passiert",
+    "doneTodayEmpty": "Sobald deine Agenten arbeiten, steht hier, was sie geschafft haben – zum Beispiel versendete Mails und einsortierte Antworten.",
     "waiting": "Wartet auf dich",
-    "waitingEmpty": "Nichts offen – alles erledigt."
+    "waitingEmptyTitle": "Alles erledigt",
+    "waitingEmpty": "Freigaben, wichtige Antworten und Postfach-Probleme erscheinen hier – jeweils mit dem passenden Knopf.",
+    "running": "Laufende Aufträge",
+    "runningEmptyTitle": "Kein Auftrag läuft",
+    "runningEmpty": "Starte einen Auftrag mit einem Ziel in deinen Worten.",
+    "mailboxes": "Postfächer",
+    "mailboxesEmptyTitle": "Noch kein Postfach",
+    "mailboxesEmpty": "Verbinde dein Postfach – hier siehst du dann die Ampel für jedes."
   },
   "settings": {
     "title": "Einstellungen",
@@ -115,7 +204,8 @@
       "confirmCode": "Code aus der App",
       "confirm": "Aktivieren",
       "backupCodes": "Deine Notfall-Codes – bewahre sie sicher auf:",
-      "enabled": "Zwei-Faktor-Anmeldung ist jetzt aktiv."
+      "enabled": "Zwei-Faktor-Anmeldung ist jetzt aktiv.",
+      "continueSetup": "Weiter einrichten"
     },
     "team": {
       "title": "Team",
@@ -132,7 +222,20 @@
       "expires": "gültig bis {date}",
       "revoke": "Zurückziehen",
       "you": "Du",
-      "twoFactorMissing": "ohne Zwei-Faktor"
+      "twoFactorMissing": "ohne Zwei-Faktor",
+      "memberCount": "{count, plural, one {# Person} other {# Personen}} im Arbeitsbereich",
+      "loadError": "Das Team konnte nicht geladen werden.",
+      "memberActions": "Aktionen für {name}",
+      "changeRole": "Rolle ändern",
+      "roleChanged": "Rolle geändert.",
+      "remove": "Aus dem Team entfernen",
+      "leave": "Arbeitsbereich verlassen",
+      "removeTitle": "{name} aus dem Team entfernen?",
+      "removeText": "Die Person verliert sofort den Zugriff auf diesen Arbeitsbereich. Du kannst sie später wieder einladen.",
+      "removeConfirm": "Entfernen",
+      "removed": "Aus dem Team entfernt.",
+      "inviteHint": "Die Einladung gilt {days} Tage. Inhaber und Admins brauchen die Zwei-Faktor-Anmeldung.",
+      "pendingEmptyHint": "Lade jemanden ein – die Einladung erscheint dann hier."
     }
   },
   "roles": {
@@ -176,11 +279,11 @@
   "emails": {
     "verify": {
       "subject": "Bitte bestätige deine E-Mail-Adresse",
-      "text": "Hallo {name},\n\nbitte bestätige deine E-Mail-Adresse mit diesem Link:\n{url}\n\nDer Link gilt 24 Stunden. Wenn du dich nicht registriert hast, kannst du diese E-Mail ignorieren."
+      "text": "Hallo {name},\n\nbitte bestätige deine E-Mail-Adresse mit diesem Link:\n{url}\n\nDer Link gilt {hours} Stunden. Wenn du dich nicht registriert hast, kannst du diese E-Mail ignorieren."
     },
     "magicLink": {
       "subject": "Dein Anmeldelink",
-      "text": "Hallo,\n\nmit diesem Link meldest du dich an:\n{url}\n\nDer Link gilt 5 Minuten und funktioniert nur einmal. Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail."
+      "text": "Hallo,\n\nmit diesem Link meldest du dich an:\n{url}\n\nDer Link gilt {minutes} Minuten und funktioniert nur einmal. Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail."
     },
     "invitation": {
       "subject": "Einladung zu {workspace}",
@@ -188,7 +291,7 @@
     },
     "resetPassword": {
       "subject": "Passwort zurücksetzen",
-      "text": "Hallo {name},\n\nmit diesem Link setzt du dein Passwort zurück:\n{url}\n\nDer Link gilt eine Stunde. Wenn du das nicht angefordert hast, ignoriere diese E-Mail."
+      "text": "Hallo {name},\n\nmit diesem Link setzt du dein Passwort zurück:\n{url}\n\nDer Link gilt {minutes} Minuten. Wenn du das nicht angefordert hast, ignoriere diese E-Mail."
     },
     "magicLinkTwoFactor": {
       "subject": "Anmeldung mit Zwei-Faktor-Code",
@@ -206,9 +309,972 @@
       "text": "Wir konnten diese Seite gerade nicht laden. Versuch es noch einmal – meist klappt es dann.",
       "retry": "Noch einmal versuchen",
       "home": "Zur Startseite"
+    },
+    "objectNotFound": {
+      "title": "Nicht gefunden",
+      "text": "Das gibt es in diesem Arbeitsbereich nicht – vielleicht wurde es gelöscht oder gehört zu einem anderen Arbeitsbereich."
     }
   },
   "nav": {
-    "main": "Hauptnavigation"
+    "main": "Hauptnavigation",
+    "start": "Start",
+    "inbox": "Posteingang",
+    "campaigns": "Aufträge",
+    "contacts": "Kontakte",
+    "templates": "Vorlagen",
+    "mailboxes": "Postfächer",
+    "agents": "Agenten",
+    "settings": "Einstellungen",
+    "admin": "Betreiberbereich"
+  },
+  "shell": {
+    "sidebar": "Seitenleiste",
+    "expand": "Seitenleiste ausklappen",
+    "collapse": "Seitenleiste einklappen",
+    "newCampaign": "Neuer Auftrag",
+    "search": "Suchen und springen",
+    "ctrlKey": "Strg",
+    "agentsSection": "Agenten",
+    "allAgents": "Alle Agenten",
+    "newAgent": "Neuen Agenten anlegen",
+    "agentsEmpty": "Hier erscheinen deine Agenten mit ihren letzten Gesprächen.",
+    "help": "Hilfe",
+    "navigation": "Navigation",
+    "openNavigation": "Navigation öffnen",
+    "closeNavigation": "Navigation schließen",
+    "helpTitle": "Hilfe und Tastenkürzel",
+    "helpText": "Mit der Befehlspalette findest du jede Seite und jede Aktion, ohne zu suchen.",
+    "shortcutPalette": "Befehlspalette öffnen",
+    "shortcutClose": "Fenster schließen",
+    "shortcutSkip": "Zum Inhalt springen (erster Tastendruck auf einer Seite)",
+    "switchWorkspace": "Arbeitsbereich wechseln",
+    "noWorkspace": "Kein Arbeitsbereich",
+    "workspaces": "Arbeitsbereiche",
+    "activeWorkspace": "Aktiver Arbeitsbereich",
+    "newWorkspace": "Neuer Arbeitsbereich",
+    "userMenu": "Profilmenü",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "theme": {
+      "label": "Darstellung",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "Wie das System"
+    },
+    "commands": "Befehlspalette",
+    "signOut": "Abmelden",
+    "palette": {
+      "title": "Befehlspalette",
+      "placeholder": "Seite oder Aktion suchen …",
+      "empty": "Nichts gefunden. Versuch es mit einem anderen Wort.",
+      "actions": "Aktionen",
+      "jump": "Springen zu",
+      "settings": "Einstellungen",
+      "workspaces": "Arbeitsbereich",
+      "switchTo": "Wechseln zu {name}",
+      "theme": "Darstellung",
+      "themeLight": "Helle Darstellung",
+      "themeDark": "Dunkle Darstellung",
+      "themeSystem": "Darstellung wie das System",
+      "action": {
+        "newCampaign": "Neuen Auftrag starten",
+        "connectMailbox": "Postfach verbinden",
+        "importContacts": "Kontakte importieren",
+        "newAgent": "Agenten anlegen",
+        "invite": "Jemanden ins Team einladen"
+      }
+    },
+    "waiting": "warten auf dich",
+    "untitledConversation": "Neues Gespräch"
+  },
+  "settingsNav": {
+    "label": "Einstellungen",
+    "profile": "Profil",
+    "team": "Team",
+    "sender": "Absender",
+    "unsubscribePage": "Abmeldeseite",
+    "plan": "Tarif",
+    "privacy": "Datenschutz",
+    "notifications": "Benachrichtigungen",
+    "connections": "Verbindungen",
+    "api": "API"
+  },
+  "senderProfile": {
+    "title": "Absender",
+    "description": "Diese Angaben stehen unter jeder geschäftlichen Mail und auf deiner Abmeldeseite. Wir fragen genau das ab, was für deine Rechtsform Pflicht ist.",
+    "formLabel": "Absenderprofil",
+    "loading": "Absenderprofil wird geladen …",
+    "loadError": "Das Absenderprofil konnte nicht geladen werden.",
+    "retry": "Noch einmal laden",
+    "readOnly": "Nur Inhaber und Admins können das Absenderprofil ändern.",
+    "companyTitle": "Wer schreibt?",
+    "companyHint": "Name und Anschrift so, wie sie im Register oder Gewerbeschein stehen.",
+    "privateHint": "Für private Arbeitsbereiche reicht dein Name.",
+    "complete": "Vollständig",
+    "missing": "{count, plural, =0 {Alles ausgefüllt – jetzt speichern} one {Noch # Pflichtangabe offen} other {Noch # Pflichtangaben offen}}",
+    "requiredMark": "*",
+    "legalFormHint": "Die Rechtsform bestimmt, welche Angaben Pflicht sind.",
+    "legalFormChoose": "Bitte wählen …",
+    "companyNameHint": "Vollständig mit Rechtsformzusatz, z. B. „Bäckerei Huber GmbH“.",
+    "registerTitle": "Register und Vertretung",
+    "registerHint": "Pflicht für eingetragene Firmen (z. B. § 35a GmbHG, § 37a HGB).",
+    "directorsHint": "Alle Personen mit Vor- und Nachnamen, durch Komma getrennt.",
+    "contactTitle": "Weitere Angaben",
+    "contactHint": "Freiwillig – erscheinen nur, wenn du sie ausfüllst.",
+    "vatIdHint": "Freiwillig, z. B. DE123456789.",
+    "privacyUrlHint": "Wird auf der Abmeldeseite verlinkt.",
+    "previewTitle": "So steht es unter deinen Mails",
+    "previewHint": "Die Pflichtangaben werden automatisch an die Signatur angehängt.",
+    "previewEmpty": "Sobald du Angaben einträgst, siehst du hier die Vorschau.",
+    "save": "Speichern",
+    "saveAndContinue": "Speichern und weiter",
+    "saved": "Absenderprofil gespeichert.",
+    "fixFields": "{count, plural, one {Bitte prüfe das markierte Feld.} other {Bitte prüfe die # markierten Felder.}}",
+    "fieldErrors": {
+      "required": "Bitte ausfüllen.",
+      "invalid": "Das Format stimmt nicht.",
+      "tooLong": "Das ist zu lang."
+    },
+    "fields": {
+      "legalForm": "Rechtsform",
+      "companyName": "Firma",
+      "privateName": "Dein Name",
+      "street": "Straße und Hausnummer",
+      "postalCode": "PLZ",
+      "city": "Ort",
+      "country": "Land",
+      "registerCourt": "Registergericht",
+      "registerNumber": "Registernummer",
+      "managingDirectors": "Geschäftsführung",
+      "supervisoryBoardChair": "Vorsitz des Aufsichtsrats",
+      "vatId": "USt-IdNr.",
+      "phone": "Telefon",
+      "website": "Website",
+      "privacyUrl": "Link zur Datenschutzerklärung"
+    },
+    "legalForms": {
+      "einzelunternehmen": "Einzelunternehmen (nicht eingetragen)",
+      "freiberufler": "Freiberuflich",
+      "gbr": "GbR",
+      "ek": "Eingetragener Kaufmann (e. K.)",
+      "ohg": "OHG",
+      "kg": "KG",
+      "gmbh_co_kg": "GmbH & Co. KG",
+      "gmbh": "GmbH",
+      "ug": "UG (haftungsbeschränkt)",
+      "ag": "AG",
+      "eg": "Genossenschaft (eG)",
+      "ev": "Eingetragener Verein (e. V.)",
+      "partg": "Partnerschaftsgesellschaft",
+      "other": "Andere Rechtsform"
+    },
+    "countries": {
+      "DE": "Deutschland",
+      "AT": "Österreich",
+      "CH": "Schweiz",
+      "LI": "Liechtenstein",
+      "LU": "Luxemburg",
+      "BE": "Belgien",
+      "NL": "Niederlande",
+      "FR": "Frankreich",
+      "IT": "Italien",
+      "PL": "Polen",
+      "CZ": "Tschechien",
+      "DK": "Dänemark"
+    },
+    "registerCourt": {
+      "DE": "Registergericht",
+      "AT": "Firmenbuchgericht",
+      "CH": "Handelsregisteramt"
+    },
+    "registerCourtHint": {
+      "DE": "z. B. Amtsgericht München",
+      "AT": "z. B. Handelsgericht Wien",
+      "CH": "z. B. Handelsregisteramt Zürich"
+    },
+    "registerNumber": {
+      "DE": "Registernummer",
+      "AT": "Firmenbuchnummer",
+      "CH": "UID"
+    },
+    "registerNumberHint": {
+      "DE": "z. B. HRB 123456",
+      "AT": "z. B. FN 123456a",
+      "CH": "z. B. CHE-123.456.789"
+    },
+    "directors": {
+      "management": "Geschäftsführung",
+      "board": "Vorstand",
+      "partners": "Gesellschafter"
+    },
+    "vatId": {
+      "DE": "USt-IdNr.",
+      "AT": "UID-Nummer",
+      "CH": "MWST-Nummer"
+    },
+    "preview": {
+      "seat": "Sitz: {city}"
+    }
+  },
+  "profile": {
+    "description": "Dein Name, deine Anmeldung und wie die Oberfläche aussieht.",
+    "detailsTitle": "Persönliche Angaben",
+    "name": "Name",
+    "nameHint": "So sehen dich andere im Team.",
+    "email": "E-Mail-Adresse",
+    "emailHint": "Mit dieser Adresse meldest du dich an.",
+    "saveName": "Name speichern",
+    "nameSaved": "Name gespeichert.",
+    "appearanceTitle": "Darstellung",
+    "appearanceHint": "Hell, dunkel oder wie dein Gerät eingestellt ist.",
+    "themeLight": "Hell",
+    "themeDark": "Dunkel",
+    "themeSystem": "Wie das System",
+    "passwordTitle": "Passwort ändern",
+    "passwordHint": "Danach wirst du auf allen anderen Geräten abgemeldet.",
+    "currentPassword": "Aktuelles Passwort",
+    "newPassword": "Neues Passwort",
+    "newPasswordHint": "Mindestens {min} Zeichen.",
+    "changePassword": "Passwort ändern",
+    "passwordChanged": "Passwort geändert. Andere Geräte sind abgemeldet."
+  },
+  "actions": {
+    "connectMailbox": "Postfach verbinden",
+    "connectOwnMailbox": "Eigenes Postfach verbinden",
+    "buyMailbox": "Postfach kaufen",
+    "newCampaign": "Neuer Auftrag",
+    "templates": "Vorlagen ansehen",
+    "lists": "Listen",
+    "importContacts": "Kontakte importieren",
+    "newAgent": "Agenten anlegen",
+    "backToInbox": "Zum Posteingang",
+    "backToContacts": "Zu den Kontakten",
+    "backToAgents": "Zu den Agenten",
+    "backToCampaigns": "Zu den Aufträgen",
+    "backToMailboxes": "Zu den Postfächern",
+    "untitled": "Ohne Titel"
+  },
+  "placeholders": {
+    "inbox": {
+      "title": "Posteingang",
+      "description": "Alle Antworten aus deinen Postfächern an einem Ort – sortiert nach dem, was wichtig ist.",
+      "soonTitle": "Hier landen bald deine Antworten",
+      "soonText": "Sobald ein Postfach verbunden ist, holt die Plattform neue Mails ab und sortiert sie vor.",
+      "items": [
+        "Wichtig, Antwort nötig, Erledigt und Info als eigene Bereiche",
+        "Abwesenheitsnotizen und Rückläufer automatisch aussortiert",
+        "Antworten direkt aus dem Thread",
+        "Suche über alle Postfächer"
+      ],
+      "asideLabel": "Details"
+    },
+    "inboxMailbox": {
+      "title": "Postfach",
+      "description": "Die Mails dieses Postfachs.",
+      "soonTitle": "Die Mails dieses Postfachs erscheinen hier",
+      "soonText": "Neue Mails werden regelmäßig abgeholt und nach Wichtigkeit sortiert.",
+      "items": [
+        "Ordner Posteingang, Werbung und Gesendet",
+        "Ungelesene zuerst",
+        "Filter nach Auftrag und Kontakt"
+      ],
+      "asideLabel": "Details"
+    },
+    "inboxThread": {
+      "title": "Unterhaltung",
+      "description": "Der ganze Verlauf mit diesem Kontakt.",
+      "soonTitle": "Hier liest und beantwortest du bald den Verlauf",
+      "soonText": "Jede Mail mit Zitaten eingeklappt, dazu der Kontakt und der Auftrag.",
+      "items": [
+        "Antwortvorschläge zum Auswählen oder selbst schreiben",
+        "Nachfassen stoppt automatisch bei einer Antwort",
+        "Kontaktdetails in der Seitenspalte"
+      ],
+      "asideLabel": "Details"
+    },
+    "campaigns": {
+      "title": "Aufträge",
+      "description": "Ein Auftrag ist ein Ziel in deinen Worten – die Plattform kümmert sich um Empfänger, Mails und Versand.",
+      "soonTitle": "Noch keine Aufträge",
+      "soonText": "Starte mit einem Ziel, zum Beispiel „Kunden zum Sommerfest einladen“. Du siehst danach jeden Auftrag mit Fortschritt hier.",
+      "items": [
+        "Empfänger, Nachricht, Feinheiten, Endcheck und Versand in fünf Schritten",
+        "Live-Ansicht mit Pausieren und Fortsetzen",
+        "Antworten und Ergebnis je Auftrag",
+        "Bericht zum Abschluss"
+      ],
+      "asideLabel": "Details"
+    },
+    "contacts": {
+      "title": "Kontakte",
+      "description": "Alle Menschen, denen du schreibst – mit Anrede, Sie oder Du und der Erlaubnis, sie anzuschreiben.",
+      "soonTitle": "Noch keine Kontakte",
+      "soonText": "Importiere eine Liste aus Excel oder CSV. Doppelte und ungültige Adressen sortieren wir dabei aus.",
+      "items": [
+        "Import aus CSV und Excel mit Zuordnung der Spalten",
+        "Anrede, Sie/Du, Region und Zeitzone je Kontakt",
+        "Statische und automatische Listen",
+        "Sperrliste für Abmeldungen"
+      ],
+      "asideLabel": "Details"
+    },
+    "contactDetail": {
+      "title": "Kontakt",
+      "description": "Alles zu diesem Kontakt auf einen Blick.",
+      "soonTitle": "Die Kontaktseite folgt",
+      "soonText": "Hier siehst du bald Angaben, Verlauf, Listen und die Rechtsgrundlage für die Ansprache.",
+      "items": [
+        "Angaben und Notizen",
+        "Alle Mails und Antworten",
+        "Listen und Aufträge",
+        "Auskunft und Löschen auf Anfrage"
+      ],
+      "asideLabel": "Details"
+    },
+    "contactLists": {
+      "title": "Listen",
+      "description": "Gruppen von Kontakten – fest zusammengestellt oder automatisch nach Regeln.",
+      "soonTitle": "Noch keine Listen",
+      "soonText": "Lege Listen an, um Kontakte für Aufträge zusammenzufassen.",
+      "items": [
+        "Feste Listen zum Hinzufügen und Entfernen",
+        "Automatische Listen nach Merkmalen",
+        "Gesperrte Kontakte sind nie dabei"
+      ],
+      "asideLabel": "Details"
+    },
+    "contactImport": {
+      "title": "Kontakte importieren",
+      "description": "Bring deine Kontakte aus einer Tabelle mit – wir erkennen die Spalten.",
+      "soonTitle": "Der Import kommt als Nächstes",
+      "soonText": "Du lädst bald eine CSV- oder Excel-Datei hoch, prüfst die Zuordnung und startest den Import.",
+      "items": [
+        "CSV mit Komma oder Semikolon, Excel (XLSX)",
+        "Umlaute und ältere Windows-Dateien",
+        "Vorschau und Zuordnung der Spalten",
+        "Prüfung der Adressen und Dubletten"
+      ],
+      "asideLabel": "Details"
+    },
+    "mailboxes": {
+      "title": "Postfächer",
+      "description": "Die Adressen, von denen deine Mails verschickt werden – mit Ampel für ihre Gesundheit.",
+      "soonTitle": "Noch kein Postfach verbunden",
+      "soonText": "Verbinde dein bestehendes Postfach, zum Beispiel bei GMX, WEB.DE, T-Online, IONOS oder Gmail.",
+      "items": [
+        "Ampel für die Zustellung je Postfach",
+        "Tageslimits und sanftes Hochfahren",
+        "Signatur mit Pflichtangaben",
+        "Prüfung der Domain-Einstellungen"
+      ],
+      "asideLabel": "Details"
+    },
+    "mailboxDetail": {
+      "title": "Postfach",
+      "description": "Gesundheit, Einrichtung, Limits, Hochfahren und Signatur dieses Postfachs.",
+      "soonTitle": "Die Postfach-Seite folgt",
+      "soonText": "Hier steuerst du bald, wie viel dieses Postfach am Tag verschickt und wie es unterschreibt.",
+      "items": [
+        "Gesundheit mit Ampel und Tipps",
+        "Einrichtung und Verbindungstest",
+        "Tageslimits und Versandfenster",
+        "Hochfahrplan",
+        "Signatur"
+      ],
+      "asideLabel": "Details"
+    },
+    "mailboxBuy": {
+      "title": "Postfach kaufen",
+      "description": "Fertige Postfächer auf eigenen Domains – eingerichtet und aufgewärmt.",
+      "soonTitle": "Gekaufte Postfächer kommen später",
+      "soonText": "Bis dahin verbindest du einfach dein eigenes Postfach.",
+      "items": [
+        "Postfächer auf passenden Domains",
+        "Einrichtung und Aufwärmen inklusive",
+        "Monatlich kündbar"
+      ],
+      "asideLabel": "Details"
+    },
+    "agents": {
+      "title": "Agenten",
+      "description": "Agenten schreiben, antworten und fassen nach – in deinem Ton und nach deinen Regeln.",
+      "soonTitle": "Noch keine Agenten",
+      "soonText": "Lege einen Agenten an, zum Beispiel für Akquise, Kundenservice oder Einladungen.",
+      "items": [
+        "Aufgabe, Ton und Sie/Du",
+        "Wann der Agent selbst antwortet und wann er fragt",
+        "Wissen aus Texten, Dateien und Webseiten",
+        "Tagesbericht"
+      ],
+      "asideLabel": "Details"
+    },
+    "agentDetail": {
+      "title": "Agent",
+      "description": "Anweisungen, Wissen und Rechte dieses Agenten.",
+      "soonTitle": "Die Agenten-Seite folgt",
+      "soonText": "Hier passt du bald an, wie der Agent schreibt und was er selbst entscheiden darf.",
+      "items": [
+        "Anweisungen und Ton",
+        "Wissen und Stilregeln",
+        "Freigaben und Grenzen",
+        "Gespräche und Berichte"
+      ],
+      "asideLabel": "Details"
+    },
+    "chat": {
+      "title": "Gespräch",
+      "description": "Sag dem Agenten, was du erreichen willst – er schlägt den Auftrag vor.",
+      "soonTitle": "Der Chat mit Agenten folgt",
+      "soonText": "Du schreibst oder sprichst dein Ziel, der Agent fragt nach und legt den Auftrag an.",
+      "items": ["Ziel in Alltagssprache", "Rückfragen statt Formulare", "Auftrag zum Freigeben"],
+      "asideLabel": "Details"
+    },
+    "plan": {
+      "title": "Tarif",
+      "description": "Dein Tarif, dein Verbrauch und deine Rechnungen.",
+      "soonTitle": "Tarife folgen",
+      "soonText": "Die Preise stehen noch nicht fest. Hier siehst du bald Limits, Verbrauch und Rechnungen.",
+      "items": [
+        "Mails, Postfächer und KI-Guthaben im Überblick",
+        "Verbrauch im laufenden Monat",
+        "Rechnungen und Zahlungsmittel"
+      ],
+      "asideLabel": "Details"
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "description": "Auskunft, Export und Löschen – für deine Kontakte und deinen Arbeitsbereich.",
+      "soonTitle": "Datenschutz-Werkzeuge folgen",
+      "soonText": "Hier findest du bald alles für Anfragen nach der DSGVO.",
+      "items": [
+        "Kontakt suchen, Auskunft geben, löschen",
+        "Export des Arbeitsbereichs",
+        "Aufbewahrungsfristen",
+        "Vertrag zur Auftragsverarbeitung"
+      ],
+      "asideLabel": "Details"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Wann und wie die Plattform dir Bescheid gibt.",
+      "soonTitle": "Benachrichtigungen folgen",
+      "soonText": "Du stellst bald je Art ein, ob du in der App oder per Mail informiert wirst – höchstens eine Mail je Viertelstunde.",
+      "items": [
+        "Freigabe nötig",
+        "Wichtige Antwort",
+        "Postfach-Problem",
+        "Auftrag fertig",
+        "Tagesbericht"
+      ],
+      "asideLabel": "Details"
+    },
+    "connections": {
+      "title": "Verbindungen",
+      "description": "Andere Dienste, mit denen die Plattform zusammenarbeitet.",
+      "soonTitle": "Verbindungen folgen",
+      "soonText": "Hier verbindest du bald zum Beispiel Telegram für Freigaben unterwegs.",
+      "items": ["Telegram", "Webhooks für deine Systeme", "Kalender und CRM später"],
+      "asideLabel": "Details"
+    },
+    "api": {
+      "title": "API",
+      "description": "Schlüssel für die Programmierschnittstelle.",
+      "soonTitle": "Die API folgt",
+      "soonText": "Mit einem API-Schlüssel steuerst du bald Kontakte und Aufträge aus deinen eigenen Programmen.",
+      "items": [
+        "Schlüssel anlegen und widerrufen",
+        "Rechte je Schlüssel",
+        "Webhooks für Ereignisse"
+      ],
+      "asideLabel": "Details"
+    }
+  },
+  "chat": {
+    "newConversation": "Neues Gespräch",
+    "messages": "Nachrichten",
+    "emptyTitle": "Worum geht es?",
+    "emptyText": "Beschreib dein Ziel in Alltagssprache, zum Beispiel „Lade unsere Stammkunden zum Sommerfest am 12. Juli ein“. Der Agent fragt nach und schlägt den Auftrag vor.",
+    "inputLabel": "Nachricht an den Agenten",
+    "placeholder": "Schreib dein Ziel …",
+    "hint": "Der Chat mit Agenten ist bald verfügbar.",
+    "voice": "Sprachnachricht",
+    "send": "Senden"
+  },
+  "status": {
+    "campaign": {
+      "draft": "Entwurf",
+      "planning": "In Planung",
+      "ready": "Bereit",
+      "pending_approval": "Wartet auf Freigabe",
+      "scheduled": "Geplant",
+      "running": "Läuft",
+      "paused": "Pausiert",
+      "completed": "Abgeschlossen",
+      "cancelled": "Abgebrochen",
+      "failed": "Fehlgeschlagen"
+    },
+    "mailbox": {
+      "connecting": "Wird verbunden",
+      "warming": "Wärmt sich auf",
+      "active": "Aktiv",
+      "paused": "Pausiert",
+      "needs_reauth": "Neu anmelden",
+      "error": "Fehler",
+      "disconnected": "Getrennt"
+    }
+  },
+  "campaignDetail": {
+    "title": "Auftrag",
+    "description": "Fortschritt, Empfänger, Mails und Antworten dieses Auftrags.",
+    "tabsLabel": "Bereiche des Auftrags",
+    "tabs": {
+      "overview": "Übersicht",
+      "live": "Live",
+      "recipients": "Empfänger",
+      "messages": "Nachrichten",
+      "replies": "Antworten",
+      "result": "Ergebnis",
+      "report": "Bericht"
+    },
+    "empty": {
+      "overview": {
+        "title": "Übersicht",
+        "text": "Ziel, Zeitplan, Fortschritt und die wichtigsten Zahlen erscheinen hier."
+      },
+      "live": {
+        "title": "Live-Ansicht",
+        "text": "Während des Versands siehst du hier jede Mail in Echtzeit – mit Pausieren und Fortsetzen."
+      },
+      "recipients": {
+        "title": "Empfänger",
+        "text": "Wer angeschrieben wird, wer schon dran war und wer aussortiert wurde."
+      },
+      "messages": {
+        "title": "Nachrichten",
+        "text": "Jede Mail dieses Auftrags mit Vorschau und Status."
+      },
+      "replies": {
+        "title": "Antworten",
+        "text": "Antworten auf diesen Auftrag, sortiert nach Absicht."
+      },
+      "result": {
+        "title": "Ergebnis",
+        "text": "Zusagen, Termine und andere Ergebnisse, die aus den Antworten gelesen werden."
+      },
+      "report": {
+        "title": "Bericht",
+        "text": "Die Zusammenfassung zum Abschluss – zum Teilen mit deinem Team."
+      }
+    }
+  },
+  "mailboxDetail": {
+    "title": "Postfach",
+    "description": "Gesundheit, Einrichtung, Limits, Hochfahren und Signatur.",
+    "tabsLabel": "Bereiche des Postfachs",
+    "tabs": {
+      "health": "Gesundheit",
+      "setup": "Einrichtung",
+      "limits": "Limits",
+      "ramp": "Hochfahren",
+      "signature": "Signatur"
+    },
+    "empty": {
+      "health": {
+        "title": "Gesundheit",
+        "text": "Ampel, Rückläufer, Abmeldungen und konkrete Tipps zur Zustellung."
+      },
+      "setup": {
+        "title": "Einrichtung",
+        "text": "Serverdaten, Verbindungstest und Domain-Prüfung."
+      },
+      "limits": {
+        "title": "Limits",
+        "text": "Wie viele Mails dieses Postfach am Tag verschickt und in welchem Zeitfenster."
+      },
+      "ramp": {
+        "title": "Hochfahren",
+        "text": "Neue Postfächer starten langsam und steigern sich Tag für Tag."
+      },
+      "signature": {
+        "title": "Signatur",
+        "text": "Deine Signatur – die Pflichtangaben aus dem Absenderprofil hängen wir automatisch an."
+      }
+    }
+  },
+  "onboardingChecklist": {
+    "title": "Richte deinen Arbeitsbereich ein",
+    "progress": "{done} von {total} Schritten erledigt",
+    "continue": "Weiter einrichten",
+    "done": "erledigt",
+    "open": "offen",
+    "steps": {
+      "workspace": "Arbeitsbereich angelegt",
+      "mailbox": "Postfach verbinden",
+      "senderProfile": "Absenderprofil ausfüllen",
+      "agent": "Ersten Agenten wählen",
+      "campaign": "Ersten Auftrag starten"
+    }
+  },
+  "newCampaign": {
+    "title": "Neuer Auftrag",
+    "description": "Sag in deinen Worten, was du erreichen willst. Den Rest erledigen wir Schritt für Schritt.",
+    "goalTitle": "Was willst du erreichen?",
+    "goalHint": "Ein Ziel statt einer fertigen Mail – zum Beispiel wen du einlädst und wozu.",
+    "goalLabel": "Dein Ziel",
+    "goalPlaceholder": "z. B. Lade unsere Stammkunden zum Sommerfest am 12. Juli ein.",
+    "suggestions": "Vorschläge",
+    "aiHint": "Die KI ergänzt den Rest.",
+    "toneLabel": "Ton",
+    "tonePlaceholder": "Oder beschreib den Ton selbst …",
+    "tones": {
+      "friendly": "Freundlich",
+      "factual": "Sachlich",
+      "casual": "Locker",
+      "formal": "Förmlich"
+    },
+    "formalityLabel": "Ansprache",
+    "formalityExplain": "„Je nach Kontakt“ nimmt Sie oder Du so, wie es beim Kontakt hinterlegt ist.",
+    "formality": {
+      "sie": "Sie",
+      "du": "Du",
+      "auto": "Je nach Kontakt"
+    },
+    "continue": "Weiter zu den Empfängern",
+    "nextSoon": "Die nächsten Schritte – Empfänger, Nachricht, Feinheiten, Endcheck und Versand – sind bald verfügbar. Dein Ziel ist schon notiert.",
+    "stepsLabel": "Schritte des Auftrags",
+    "stepsTitle": "So geht es weiter",
+    "steps": {
+      "recipients": {
+        "title": "Empfänger",
+        "text": "Liste, Datei oder einzelne Adresse"
+      },
+      "message": {
+        "title": "Nachricht",
+        "text": "Vorlage oder freier Text, mit Nachfassen"
+      },
+      "details": {
+        "title": "Feinheiten",
+        "text": "Zweck, Postfächer, Versandzeiten"
+      },
+      "check": {
+        "title": "Endcheck",
+        "text": "Übersicht und „Wirklich senden“"
+      },
+      "send": {
+        "title": "Versand",
+        "text": "Live verfolgen, pausieren, fortsetzen"
+      }
+    }
+  },
+  "templates": {
+    "title": "Vorlagen",
+    "description": "Fertige Ideen für typische Anlässe. Wähle eine aus – der Assistent startet vorausgefüllt.",
+    "preview": "Vorschau",
+    "previewOf": "Vorschau: {name}",
+    "subject": "Betreff",
+    "variablesHint": "Platzhalter wie {vorname} füllen wir je Kontakt aus. Ton und Ansprache passt du im Assistenten an.",
+    "use": "Verwenden",
+    "useNamed": "Vorlage „{name}“ verwenden",
+    "items": {
+      "summerParty": {
+        "name": "Einladung zum Fest",
+        "short": "Zum Fest einladen",
+        "category": "Einladung",
+        "description": "Kunden und Partner zu einer Feier oder Veranstaltung einladen – mit Zusage per Antwort.",
+        "goal": "Lade unsere Stammkunden zum Sommerfest ein und frag nach einer kurzen Zusage.",
+        "subject": "Feiern Sie mit uns: Sommerfest am {datum}",
+        "body": "Guten Tag {anrede} {nachname},\n\nam {datum} feiern wir unser Sommerfest – und wir würden uns sehr freuen, Sie dabei zu haben.\n\nGeben Sie uns einfach mit einer kurzen Antwort Bescheid, ob Sie kommen.\n\nHerzliche Grüße\n{absender}"
+      },
+      "appointmentReminder": {
+        "name": "Terminerinnerung",
+        "short": "An Termin erinnern",
+        "category": "Erinnerung",
+        "description": "Freundlich an einen anstehenden Termin erinnern und eine Absage leicht machen.",
+        "goal": "Erinnere unsere Kunden an ihren Termin nächste Woche und biete eine einfache Verschiebung an.",
+        "subject": "Erinnerung an Ihren Termin am {datum}",
+        "body": "Guten Tag {anrede} {nachname},\n\nwir freuen uns auf Ihren Termin am {datum} um {uhrzeit}.\n\nFalls es nicht passt, antworten Sie einfach auf diese Mail – wir finden gern einen neuen Termin.\n\nViele Grüße\n{absender}"
+      },
+      "offerFollowUp": {
+        "name": "Angebot nachfassen",
+        "short": "Angebot nachfassen",
+        "category": "Verkauf",
+        "description": "Nach einem Angebot freundlich nachhaken, ohne zu drängen.",
+        "goal": "Fass bei allen nach, die vor zwei Wochen ein Angebot bekommen und noch nicht geantwortet haben.",
+        "subject": "Kurze Nachfrage zu unserem Angebot",
+        "body": "Guten Tag {anrede} {nachname},\n\nvor zwei Wochen haben wir Ihnen ein Angebot geschickt. Haben Sie noch Fragen dazu?\n\nIch helfe Ihnen gern weiter.\n\nBeste Grüße\n{absender}"
+      },
+      "newsletter": {
+        "name": "Neuigkeiten",
+        "short": "Neuigkeiten teilen",
+        "category": "Information",
+        "description": "Kunden über Neuigkeiten, Öffnungszeiten oder Angebote informieren.",
+        "goal": "Informiere unsere Kunden über die neuen Öffnungszeiten ab nächstem Monat.",
+        "subject": "Neu bei uns: {thema}",
+        "body": "Hallo {vorname},\n\nwir haben Neuigkeiten für dich: {thema}.\n\nAlle Details findest du auf unserer Website.\n\nBis bald\n{absender}"
+      },
+      "reviewRequest": {
+        "name": "Bewertung erbitten",
+        "short": "Um Bewertung bitten",
+        "category": "Kundenpflege",
+        "description": "Zufriedene Kunden um eine kurze Bewertung bitten.",
+        "goal": "Bitte Kunden, die diesen Monat bei uns waren, um eine kurze Bewertung.",
+        "subject": "Wie war es bei uns?",
+        "body": "Guten Tag {anrede} {nachname},\n\nvielen Dank für Ihren Besuch. Wir würden uns sehr über eine kurze Bewertung freuen – das hilft uns und anderen Kunden.\n\nHerzlichen Dank\n{absender}"
+      },
+      "winBack": {
+        "name": "Wieder melden",
+        "short": "Ehemalige Kunden ansprechen",
+        "category": "Kundenpflege",
+        "description": "Kunden ansprechen, von denen man länger nichts gehört hat.",
+        "goal": "Melde dich bei Kunden, die seit über einem Jahr nichts mehr bestellt haben.",
+        "subject": "Lange nichts gehört",
+        "body": "Guten Tag {anrede} {nachname},\n\nes ist eine Weile her – wir hoffen, es geht Ihnen gut.\n\nGibt es etwas, bei dem wir Ihnen helfen können?\n\nFreundliche Grüße\n{absender}"
+      }
+    }
+  },
+  "connectMailbox": {
+    "title": "Postfach verbinden",
+    "description": "Verbinde dein bestehendes Postfach. Deine Mails gehen weiter von deiner eigenen Adresse raus.",
+    "providerLegend": "Bei welchem Anbieter liegt dein Postfach?",
+    "chooseFirst": "Wähle oben deinen Anbieter – wir zeigen dir, was du vorbereiten musst.",
+    "prepareTitle": "Postfach bei {provider}",
+    "email": "E-Mail-Adresse",
+    "emailPlaceholder": "name@beispiel.de",
+    "password": "Passwort",
+    "passwordHint": "Wird sofort verschlüsselt und nie im Klartext gespeichert.",
+    "soonText": "Das Verbinden ist bald verfügbar. Dann prüfen wir die Verbindung mit einer Testmail.",
+    "providers": {
+      "gmx": {
+        "name": "GMX",
+        "kind": "IMAP und SMTP",
+        "hint": "Aktiviere in den GMX-Einstellungen unter „E-Mail-Programme“ den Zugriff per IMAP."
+      },
+      "webde": {
+        "name": "WEB.DE",
+        "kind": "IMAP und SMTP",
+        "hint": "Aktiviere in den WEB.DE-Einstellungen unter „POP3/IMAP Abruf“ den Zugriff per IMAP."
+      },
+      "tonline": {
+        "name": "T-Online",
+        "kind": "IMAP und SMTP",
+        "hint": "T-Online braucht das separate E-Mail-Passwort – nicht das Passwort für das Kundencenter."
+      },
+      "ionos": {
+        "name": "IONOS",
+        "kind": "IMAP und SMTP",
+        "hint": "Nimm die Zugangsdaten deines IONOS-Postfachs; IMAP ist bereits aktiv."
+      },
+      "gmail": {
+        "name": "Gmail",
+        "kind": "App-Passwort",
+        "hint": "Für Gmail brauchst du die Bestätigung in zwei Schritten und ein App-Passwort aus deinem Google-Konto."
+      },
+      "outlook": {
+        "name": "Outlook und Microsoft 365",
+        "kind": "Anmeldung mit einem Klick",
+        "hint": "Für Outlook und Microsoft 365 kommt die Anmeldung mit einem Klick."
+      },
+      "strato": {
+        "name": "Strato",
+        "kind": "IMAP und SMTP",
+        "hint": "Nimm die Zugangsdaten deines Strato-Postfachs."
+      },
+      "other": {
+        "name": "Anderer Anbieter",
+        "kind": "Serverdaten selbst eintragen",
+        "hint": "Du brauchst die Serverdaten für IMAP und SMTP – sie stehen meist in der Hilfe deines Anbieters."
+      }
+    }
+  },
+  "newAgent": {
+    "title": "Agenten anlegen",
+    "description": "Wähle, wofür dein Agent da ist. Ton, Regeln und Wissen passt du danach an.",
+    "legend": "Aufgabe des Agenten",
+    "choose": "Diese Aufgabe wählen",
+    "soon": "Gute Wahl: {role}. Das Anlegen von Agenten ist bald verfügbar.",
+    "roles": {
+      "allround": {
+        "name": "Allrounder",
+        "text": "Für alles ein bisschen – der beste Start."
+      },
+      "acquisition": {
+        "name": "Akquise",
+        "text": "Neue Kunden ansprechen und nachfassen."
+      },
+      "support": {
+        "name": "Kundenservice",
+        "text": "Fragen beantworten und weiterleiten."
+      },
+      "reminders": {
+        "name": "Erinnerungen",
+        "text": "Termine, Rechnungen und Fristen."
+      },
+      "events": {
+        "name": "Einladungen und Events",
+        "text": "Einladen, Zusagen sammeln, erinnern."
+      },
+      "custom": {
+        "name": "Eigene Aufgabe",
+        "text": "Du beschreibst selbst, was er tun soll."
+      }
+    }
+  },
+  "unsubscribeSettings": {
+    "title": "Abmeldeseite",
+    "description": "Diese Seite sehen Empfänger, wenn sie auf „Abmelden“ klicken. Sie zeigt deinen Namen und deine Pflichtangaben.",
+    "previewTitle": "Vorschau",
+    "previewHint": "So sieht die Seite für deine Empfänger aus.",
+    "incomplete": "Dein Absenderprofil ist noch nicht vollständig – die Pflichtangaben fehlen auf der Seite.",
+    "completeProfile": "Absenderprofil ergänzen",
+    "optionsTitle": "Optionen",
+    "optionsText": "Später wählst du hier, ob Empfänger einen Grund angeben können und was nach der Abmeldung angezeigt wird."
+  },
+  "unsubscribe": {
+    "title": "Abmelden",
+    "text": "Sie erhalten dann keine Mails mehr von diesem Absender.",
+    "confirm": "Abmeldung bestätigen",
+    "sender": "Absender",
+    "invalid": "Dieser Abmeldelink ist ungültig oder abgelaufen.",
+    "fallback": "Sie möchten trotzdem keine Mails mehr erhalten? Antworten Sie einfach mit „Abmelden“ auf die Mail – das gilt genauso."
+  },
+  "clickRedirect": {
+    "title": "Link nicht gefunden",
+    "text": "Dieser Link ist ungültig oder abgelaufen. Aus Sicherheitsgründen leiten wir nur zu gespeicherten Zielen weiter."
+  },
+  "admin": {
+    "eyebrow": "Nur für das Plattform-Team",
+    "title": "Betreiberbereich",
+    "description": "Arbeitsbereiche, Vertrauensstufen, Missbrauch und Systemzustand der ganzen Plattform. Jeder Zugriff wird protokolliert.",
+    "back": "Zur Übersicht",
+    "soonTitle": "Dieser Bereich folgt",
+    "soonText": "Bis dahin setzt der Befehl „pnpm ops:set-trust“ die Vertrauensstufe eines Arbeitsbereichs; jede Änderung steht im Audit-Log.",
+    "sections": {
+      "workspaces": {
+        "title": "Arbeitsbereiche",
+        "text": "Alle Arbeitsbereiche mit Tarif, Versandvolumen und Fehlerraten."
+      },
+      "users": {
+        "title": "Nutzer",
+        "text": "Konten, Rollen und Anmeldungen."
+      },
+      "trust": {
+        "title": "Vertrauen und Missbrauch",
+        "text": "Vertrauensstufen und die Warteschlange für Missbrauchsfälle."
+      },
+      "mailboxPool": {
+        "title": "Postfach-Pool",
+        "text": "Plattform-Domains, Mailserver, IP-Pools und ihr Ruf."
+      },
+      "seedAccounts": {
+        "title": "Prüfpostfächer",
+        "text": "Postfächer für Posteingangs-Tests mit Status."
+      },
+      "system": {
+        "title": "Systemzustand",
+        "text": "Warteschlangen, Worker, Abruf-Verzug und Fehler."
+      },
+      "suppressions": {
+        "title": "Globale Sperrliste",
+        "text": "Adressen, die nie angeschrieben werden."
+      },
+      "announcements": {
+        "title": "Ankündigungen",
+        "text": "Hinweise an alle Nutzer und Feature-Schalter."
+      }
+    }
+  },
+  "site": {
+    "nav": "Website",
+    "pricing": {
+      "title": "Preise",
+      "intro": "Die Preise stehen noch nicht fest. Während der privaten Beta nutzt du die Plattform kostenlos – mit festen Grenzen, die uns und dich vor Missbrauch schützen.",
+      "betaTitle": "Private Beta",
+      "betaText": "Jeder Tarif besteht später aus klaren Grenzen. Das ist dabei:",
+      "included": {
+        "mailboxes": "Verbundene Postfächer",
+        "mails": "Mails pro Monat",
+        "ai": "Guthaben für die KI",
+        "agents": "Agenten",
+        "team": "Plätze im Team",
+        "inboxTests": "Posteingangs-Tests"
+      },
+      "cta": "Für die Beta registrieren"
+    },
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "footer": "{name} – Mails mit Agenten, aus deinem eigenen Postfach.",
+    "legalNav": "Rechtliches",
+    "legal": {
+      "imprint": "Impressum",
+      "privacy": "Datenschutz",
+      "terms": "AGB",
+      "dpa": "Auftragsverarbeitung"
+    },
+    "home": {
+      "badge": "Private Beta · für Firmen in Deutschland, Österreich und der Schweiz",
+      "title": "Du sagst das Ziel, nicht die E-Mail.",
+      "subtitle": "Sag in einem Satz, was du erreichen willst. Deine Agenten schreiben, verschicken aus deinem eigenen Postfach, sortieren die Antworten und fassen nach.",
+      "cta": "Kostenlos starten",
+      "secondary": "Preise ansehen",
+      "howTitle": "So funktioniert es",
+      "step": "Schritt {number}",
+      "steps": {
+        "goal": {
+          "title": "Ziel sagen",
+          "text": "Zum Beispiel: „Lade unsere Stammkunden zum Sommerfest ein.“ Per Chat, Klick oder Vorlage."
+        },
+        "agent": {
+          "title": "Der Agent bereitet vor",
+          "text": "Empfänger, Mails in deinem Ton, Versandzeiten und Nachfassen – mit Sie oder Du je Kontakt."
+        },
+        "approve": {
+          "title": "Du gibst frei",
+          "text": "Ein Endcheck zeigt alles auf einen Blick. Danach läuft der Versand ruhig und regelkonform."
+        }
+      },
+      "featuresTitle": "Gemacht für den Alltag in DACH",
+      "features": {
+        "ownAddress": {
+          "title": "Deine eigene Adresse",
+          "text": "Mails gehen aus deinem Postfach bei GMX, WEB.DE, T-Online, IONOS oder Gmail – Antworten landen wie gewohnt bei dir."
+        },
+        "legal": {
+          "title": "Pflichtangaben automatisch",
+          "text": "Firma, Register und Geschäftsführung hängen wir passend zur Rechtsform an. Abmelden geht mit einem Klick."
+        },
+        "delivery": {
+          "title": "Zustellung im Blick",
+          "text": "Sanftes Hochfahren, Tageslimits und eine Ampel je Postfach schützen deinen Ruf."
+        },
+        "dach": {
+          "title": "Sie, Du und Feiertage",
+          "text": "Anrede je Kontakt, Schweizer Schreibweise, Feiertage nach Bundesland und Kanton."
+        }
+      }
+    },
+    "legalPages": {
+      "pending": "Der endgültige Text folgt nach der Prüfung durch eine Kanzlei vor dem Livegang.",
+      "imprint": {
+        "title": "Impressum",
+        "intro": "Angaben nach § 5 DDG zum Betreiber dieser Plattform."
+      },
+      "privacy": {
+        "title": "Datenschutzerklärung",
+        "intro": "Wie wir mit personenbezogenen Daten umgehen – von dir, deinem Team und den Menschen, denen du schreibst."
+      },
+      "terms": {
+        "title": "Allgemeine Geschäftsbedingungen",
+        "intro": "Die Bedingungen für die Nutzung der Plattform."
+      },
+      "dpa": {
+        "title": "Vertrag zur Auftragsverarbeitung",
+        "intro": "Für die Daten deiner Kontakte handeln wir in deinem Auftrag nach Art. 28 DSGVO."
+      }
+    },
+    "pricingLink": "Preise"
+  },
+  "threadDetail": {
+    "contactTitle": "Kontakt",
+    "contactText": "Name, Firma, Listen und frühere Aufträge des Kontakts erscheinen hier neben dem Verlauf."
   }
 }
