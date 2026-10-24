@@ -1,5 +1,5 @@
-import { infraDown, infraUp } from "./lib/infra";
-import type { StackName } from "./lib/stacks";
+import type { StackName } from "@ep/testing/infra";
+import { infraDown, infraUp } from "@ep/testing/infra";
 
 const [command = "up", stack = "dev", flag] = process.argv.slice(2);
 if (stack !== "dev" && stack !== "test") throw new Error(`Unknown stack ${stack}`);

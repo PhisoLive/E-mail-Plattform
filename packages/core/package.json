@@ -1,0 +1,23 @@
+{
+  "name": "@ep/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./system": "./src/system/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ep/config": "workspace:*",
+    "@ep/db": "workspace:*",
+    "bullmq": "6.4.2",
+    "drizzle-orm": "0.45.4",
+    "ioredis": "6.0.0",
+    "uuid": "14.0.3",
+    "zod": "4.6.7"
+  }
+}

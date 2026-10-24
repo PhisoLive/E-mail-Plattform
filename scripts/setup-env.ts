@@ -6,8 +6,7 @@
 import { generateKeyPairSync, randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { repoRoot } from "./lib/infra";
-import { appPorts, stacks } from "./lib/stacks";
+import { appPorts, repoRoot, stacks } from "@ep/testing/infra";
 
 const envPath = resolve(repoRoot, ".env");
 

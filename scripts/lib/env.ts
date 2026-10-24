@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { repoRoot } from "./infra";
+import { repoRoot } from "@ep/testing/infra";
 
 /** Loads the root `.env` into process.env (existing variables win). */
 export function loadRootEnv(): void {

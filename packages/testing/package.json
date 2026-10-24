@@ -1,0 +1,22 @@
+{
+  "name": "@ep/testing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./infra": "./src/infra/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ep/config": "workspace:*",
+    "@ep/core": "workspace:*",
+    "@ep/db": "workspace:*",
+    "drizzle-orm": "0.45.4",
+    "ioredis": "6.0.0",
+    "postgres": "3.4.9"
+  }
+}

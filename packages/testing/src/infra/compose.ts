@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { assertPortsFree } from "./ports";
 import { type StackName, stacks } from "./stacks";
 
-export const repoRoot = resolve(import.meta.dirname, "..", "..");
+export const repoRoot = resolve(import.meta.dirname, "..", "..", "..", "..");
 
 function dockerAvailable(): boolean {
   return spawnSync("docker", ["info"], { stdio: "ignore" }).status === 0;
