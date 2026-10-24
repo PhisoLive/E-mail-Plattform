@@ -29,7 +29,39 @@ Zusätzlich gebaut (Grundlage für spätere Phasen): `packages/crypto` (AES-256-
 | CI ist grün | siehe unten | GitHub Actions, Workflow `CI` auf `claude/amazing-carson-fippeq` |
 | Gerüst für Mandantentests steht | erfüllt | `apps/web/server/trpc/tenant-isolation.int.test.ts`: je tRPC-Prozedur ein Angriff aus Arbeitsbereich B auf A; der Test „covers every procedure of the app router“ schlägt fehl, sobald eine neue Prozedur ohne Fall dazukommt. Dazu `packages/core/src/state/transition.int.test.ts` („cannot reach rows of another workspace“) und `packages/core/src/system/system-imports.test.ts` |
 
-Prüfbefehle (letzter Lauf): `pnpm lint` → Exit 0, `pnpm typecheck` → Exit 0 (10 Pakete + Skripte), `pnpm test` → 69 Tests grün, `pnpm test:e2e` → 5 Tests grün.
+Prüfbefehle (letzter Lauf nach der Nachbesserung): `pnpm lint` → Exit 0 (keine Warnungen), `pnpm typecheck` → Exit 0 (10 Pakete + Skripte), `pnpm test` → 83 Tests grün, `pnpm test:e2e` (lokal, `next dev`) → 7 Tests grün, `pnpm test:e2e:prod` bzw. `CI=true E2E_WEB_MODE=production pnpm test:e2e` (wie die CI, Produktions-Build) → 7 Tests grün.
+
+## Nachbesserung nach der unabhängigen Abnahme
+
+Die erste Abnahme (`docs/berichte/phase-00-abnahme.md`) ergab „nein“. Zusätzlich haben fünf Regel-Prüfer (Mandantentrennung, Versand/Secrets, Auth-Sicherheit, Texte/Oberfläche, Datenmodell) Befunde geliefert, die je ein weiterer Agent gegenzuprüfen versuchte. Alle Befunde sind behoben:
+
+| Befund | Behebung | Nachweis |
+| --- | --- | --- |
+| B1 Produktions-Build scheitert (`NODE_ENV=development`) | `scripts/e2e.ts` setzt `NODE_ENV` nicht mehr | `CI=true E2E_WEB_MODE=production pnpm test:e2e` → 7 passed |
+| B2 Nonce-CSP blockiert JS auf statischen Seiten | Root-Layout liest Header → alle Seiten dynamisch; `style-src 'unsafe-inline'` (E-026) | E2E „Keine CSP-Verletzungen auf öffentlichen Seiten und in der App“ (Produktions-Build) |
+| M1 DB-Zugriffe außerhalb von `withWorkspace`/`systemContext`, lückenhafter Import-Wächter, keine eigene DB-Rolle | Löschjob und Auth-Abfragen in `packages/core/src/system/*`; `getMembershipRole` über `withUser` (E-027); Rollen `ep_app`/`ep_system` (E-028); Wächter für System-Importe (auch `scripts/`, Unterpfade, `import()`) und rohe `deps.db`-Zugriffe | `packages/core/src/system/system-imports.test.ts` (3 Tests), `retention.int.test.ts` |
+| M2 Web-App erhält `MASTER_KEY` | Gefilterte Umgebung je App in `pnpm dev` und `scripts/run-app.ts`; Start-Prüfung `forbiddenSecrets` (E-032) | `packages/config/src/env.test.ts` „secret separation …“; `/proc/<pid>/environ` der Next-Prozesse ohne `MASTER_KEY`/`SEALED_BOX_SECRET_KEY` |
+| m1 Sandbox nur über Hostnamen; Host aus URL ≠ Nodemailer-Ziel; Adresslisten als ein Empfänger | `SANDBOX_MAIL_ENDPOINTS` als `host:port`, Formatprüfung, Transport aus Einzelwerten, keine Query-Parameter, Empfänger per `addressparser` (E-029) | `packages/mail/src/send-guard.test.ts` (5 Tests), `system-mailer.int.test.ts` |
+| m2 Tokens und Adressen im Request-Log | `logging.incomingRequests.ignore` für `/api/auth/`, `/einladung/`, `token=` | `apps/web/next.config.ts` |
+| m3 Text im Edge-Dienst | 404 ohne Text; öffentliche Seiten bekommen ihre Texte aus `de.json` (Phase 4) | `apps/edge/src/app.ts` |
+| m4 Anmeldungen/2FA nicht auditiert | After-Hook schreibt `auth.sign_in`, `auth.sign_in_magic_link`, `auth.sign_in_two_factor`, `auth.two_factor_enabled/disabled`, `auth.password_changed` | E2E Haupt-Ablauf prüft die Einträge in `audit_logs` |
+| m5 E2E-Test hielt nicht, was der Name sagt | Test prüft jetzt unbekannte Adresse, falsches Passwort eines bestätigten Kontos und unbestätigte Adresse | E2E „Falsches Passwort und unbestätigte Adresse werden abgewiesen“ |
+| m6 `pnpm audit` ohne Wirkung | blockierend ab „high“ | `.github/workflows/ci.yml` |
+| m7 letzter Inhaber nicht nebenläufigkeitssicher | Inhaber-Zeilen werden zuerst gesperrt | `members.int.test.ts` „last owner protection under concurrency“ (2 Tests) |
+| Offene Weiterleitung über `next` (Tab/CR/LF) | `safeNext` prüft Steuerzeichen, Backslash und Herkunft | `apps/web/lib/safe-next.test.ts` |
+| Admins konnten Inhaber-Einladungen zurückziehen/ersetzen; unbegrenzte Einladungsmails | `canManageRole` auch für bestehende Einladungen; 50 je Tag (E-030); Namen bereinigt | `invitations.int.test.ts` „invitation protections“, `email-texts.test.ts` |
+| Fehlercodes ohne Text (falsches 2FA-Passwort, 429, Transportfehler) | vollständige Zuordnung inkl. HTTP 429, `errorCode()` nur bekannte Codes | `apps/web/lib/auth-client.ts`, `apps/web/lib/trpc.tsx` |
+| Abgelaufene Links ohne Hinweis | Login zeigt `?error=` (auch im `next`-Ziel) | E2E „Abgelaufene oder ungültige Anmeldelinks zeigen einen Hinweis“ |
+| Englische 404-/Fehlerseiten | `not-found.tsx`, `error.tsx`, `global-error.tsx` mit Texten aus `de.json` | E2E CSP-Test besucht `/gibt-es-nicht` |
+| Lade-/Fehlerzustand offener Einladungen | ergänzt, „Zurückziehen“ mit Ladezustand und Fehlermeldung | `apps/web/components/team-settings.tsx` |
+| `<button>` in `<a>` auf der Startseite | `buttonClasses()` für Links | `apps/web/app/page.tsx` |
+| Mindestlänge Passwort und Produktname fest im Code | aus `defaults.ts` bzw. `de.json` | `auth-forms.tsx`, `server/auth.ts` |
+| Fristen/Limits fest im Code | `defaults.auth.*`, `defaults.queues.keep*`, `shutdownGraceSeconds` | `packages/config/src/defaults.ts` |
+| `PASSWORD_BREACH_CHECK=off` außerhalb Entwicklung möglich | Start verweigert; `.env.example` steht auf `on` | `packages/config/src/env.ts` |
+| Nicht deklarierte Umgebungsvariablen | `toolingEnvSchema` + `.env.example` + `turbo.json` | `pnpm lint` ohne `noUndeclaredEnvVars` |
+| Datenmodell: fehlende FKs (`suppressions.source_message_id`, `abuse_reports`), `subscriptions.status` ohne Enum, Feature-Flags mit NULL, `priority` ohne Bereich, Kostenspalte | Migration `0002_review_fixes.sql`, Entscheidungen E-031, E-033 | `drizzle-kit generate` meldet keine Abweichung |
+
+Hinweis zur Oberfläche: Kopfzeile bei 360 px und die Beschriftung der Navigation werden mit der neuen App-Schale in Phase 1 ersetzt (Seitenleiste mit `aria-current`).
 
 ## Offene Punkte
 
