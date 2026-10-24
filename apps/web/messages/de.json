@@ -1,0 +1,187 @@
+{
+  "app": {
+    "name": "E-Mail-Plattform",
+    "tagline": "Du sagst das Ziel, nicht die E-Mail."
+  },
+  "common": {
+    "save": "Speichern",
+    "saving": "Wird gespeichert …",
+    "cancel": "Abbrechen",
+    "continue": "Weiter",
+    "back": "Zurück",
+    "loading": "Wird geladen …",
+    "retry": "Noch einmal versuchen",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "name": "Name",
+    "or": "oder",
+    "remove": "Entfernen",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "signOut": "Abmelden",
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "auth": {
+    "login": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melde dich an, um deine E-Mails erledigen zu lassen.",
+      "submit": "Anmelden",
+      "magicLink": "Anmeldelink per E-Mail schicken",
+      "magicLinkSent": "Wir haben dir einen Anmeldelink an {email} geschickt. Er gilt 5 Minuten.",
+      "noAccount": "Noch kein Konto?",
+      "toRegister": "Jetzt registrieren",
+      "invalid": "E-Mail-Adresse oder Passwort stimmen nicht.",
+      "notVerified": "Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir den Link noch einmal geschickt."
+    },
+    "register": {
+      "title": "Konto anlegen",
+      "subtitle": "In zwei Minuten startklar. Keine Kreditkarte nötig.",
+      "nameLabel": "Dein Name",
+      "passwordHint": "Mindestens 10 Zeichen.",
+      "submit": "Konto anlegen",
+      "haveAccount": "Schon registriert?",
+      "toLogin": "Zur Anmeldung",
+      "emailTaken": "Für diese E-Mail-Adresse gibt es schon ein Konto.",
+      "passwordTooShort": "Das Passwort braucht mindestens 10 Zeichen.",
+      "passwordPwned": "Dieses Passwort ist aus einem Datenleck bekannt. Bitte wähle ein anderes."
+    },
+    "verify": {
+      "title": "Fast geschafft",
+      "text": "Wir haben dir eine E-Mail an {email} geschickt. Klick auf den Link darin, um deine Adresse zu bestätigen.",
+      "hint": "Nichts angekommen? Schau im Spam-Ordner nach."
+    },
+    "twoFactor": {
+      "title": "Zwei-Faktor-Anmeldung",
+      "subtitle": "Gib den sechsstelligen Code aus deiner Authenticator-App ein.",
+      "codeLabel": "Code",
+      "submit": "Bestätigen",
+      "invalid": "Der Code stimmt nicht. Versuch es noch einmal."
+    },
+    "invitation": {
+      "title": "Einladung zu {workspace}",
+      "text": "Du wurdest als {role} eingeladen. Die Einladung gilt für {email}.",
+      "accept": "Einladung annehmen",
+      "loginFirst": "Melde dich mit {email} an oder registriere dich, um die Einladung anzunehmen.",
+      "expired": "Diese Einladung ist abgelaufen. Bitte lass dich neu einladen.",
+      "used": "Diese Einladung wurde schon angenommen.",
+      "invalid": "Diese Einladung gibt es nicht oder sie wurde zurückgezogen.",
+      "accepted": "Willkommen im Team!"
+    }
+  },
+  "onboarding": {
+    "createWorkspace": {
+      "title": "Dein Arbeitsbereich",
+      "subtitle": "Hier liegen deine Postfächer, Kontakte und Agenten. Du kannst später weitere anlegen.",
+      "nameLabel": "Name des Arbeitsbereichs",
+      "namePlaceholder": "z. B. Bäckerei Huber",
+      "kindLabel": "Wofür nutzt du die Plattform?",
+      "kindBusiness": "Für eine Firma",
+      "kindPrivate": "Privat",
+      "countryLabel": "Land",
+      "countryDE": "Deutschland",
+      "countryAT": "Österreich",
+      "countryCH": "Schweiz",
+      "countryOther": "Anderes Land",
+      "submit": "Arbeitsbereich anlegen"
+    }
+  },
+  "start": {
+    "title": "Start",
+    "greeting": "Hallo {name}",
+    "doneToday": "Heute erledigt",
+    "doneTodayEmpty": "Heute ist noch nichts passiert. Sobald deine Agenten arbeiten, steht es hier.",
+    "waiting": "Wartet auf dich",
+    "waitingEmpty": "Nichts offen – alles erledigt."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "profile": {
+      "title": "Profil",
+      "twoFactorTitle": "Zwei-Faktor-Anmeldung",
+      "twoFactorOn": "Die Zwei-Faktor-Anmeldung ist aktiv.",
+      "twoFactorOff": "Schütze dein Konto mit einem zweiten Faktor. Für Inhaber und Admins ist das Pflicht.",
+      "twoFactorRequired": "Als Inhaber oder Admin brauchst du die Zwei-Faktor-Anmeldung, bevor du weitermachen kannst.",
+      "enable": "Zwei-Faktor-Anmeldung einrichten",
+      "passwordConfirm": "Bestätige mit deinem Passwort",
+      "scanQr": "Scanne den Code mit deiner Authenticator-App oder gib den Schlüssel von Hand ein:",
+      "secretLabel": "Schlüssel",
+      "confirmCode": "Code aus der App",
+      "confirm": "Aktivieren",
+      "backupCodes": "Deine Notfall-Codes – bewahre sie sicher auf:",
+      "enabled": "Zwei-Faktor-Anmeldung ist jetzt aktiv."
+    },
+    "team": {
+      "title": "Team",
+      "subtitle": "Lade Kolleginnen und Kollegen ein und lege fest, was sie dürfen.",
+      "members": "Mitglieder",
+      "invite": "Einladen",
+      "inviteTitle": "Jemanden einladen",
+      "emailLabel": "E-Mail-Adresse",
+      "roleLabel": "Rolle",
+      "send": "Einladung senden",
+      "sent": "Einladung an {email} verschickt.",
+      "pending": "Offene Einladungen",
+      "pendingEmpty": "Keine offenen Einladungen.",
+      "expires": "gültig bis {date}",
+      "revoke": "Zurückziehen",
+      "you": "Du",
+      "twoFactorMissing": "ohne Zwei-Faktor"
+    }
+  },
+  "roles": {
+    "owner": "Inhaber",
+    "admin": "Admin",
+    "member": "Mitglied",
+    "viewer": "Leser"
+  },
+  "errors": {
+    "VALIDATION": "Bitte prüf deine Eingaben.",
+    "NOT_FOUND": "Das haben wir nicht gefunden.",
+    "FORBIDDEN": "Dafür fehlen dir die Rechte.",
+    "UNAUTHENTICATED": "Bitte melde dich an.",
+    "CONFLICT": "Das gibt es schon.",
+    "STATE_CHANGED": "Inzwischen hat sich etwas geändert. Lade die Seite neu.",
+    "INVALID_TRANSITION": "Dieser Schritt ist gerade nicht möglich.",
+    "RATE_LIMITED": "Zu viele Versuche. Warte kurz und versuch es dann noch einmal.",
+    "INTERNAL": "Da ist etwas schiefgelaufen. Versuch es gleich noch einmal.",
+    "TWO_FACTOR_REQUIRED": "Richte zuerst die Zwei-Faktor-Anmeldung ein.",
+    "FRESH_LOGIN_REQUIRED": "Bitte melde dich zur Sicherheit noch einmal an.",
+    "EMAIL_NOT_VERIFIED": "Bitte bestätige zuerst deine E-Mail-Adresse.",
+    "INVITATION_INVALID": "Diese Einladung gibt es nicht oder sie wurde zurückgezogen.",
+    "INVITATION_EXPIRED": "Diese Einladung ist abgelaufen.",
+    "INVITATION_EMAIL_MISMATCH": "Diese Einladung gilt für eine andere E-Mail-Adresse.",
+    "ALREADY_MEMBER": "Diese Person ist schon im Team.",
+    "LAST_OWNER": "Ein Arbeitsbereich braucht mindestens einen Inhaber.",
+    "OWNER_PROTECTED": "Inhaber kann nur ein Inhaber ändern.",
+    "SLUG_TAKEN": "Dieser Name ist schon vergeben.",
+    "MAILBOX_AUTH_FAILED": "Die Anmeldung bei deinem Postfach ist fehlgeschlagen. Bitte verbinde es neu.",
+    "MAILBOX_RATE_LIMITED": "Dein Anbieter bremst gerade. Wir senden morgen automatisch weiter.",
+    "RECIPIENT_SUPPRESSED": "Diese Adresse ist gesperrt – abgemeldet oder nicht zustellbar.",
+    "PREFLIGHT_PLACEHOLDER": "In {anzahl} Mails steht noch ein offener Platzhalter.",
+    "PREFLIGHT_AUTH_MISSING": "Für Aktionen ab 100 Empfängern braucht deine Domain SPF, DKIM und DMARC. Wir zeigen dir, wie das geht.",
+    "AI_BUDGET_EXCEEDED": "Dein KI-Guthaben für diesen Monat ist aufgebraucht.",
+    "TRUST_DAILY_LIMIT": "Neue Konten starten mit einem Tageslimit. Wir verteilen deine Aktion auf mehrere Tage.",
+    "PLAN_LIMIT": "Dein Tarif erlaubt {limit}. Mehr geht mit einem größeren Tarif.",
+    "SEND_UNVERIFIED": "Bei {anzahl} Mails ist unklar, ob sie rausgegangen sind. Sollen wir sie erneut senden?",
+    "GRAPH_MESSAGE_TOO_LARGE": "Über Microsoft gehen höchstens 3 MB pro Mail. Verkleinere die Anhänge oder schick einen Link.",
+    "SEND_BLOCKED_BY_MODE": "Der Versand ist in dieser Umgebung gesperrt (Testbetrieb)."
+  },
+  "emails": {
+    "verify": {
+      "subject": "Bitte bestätige deine E-Mail-Adresse",
+      "text": "Hallo {name},\n\nbitte bestätige deine E-Mail-Adresse mit diesem Link:\n{url}\n\nDer Link gilt 24 Stunden. Wenn du dich nicht registriert hast, kannst du diese E-Mail ignorieren."
+    },
+    "magicLink": {
+      "subject": "Dein Anmeldelink",
+      "text": "Hallo,\n\nmit diesem Link meldest du dich an:\n{url}\n\nDer Link gilt 5 Minuten und funktioniert nur einmal. Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail."
+    },
+    "invitation": {
+      "subject": "Einladung zu {workspace}",
+      "text": "Hallo,\n\n{inviter} lädt dich in den Arbeitsbereich „{workspace}“ ein (Rolle: {role}).\n\nEinladung annehmen:\n{url}\n\nDie Einladung gilt bis {date}."
+    },
+    "resetPassword": {
+      "subject": "Passwort zurücksetzen",
+      "text": "Hallo {name},\n\nmit diesem Link setzt du dein Passwort zurück:\n{url}\n\nDer Link gilt eine Stunde. Wenn du das nicht angefordert hast, ignoriere diese E-Mail."
+    }
+  }
+}

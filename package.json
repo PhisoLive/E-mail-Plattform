@@ -34,6 +34,7 @@
     "@ep/core": "workspace:*",
     "@ep/db": "workspace:*",
     "@ep/testing": "workspace:*",
+    "@playwright/test": "1.63.0",
     "@types/node": "^24.19.2",
     "tsx": "^4.23.15",
     "turbo": "2.11.10",

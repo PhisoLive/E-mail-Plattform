@@ -1,0 +1,81 @@
+/*
+ * Design tokens of the platform (concept chapter 13). Components use only these tokens.
+ * Calm surfaces, one accent colour, neutral greys, soft corners (8–12 px), subtle shadows,
+ * light and dark mode, spacing in 4 px steps.
+ */
+:root {
+  color-scheme: light;
+  --ep-bg: oklch(0.985 0.003 95);
+  --ep-surface: oklch(1 0 0);
+  --ep-surface-muted: oklch(0.965 0.004 95);
+  --ep-border: oklch(0.905 0.006 95);
+  --ep-border-strong: oklch(0.82 0.008 95);
+  --ep-text: oklch(0.22 0.012 260);
+  --ep-text-muted: oklch(0.47 0.012 260);
+  --ep-accent: oklch(0.47 0.12 175);
+  --ep-accent-hover: oklch(0.42 0.12 175);
+  --ep-accent-soft: oklch(0.95 0.035 175);
+  --ep-accent-text: oklch(0.99 0 0);
+  --ep-danger: oklch(0.52 0.19 27);
+  --ep-danger-soft: oklch(0.96 0.03 27);
+  --ep-warning: oklch(0.58 0.13 70);
+  --ep-warning-soft: oklch(0.96 0.045 85);
+  --ep-success: oklch(0.5 0.12 150);
+  --ep-success-soft: oklch(0.96 0.04 150);
+  --ep-focus: oklch(0.6 0.14 175);
+  --ep-radius-sm: 8px;
+  --ep-radius-md: 10px;
+  --ep-radius-lg: 12px;
+  --ep-shadow-sm: 0 1px 2px oklch(0.2 0.01 260 / 0.06);
+  --ep-shadow-md: 0 2px 8px oklch(0.2 0.01 260 / 0.07), 0 1px 2px oklch(0.2 0.01 260 / 0.05);
+}
+
+.dark {
+  color-scheme: dark;
+  --ep-bg: oklch(0.17 0.008 260);
+  --ep-surface: oklch(0.205 0.009 260);
+  --ep-surface-muted: oklch(0.24 0.01 260);
+  --ep-border: oklch(0.3 0.01 260);
+  --ep-border-strong: oklch(0.38 0.012 260);
+  --ep-text: oklch(0.95 0.004 95);
+  --ep-text-muted: oklch(0.74 0.01 260);
+  --ep-accent: oklch(0.72 0.11 175);
+  --ep-accent-hover: oklch(0.78 0.1 175);
+  --ep-accent-soft: oklch(0.3 0.045 175);
+  --ep-accent-text: oklch(0.17 0.01 260);
+  --ep-danger: oklch(0.72 0.15 27);
+  --ep-danger-soft: oklch(0.3 0.06 27);
+  --ep-warning: oklch(0.8 0.12 80);
+  --ep-warning-soft: oklch(0.3 0.05 80);
+  --ep-success: oklch(0.75 0.12 150);
+  --ep-success-soft: oklch(0.29 0.05 150);
+  --ep-focus: oklch(0.75 0.11 175);
+  --ep-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
+  --ep-shadow-md: 0 2px 10px oklch(0 0 0 / 0.35);
+}
+
+@theme inline {
+  --color-bg: var(--ep-bg);
+  --color-surface: var(--ep-surface);
+  --color-surface-muted: var(--ep-surface-muted);
+  --color-border: var(--ep-border);
+  --color-border-strong: var(--ep-border-strong);
+  --color-text: var(--ep-text);
+  --color-text-muted: var(--ep-text-muted);
+  --color-accent: var(--ep-accent);
+  --color-accent-hover: var(--ep-accent-hover);
+  --color-accent-soft: var(--ep-accent-soft);
+  --color-accent-text: var(--ep-accent-text);
+  --color-danger: var(--ep-danger);
+  --color-danger-soft: var(--ep-danger-soft);
+  --color-warning: var(--ep-warning);
+  --color-warning-soft: var(--ep-warning-soft);
+  --color-success: var(--ep-success);
+  --color-success-soft: var(--ep-success-soft);
+  --color-focus: var(--ep-focus);
+  --radius-sm: var(--ep-radius-sm);
+  --radius-md: var(--ep-radius-md);
+  --radius-lg: var(--ep-radius-lg);
+  --shadow-sm: var(--ep-shadow-sm);
+  --shadow-md: var(--ep-shadow-md);
+}
