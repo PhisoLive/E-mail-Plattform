@@ -13,8 +13,8 @@
 ## Phase 1 – in Arbeit
 
 - Arbeitsbaum: `ep-phase1` im Scratchpad, Zweig `phase1-wip` (wird nach Abschluss in `claude/amazing-carson-fippeq` übernommen).
-- Fertig: Design-Tokens (warme Neutraltöne, Akzent Petrol, Hell/Dunkel per Cookie `ep_theme` + Systemeinstellung), Komponenten in `packages/ui` (Button, Eingaben, Karten, Badges/Ampel, Zustände, Dialog, Drawer, Menü, Tooltip, Reiter, Schalter, Segmente, Toaster, Befehlspalette, `SuggestOrWrite` mit Tests), App-Schale (einklappbare Seitenleiste, mobile Navigation, Befehlspalette Strg/⌘+K, Hilfe), Regeln für Pflichtangaben je Rechtsform (`packages/core/src/sender/legal-forms.ts` + Tests), Migration `0004_sender_profile_board.sql`.
-- Nächster Schritt: Absenderprofil-Dienst + tRPC + Mandantentests, Einstellungsseiten, Startseite, alle Routen aus Kapitel 13, Onboarding-Gerüst, Passwort-vergessen-Seiten, Barrierefreiheits- und 360-px-E2E, Lighthouse-Skript, Abnahme.
+- Fertig: Design-System und Komponenten, App-Schale (Seitenleiste mit Agenten und Zähler, Schublade unter 1024 px, Befehlspalette, Hilfe), alle Routen aus Kapitel 13, Startseite, Einstellungen (Profil, Team mit Rollen/Entfernen, Absender mit Pflichtangaben je Rechtsform), Onboarding, Website, Betreiberbereich, öffentliche Seiten, „Passwort vergessen“, E2E mit axe und Lighthouse, Entscheidungen E-037 bis E-046.
+- Nächster Schritt: kompletter Testlauf (lint, typecheck, test, test:e2e, test:e2e:prod), Bericht `docs/berichte/phase-01.md`, Übernahme in den Hauptzweig, unabhängige Abnahme, Befunde beheben.
 
 ## Offene Punkte
 
