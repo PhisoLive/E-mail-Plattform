@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./system": "./src/system/index.ts",
+    "./system/operations": "./src/system/operations.ts",
     "./*": "./src/*.ts"
   },
   "scripts": {

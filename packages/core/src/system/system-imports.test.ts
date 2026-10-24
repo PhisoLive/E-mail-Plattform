@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
  */
 const allowed = new Set([
   "packages/core/src/system/index.ts",
+  "packages/core/src/system/operations.ts",
   "packages/core/src/services/invitations.ts",
 ]);
 

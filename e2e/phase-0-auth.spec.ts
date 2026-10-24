@@ -107,3 +107,23 @@ test("Health-Endpunkte von Web, Edge und Worker", async ({ request }) => {
   const worker = await request.get(`http://127.0.0.1:${process.env.WORKER_PORT ?? "4402"}/health`);
   expect(worker.status()).toBe(200);
 });
+
+test("Magic Link umgeht die Zwei-Faktor-Anmeldung nicht", async ({ page }) => {
+  const user = { name: "Tom Totp", email: uniqueAddress("tfa"), password: defaultPassword };
+  await registerAndVerify(page, user);
+  await login(page, user);
+  await createWorkspace(page, "Firma mit 2FA");
+  await enableTwoFactor(page, user.password);
+  await page.context().clearCookies();
+
+  const requested = new Date(Date.now() - 1000);
+  await page.goto("/login");
+  await page.getByLabel("E-Mail-Adresse").fill(user.email);
+  await page.getByRole("button", { name: "Anmeldelink per E-Mail schicken" }).click();
+  const mail = await mailpit.waitForMail(user.email, {
+    subject: "Anmeldung mit Zwei-Faktor-Code",
+    after: requested,
+  });
+  expect(mail).toContain("Passwort und dem Code");
+  expect(mail).not.toMatch(/magic-link\/verify/);
+});
