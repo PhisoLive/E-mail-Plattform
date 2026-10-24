@@ -21,7 +21,7 @@ export function runtime(): WebRuntime {
       mailer: createSystemMailer(env.SYSTEM_MAIL_SMTP_URL, env.SYSTEM_MAIL_FROM, {
         mode: env.MAIL_SEND_MODE,
         allowlist: env.MAIL_ALLOWLIST,
-        sandboxHosts: env.SANDBOX_MAIL_HOSTS,
+        sandboxEndpoints: env.SANDBOX_MAIL_ENDPOINTS,
       }),
       logger: createLogger("web", env.LOG_LEVEL),
     };

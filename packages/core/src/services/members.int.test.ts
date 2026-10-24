@@ -61,3 +61,46 @@ describe("member service", () => {
     expect((await removeMember(admin.ctx, memberRow.id)).ok).toBe(true);
   });
 });
+
+describe("last owner protection under concurrency", () => {
+  it("never leaves a workspace without owner when two owners remove each other at once", async () => {
+    const workspace = await createTestWorkspace(deps);
+    const second = await addTestMember(deps, workspace, "owner");
+    const members = await listMembers(workspace.ownerCtx);
+    if (!members.ok) throw new Error("list failed");
+    const firstRow = members.value.find((row) => row.userId === workspace.owner.id);
+    const secondRow = members.value.find((row) => row.userId === second.user.id);
+    if (!firstRow || !secondRow) throw new Error("rows missing");
+
+    const results = await Promise.all([
+      removeMember(workspace.ownerCtx, secondRow.id),
+      removeMember(second.ctx, firstRow.id),
+    ]);
+    expect(results.filter((result) => result.ok)).toHaveLength(1);
+    expect(results.filter((result) => !result.ok)).toEqual([
+      { ok: false, error: { code: "LAST_OWNER" } },
+    ]);
+    const after = await listMembers(
+      workspace.ownerCtx.role === "owner" && results[0]?.ok ? workspace.ownerCtx : second.ctx,
+    );
+    expect(after.ok && after.value.filter((row) => row.role === "owner")).toHaveLength(1);
+  });
+
+  it("never leaves a workspace without owner when two owners demote each other at once", async () => {
+    const workspace = await createTestWorkspace(deps);
+    const second = await addTestMember(deps, workspace, "owner");
+    const members = await listMembers(workspace.ownerCtx);
+    if (!members.ok) throw new Error("list failed");
+    const firstRow = members.value.find((row) => row.userId === workspace.owner.id);
+    const secondRow = members.value.find((row) => row.userId === second.user.id);
+    if (!firstRow || !secondRow) throw new Error("rows missing");
+
+    const results = await Promise.all([
+      changeMemberRole(workspace.ownerCtx, { memberId: secondRow.id, role: "member" }),
+      changeMemberRole(second.ctx, { memberId: firstRow.id, role: "member" }),
+    ]);
+    expect(results.filter((result) => result.ok)).toHaveLength(1);
+    const after = await listMembers(workspace.ownerCtx);
+    expect(after.ok && after.value.filter((row) => row.role === "owner")).toHaveLength(1);
+  });
+});

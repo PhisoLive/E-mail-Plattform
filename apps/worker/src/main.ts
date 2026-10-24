@@ -4,7 +4,7 @@ import { createCoreRuntime } from "@ep/core/runtime";
 import { startHealthServer } from "./health-server";
 import { startWorkers } from "./runner";
 
-const env = loadEnv(workerEnvSchema);
+const env = loadEnv(workerEnvSchema, process.env, "worker");
 const logger = createLogger("worker", env.LOG_LEVEL);
 const runtime = createCoreRuntime(env, {
   applicationName: "emailplattform-worker",

@@ -1,5 +1,6 @@
 "use client";
 
+import { type ErrorCode, errorCodes } from "@ep/core/errors";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
@@ -43,11 +44,15 @@ export function TrpcProviders({ children }: { children: ReactNode }) {
   );
 }
 
-/** Error code of a failed tRPC call – the text comes from de.json `errors.<CODE>`. */
-export function errorCode(error: unknown): string {
+/**
+ * Error code of a failed tRPC call – the text comes from de.json `errors.<CODE>`.
+ * Unknown codes and transport errors (offline, timeouts) map to INTERNAL.
+ */
+export function errorCode(error: unknown): ErrorCode {
   if (error instanceof TRPCClientError) {
     const data = error.data as { appError?: { code: string } | null } | undefined;
-    return data?.appError?.code ?? (error.message || "INTERNAL");
+    const code = data?.appError?.code ?? error.message;
+    if ((errorCodes as readonly string[]).includes(code)) return code as ErrorCode;
   }
   return "INTERNAL";
 }

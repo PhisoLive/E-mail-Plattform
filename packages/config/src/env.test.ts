@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { baseEnvSchema, checkSendModeSafety, EnvError, loadEnv } from "./env";
+import { baseEnvSchema, checkSendModeSafety, EnvError, envForApp, loadEnv } from "./env";
 
 const key = Buffer.alloc(32, 1).toString("base64");
 
@@ -57,5 +57,53 @@ describe("loadEnv", () => {
       expect(String(error)).toContain("EMAIL_HASH_KEY");
       expect(String(error)).not.toContain("c2VjcmV0");
     }
+  });
+});
+
+describe("secret separation between apps (concept chapter 16)", () => {
+  it("refuses to start the web app when the master key is present", () => {
+    expect(() => loadEnv(baseEnvSchema, { ...valid, MASTER_KEY: key }, "web")).toThrow(
+      /MASTER_KEY: must not be available/,
+    );
+    expect(() => loadEnv(baseEnvSchema, { ...valid, SEALED_BOX_SECRET_KEY: key }, "web")).toThrow(
+      EnvError,
+    );
+    expect(() =>
+      loadEnv(baseEnvSchema, { ...valid, BETTER_AUTH_SECRET: "x".repeat(40) }, "edge"),
+    ).toThrow(EnvError);
+    expect(loadEnv(baseEnvSchema, valid, "web").MAIL_SEND_MODE).toBe("sandbox");
+  });
+
+  it("filters the environment per app", () => {
+    const all = {
+      ...valid,
+      MASTER_KEY: key,
+      SEALED_BOX_SECRET_KEY: key,
+      BETTER_AUTH_SECRET: "s".repeat(40),
+      PATH: "/bin",
+    };
+    expect(Object.keys(envForApp("web", all))).not.toContain("MASTER_KEY");
+    expect(Object.keys(envForApp("web", all))).not.toContain("SEALED_BOX_SECRET_KEY");
+    expect(Object.keys(envForApp("web", all))).toContain("BETTER_AUTH_SECRET");
+    expect(Object.keys(envForApp("worker", all))).toContain("MASTER_KEY");
+    expect(Object.keys(envForApp("worker", all))).not.toContain("BETTER_AUTH_SECRET");
+    expect(Object.keys(envForApp("edge", all))).toEqual(
+      expect.arrayContaining(["PATH", "DATABASE_URL"]),
+    );
+  });
+});
+
+describe("sandbox endpoints", () => {
+  it("must be host:port entries", () => {
+    expect(
+      loadEnv(baseEnvSchema, { ...valid, SANDBOX_MAIL_ENDPOINTS: "127.0.0.1:54025, Mailpit:1025" })
+        .SANDBOX_MAIL_ENDPOINTS,
+    ).toEqual(["127.0.0.1:54025", "mailpit:1025"]);
+    expect(() => loadEnv(baseEnvSchema, { ...valid, SANDBOX_MAIL_ENDPOINTS: "127.0.0.1" })).toThrow(
+      /host:port/,
+    );
+    expect(() =>
+      loadEnv(baseEnvSchema, { ...valid, SANDBOX_MAIL_ENDPOINTS: "smtp.gmail.com" }),
+    ).toThrow(EnvError);
   });
 });

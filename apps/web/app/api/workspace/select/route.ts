@@ -14,8 +14,13 @@ export async function POST(request: Request): Promise<Response> {
   const parsed = body.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "VALIDATION" }, { status: 400 });
   const role = await workspaceService.getMembershipRole(
-    runtime().core.deps,
-    session.userId,
+    {
+      kind: "user",
+      deps: runtime().core.deps,
+      userId: session.userId,
+      email: session.email,
+      emailVerified: session.emailVerified,
+    },
     parsed.data.workspaceId,
   );
   if (!role) return Response.json({ error: "FORBIDDEN" }, { status: 403 });

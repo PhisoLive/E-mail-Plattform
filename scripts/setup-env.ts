@@ -59,7 +59,10 @@ export function ensureDevEnv(): void {
     ["VALKEY_PREFIX", "ep"],
     ["MAIL_SEND_MODE", "sandbox"],
     ["MAIL_ALLOWLIST", ""],
-    ["SANDBOX_MAIL_HOSTS", "127.0.0.1,localhost,greenmail,mailpit"],
+    [
+      "SANDBOX_MAIL_ENDPOINTS",
+      `127.0.0.1:${ports.gmSmtp},127.0.0.1:${ports.gmSmtps},127.0.0.1:${ports.mailpitSmtp}`,
+    ],
     ["EMAIL_HASH_KEY", random(32)],
     ["WEB_URL", `http://127.0.0.1:${appPorts.dev.web}`],
     ["EDGE_URL", `http://127.0.0.1:${appPorts.dev.edge}`],

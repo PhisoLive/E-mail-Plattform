@@ -1,6 +1,8 @@
 import { MailpitClient } from "@ep/testing";
 import { expect, test } from "@playwright/test";
 import {
+  auditActions,
+  collectCspViolations,
   createWorkspace,
   defaultPassword,
   enableTwoFactor,
@@ -32,6 +34,15 @@ test("Registrieren → Anmelden → 2FA → Arbeitsbereich → Mitglied einladen
   await ownerPage.context().clearCookies();
   await login(ownerPage, { ...owner, totpSecret: secret });
   await expect(ownerPage.getByRole("heading", { name: /Hallo Olga/ })).toBeVisible();
+  // Sign-ins and the 2FA activation are in the audit log (concept chapter 16).
+  expect(await auditActions(owner.email)).toEqual(
+    expect.arrayContaining([
+      "auth.sign_in",
+      "auth.two_factor_enabled",
+      "auth.sign_in_two_factor",
+      "workspace.created",
+    ]),
+  );
 
   // Invite a member.
   const member = {
@@ -91,11 +102,61 @@ test("Anmeldung per Magic Link", async ({ page }) => {
 });
 
 test("Falsches Passwort und unbestätigte Adresse werden abgewiesen", async ({ page }) => {
+  // Unknown address.
   await page.goto("/login");
   await page.getByLabel("E-Mail-Adresse").fill(uniqueAddress("nobody"));
   await page.getByLabel("Passwort").fill("falsches-passwort-123");
   await page.getByRole("button", { name: "Anmelden", exact: true }).click();
   await expect(page.getByText("E-Mail-Adresse oder Passwort stimmen nicht.")).toBeVisible();
+
+  // Existing, confirmed account with a wrong password.
+  const user = { name: "Paula Passwort", email: uniqueAddress("pw"), password: defaultPassword };
+  await registerAndVerify(page, user);
+  await page.context().clearCookies();
+  await page.goto("/login");
+  await page.getByLabel("E-Mail-Adresse").fill(user.email);
+  await page.getByLabel("Passwort").fill("nicht-das-richtige-1");
+  await page.getByRole("button", { name: "Anmelden", exact: true }).click();
+  await expect(page.getByText("E-Mail-Adresse oder Passwort stimmen nicht.")).toBeVisible();
+
+  // Registered, but the address is not confirmed yet.
+  const unverified = {
+    name: "Udo Unbestätigt",
+    email: uniqueAddress("unverified"),
+    password: defaultPassword,
+  };
+  await page.goto("/registrieren");
+  await page.getByLabel("Dein Name").fill(unverified.name);
+  await page.getByLabel("E-Mail-Adresse").fill(unverified.email);
+  await page.getByLabel("Passwort").fill(unverified.password);
+  await page.getByRole("button", { name: "Konto anlegen" }).click();
+  await expect(page.getByRole("heading", { name: "Fast geschafft" })).toBeVisible();
+  await page.goto("/login");
+  await page.getByLabel("E-Mail-Adresse").fill(unverified.email);
+  await page.getByLabel("Passwort").fill(unverified.password);
+  await page.getByRole("button", { name: "Anmelden", exact: true }).click();
+  await expect(page.getByText("Bitte bestätige zuerst deine E-Mail-Adresse.")).toBeVisible();
+});
+
+test("Abgelaufene oder ungültige Anmeldelinks zeigen einen Hinweis", async ({ page }) => {
+  await page.goto("/login?error=INVALID_TOKEN");
+  await expect(
+    page.getByText("Dieser Link ist abgelaufen oder wurde schon benutzt."),
+  ).toBeVisible();
+});
+
+test("Keine CSP-Verletzungen auf öffentlichen Seiten und in der App", async ({ page }) => {
+  const violations = collectCspViolations(page);
+  for (const path of ["/", "/login", "/registrieren", "/gibt-es-nicht"]) {
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+  }
+  await expect(page.getByRole("heading", { name: "Seite nicht gefunden" })).toBeVisible();
+  const user = { name: "Clara CSP", email: uniqueAddress("csp"), password: defaultPassword };
+  await registerAndVerify(page, user);
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("heading", { name: "Dein Arbeitsbereich" })).toBeVisible();
+  expect(violations).toEqual([]);
 });
 
 test("Health-Endpunkte von Web, Edge und Worker", async ({ request }) => {

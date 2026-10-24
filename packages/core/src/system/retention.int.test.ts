@@ -1,18 +1,11 @@
-import type { workerEnvSchema } from "@ep/config/env";
-import { createLogger } from "@ep/core";
 import { invitations, session } from "@ep/db";
 import { createTestDeps, createTestUser, createTestWorkspace, TestClock } from "@ep/testing";
 import { eq } from "drizzle-orm";
 import { describe, expect, it } from "vitest";
-import { runRetention } from "./maintenance";
+import { runRetention } from "./retention";
 
 const clock = new TestClock(new Date("2026-11-02T03:00:00Z"));
 const deps = createTestDeps(clock);
-const ctx = {
-  deps,
-  env: {} as ReturnType<typeof workerEnvSchema.parse>,
-  logger: createLogger("test", "silent"),
-};
 
 describe("retention job", () => {
   it("deletes expired sessions and old invitations but keeps current ones", async () => {
@@ -55,7 +48,7 @@ describe("retention job", () => {
       })
       .returning({ id: invitations.id });
 
-    await runRetention(ctx);
+    await runRetention(deps);
 
     expect(
       await deps.db

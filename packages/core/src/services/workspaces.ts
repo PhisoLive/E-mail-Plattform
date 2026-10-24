@@ -2,7 +2,7 @@ import { senderProfiles, user, workspaceMembers, workspaces } from "@ep/db";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { writeAudit, writeUserAudit } from "../audit";
-import type { CoreDeps, MemberRole, UserContext, WorkspaceContext } from "../context";
+import type { MemberRole, UserContext, WorkspaceContext } from "../context";
 import { randomToken } from "../crypto-utils";
 import { appError } from "../errors";
 import { requirePermission } from "../permissions";
@@ -109,24 +109,25 @@ export async function listMyWorkspaces(ctx: UserContext): Promise<WorkspaceSumma
   });
 }
 
-/** Role of a user in a workspace, or null. Used to build the WorkspaceContext of a request. */
+/** Role of the signed-in user in a workspace, or null. Used to build the WorkspaceContext. */
 export async function getMembershipRole(
-  deps: CoreDeps,
-  userId: string,
+  ctx: UserContext,
   workspaceId: string,
 ): Promise<MemberRole | null> {
-  const [row] = await deps.db
-    .select({ role: workspaceMembers.role })
-    .from(workspaceMembers)
-    .innerJoin(workspaces, eq(workspaces.id, workspaceMembers.workspaceId))
-    .where(
-      and(
-        eq(workspaceMembers.userId, userId),
-        eq(workspaceMembers.workspaceId, workspaceId),
-        isNull(workspaces.deletedAt),
-      ),
-    );
-  return row?.role ?? null;
+  return withUser(ctx, async (scope) => {
+    const [row] = await scope.tx
+      .select({ role: workspaceMembers.role })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaces.id, workspaceMembers.workspaceId))
+      .where(
+        and(
+          eq(workspaceMembers.userId, scope.userId),
+          eq(workspaceMembers.workspaceId, workspaceId),
+          isNull(workspaces.deletedAt),
+        ),
+      );
+    return row?.role ?? null;
+  });
 }
 
 export interface WorkspaceDetails {

@@ -12,6 +12,24 @@ function useT() {
   return (key: string, values?: Record<string, string>) => t(key as never, values as never);
 }
 
+/**
+ * Better Auth redirects failed magic links and e-mail verifications with `?error=…` – either
+ * directly to /login or inside the `next` target (verification callback behind the login).
+ */
+function linkError(params: URLSearchParams, t: (key: string) => string): string | null {
+  const nested = params.get("next");
+  const code =
+    params.get("error") ??
+    (nested ? new URLSearchParams(nested.split("?")[1] ?? "").get("error") : null);
+  if (!code) return null;
+  if (code === "TOKEN_EXPIRED" || code === "INVALID_TOKEN" || code === "USER_NOT_FOUND") {
+    return t(
+      nested?.startsWith("/willkommen") ? "auth.errors.verifyFailed" : "auth.errors.linkExpired",
+    );
+  }
+  return t("auth.errors.linkExpired");
+}
+
 export function LoginForm() {
   const t = useT();
   const router = useRouter();
@@ -19,7 +37,7 @@ export function LoginForm() {
   const next = safeNext(params.get("next"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => linkError(params, t));
   const [info, setInfo] = useState<string | null>(null);
   const [pending, setPending] = useState<"password" | "magic" | null>(null);
 
@@ -35,7 +53,7 @@ export function LoginForm() {
     });
     setPending(null);
     if (failure) {
-      setError(t(authErrorKey(failure.code)));
+      setError(t(authErrorKey(failure.code, failure.status)));
       return;
     }
     if (data && "twoFactorRedirect" in data && data.twoFactorRedirect) {
@@ -58,7 +76,7 @@ export function LoginForm() {
       errorCallbackURL: "/login",
     });
     setPending(null);
-    if (failure) setError(t(authErrorKey(failure.code)));
+    if (failure) setError(t(authErrorKey(failure.code, failure.status)));
     else setInfo(t("auth.login.magicLinkSent", { email }));
   }
 
@@ -135,7 +153,7 @@ export function TwoFactorForm() {
     });
     setPending(false);
     if (failure) {
-      setError(t(authErrorKey(failure.code)));
+      setError(t(authErrorKey(failure.code, failure.status)));
       return;
     }
     window.location.assign(next);
@@ -172,7 +190,7 @@ export function TwoFactorForm() {
   );
 }
 
-export function RegisterForm() {
+export function RegisterForm({ minPasswordLength }: { minPasswordLength: number }) {
   const t = useT();
   const params = useSearchParams();
   const next = safeNext(params.get("next"), "/willkommen");
@@ -185,8 +203,8 @@ export function RegisterForm() {
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
-    if (password.length < 10) {
-      setError(t("auth.register.passwordTooShort"));
+    if (password.length < minPasswordLength) {
+      setError(t("auth.register.passwordTooShort", { min: String(minPasswordLength) }));
       return;
     }
     setPending(true);
@@ -199,7 +217,7 @@ export function RegisterForm() {
     });
     setPending(false);
     if (failure) {
-      setError(t(authErrorKey(failure.code)));
+      setError(t(authErrorKey(failure.code, failure.status), { min: String(minPasswordLength) }));
       return;
     }
     setDone(true);
@@ -245,13 +263,17 @@ export function RegisterForm() {
               onChange={(event) => setEmail(event.target.value)}
             />
           </Field>
-          <Field id="password" label={t("common.password")} hint={t("auth.register.passwordHint")}>
+          <Field
+            id="password"
+            label={t("common.password")}
+            hint={t("auth.register.passwordHint", { min: String(minPasswordLength) })}
+          >
             <Input
               id="password"
               type="password"
               autoComplete="new-password"
               required
-              minLength={10}
+              minLength={minPasswordLength}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               aria-describedby="password-hint"

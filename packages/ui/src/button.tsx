@@ -24,6 +24,26 @@ const sizes: Record<ButtonSize, string> = {
   lg: "h-11 px-5 text-base gap-2",
 };
 
+/** Button look for other elements, e.g. a Next.js <Link> (no <button> inside <a>). */
+export function buttonClasses({
+  variant = "primary",
+  size = "md",
+  className,
+}: {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+} = {}): string {
+  return cn(
+    "inline-flex items-center justify-center rounded-md font-medium transition-colors",
+    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
+    "disabled:pointer-events-none disabled:opacity-50",
+    variants[variant],
+    sizes[size],
+    className,
+  );
+}
+
 export function Button({
   variant = "primary",
   size = "md",
@@ -37,14 +57,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={cn(
-        "inline-flex items-center justify-center rounded-md font-medium transition-colors",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-        "disabled:pointer-events-none disabled:opacity-50",
-        variants[variant],
-        sizes[size],
-        className,
-      )}
+      className={buttonClasses({ variant, size, ...(className ? { className } : {}) })}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       {...props}

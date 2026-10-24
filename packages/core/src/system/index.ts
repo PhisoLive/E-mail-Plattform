@@ -4,6 +4,7 @@
  * Only modules listed in `system-imports.test.ts` may import this module.
  */
 import type { Tx } from "@ep/db";
+import { sql } from "drizzle-orm";
 import type { CoreDeps } from "../context";
 
 export interface SystemContext {
@@ -17,6 +18,10 @@ export function systemContext(deps: CoreDeps, purpose: string): SystemContext {
   return { kind: "system", deps, purpose };
 }
 
+/** Transaction with the dedicated database role `ep_system` (BYPASSRLS from phase 14). */
 export async function withSystem<T>(ctx: SystemContext, fn: (tx: Tx) => Promise<T>): Promise<T> {
-  return ctx.deps.db.transaction(fn);
+  return ctx.deps.db.transaction(async (tx) => {
+    await tx.execute(sql`set local role ep_system`);
+    return fn(tx);
+  });
 }

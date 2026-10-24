@@ -67,3 +67,32 @@ export async function enableTwoFactor(page: Page, password: string): Promise<str
   await expect(page.getByText("Zwei-Faktor-Anmeldung ist jetzt aktiv.")).toBeVisible();
   return secret;
 }
+
+/** Collects Content-Security-Policy violations reported by the browser. */
+export function collectCspViolations(page: Page): string[] {
+  const violations: string[] = [];
+  page.on("console", (message) => {
+    if (/Content Security Policy|Content-Security-Policy/i.test(message.text()))
+      violations.push(message.text());
+  });
+  page.on("pageerror", (error) => {
+    if (/Content Security Policy/i.test(error.message)) violations.push(error.message);
+  });
+  return violations;
+}
+
+/** Audit actions of a user, read directly from the E2E database. */
+export async function auditActions(email: string): Promise<string[]> {
+  const url = process.env.E2E_DATABASE_URL;
+  if (!url) throw new Error("E2E_DATABASE_URL missing");
+  const { default: postgres } = await import("postgres");
+  const sql = postgres(url, { max: 1, onnotice: () => {} });
+  try {
+    const rows = await sql<{ action: string }[]>`
+      select a.action from audit_logs a join "user" u on u.id::text = a.actor_id
+      where lower(u.email) = ${email.toLowerCase()} order by a.created_at`;
+    return rows.map((row) => row.action);
+  } finally {
+    await sql.end({ timeout: 2 });
+  }
+}

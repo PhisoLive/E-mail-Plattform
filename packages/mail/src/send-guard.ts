@@ -1,5 +1,6 @@
 import type { MailSendMode } from "@ep/config/env";
 import { appError, err, normalizeEmail, ok, type Result } from "@ep/core";
+import addressparser from "nodemailer/lib/addressparser";
 
 /**
  * Send switch (concept chapter 18, CLAUDE.md): without an explicit `live` no mail leaves the
@@ -9,14 +10,25 @@ export interface SendPolicy {
   mode: MailSendMode;
   /** `address@domain` or `@domain` entries (staging). */
   allowlist: readonly string[];
-  /** SMTP hosts that are mail sandboxes (GreenMail, Mailpit). */
-  sandboxHosts: readonly string[];
+  /** `host:port` endpoints of the mail sandboxes (GreenMail, Mailpit) – only these in sandbox mode. */
+  sandboxEndpoints: readonly string[];
 }
 
 export interface SendAttempt {
-  /** Host of the SMTP server or API endpoint the mail is handed to. */
+  /** Host and port of the SMTP server or API endpoint the mail is handed to. */
   transportHost: string;
+  transportPort: number;
+  /** Address fields as given to the transport; lists are parsed like Nodemailer does. */
   recipients: readonly string[];
+}
+
+/** Every mailbox address in the recipient fields (groups and lists flattened). */
+export function parseRecipients(recipients: readonly string[]): string[] {
+  return recipients.flatMap((field) =>
+    addressparser(field, { flatten: true })
+      .map((entry) => entry.address.trim())
+      .filter((address) => address.length > 0),
+  );
 }
 
 function matchesAllowlist(recipient: string, allowlist: readonly string[]): boolean {
@@ -28,13 +40,18 @@ function matchesAllowlist(recipient: string, allowlist: readonly string[]): bool
   });
 }
 
+export function endpointKey(host: string, port: number): string {
+  return `${host.toLowerCase()}:${port}`;
+}
+
 export function checkSendAllowed(policy: SendPolicy, attempt: SendAttempt): Result<true> {
-  if (attempt.recipients.length === 0) return err(appError("VALIDATION"));
+  const addresses = parseRecipients(attempt.recipients);
+  if (addresses.length === 0) return err(appError("VALIDATION"));
   switch (policy.mode) {
     case "live":
       return ok(true);
     case "allowlist": {
-      const blocked = attempt.recipients.filter(
+      const blocked = addresses.filter(
         (recipient) => !matchesAllowlist(recipient, policy.allowlist),
       );
       return blocked.length === 0
@@ -42,8 +59,8 @@ export function checkSendAllowed(policy: SendPolicy, attempt: SendAttempt): Resu
         : err(appError("SEND_BLOCKED_BY_MODE", { mode: "allowlist", count: blocked.length }));
     }
     case "sandbox": {
-      const host = attempt.transportHost.toLowerCase();
-      return policy.sandboxHosts.includes(host)
+      const endpoint = endpointKey(attempt.transportHost, attempt.transportPort);
+      return policy.sandboxEndpoints.map((entry) => entry.toLowerCase()).includes(endpoint)
         ? ok(true)
         : err(appError("SEND_BLOCKED_BY_MODE", { mode: "sandbox" }));
     }

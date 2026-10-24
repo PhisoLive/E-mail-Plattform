@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, Button, Card, CardBody, CardHeader, Field, Input } from "@ep/ui";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import QRCode from "qrcode";
@@ -29,7 +30,7 @@ export function TwoFactorSetup({ enabled, required }: { enabled: boolean; requir
     const { data, error: failure } = await authClient.twoFactor.enable({ password });
     setPending(false);
     if (failure || !data || data.method !== "totp") {
-      setError(t(authErrorKey(failure?.code) as never));
+      setError(t(authErrorKey(failure?.code, failure?.status) as never));
       return;
     }
     setUri(data.totpURI);
@@ -47,7 +48,7 @@ export function TwoFactorSetup({ enabled, required }: { enabled: boolean; requir
     });
     setPending(false);
     if (failure) {
-      setError(t(authErrorKey(failure.code) as never));
+      setError(t(authErrorKey(failure.code, failure.status) as never));
       return;
     }
     setJustEnabled(true);
@@ -118,9 +119,9 @@ export function TwoFactorSetup({ enabled, required }: { enabled: boolean; requir
               data-testid="otpauth-uri"
               data-uri={uri}
             >
-              {/* biome-ignore lint/performance/noImgElement: data URL QR code, no optimisation needed */}
               {qr ? (
-                <img
+                <Image
+                  unoptimized
                   src={qr}
                   alt=""
                   width={192}

@@ -24,6 +24,7 @@ export function createEdgeApp(deps: CoreDeps, redis?: Redis): Hono {
     const report = await checkHealth(deps, redis);
     return c.json(report, report.status === "ok" ? 200 : 503);
   });
-  app.notFound((c) => c.text("Nicht gefunden", 404));
+  // No text in code: public pages of the edge service get their texts from de.json (phase 4).
+  app.notFound((c) => c.body(null, 404));
   return app;
 }

@@ -44,6 +44,8 @@ export const defaults = {
   invitation: {
     /** Not specified in the concept – decision recorded in docs/ENTSCHEIDUNGEN.md. */
     expiresDays: 7,
+    /** Invitation mails per workspace in 24 hours (protects the system sender, E-030). */
+    maxPerWorkspacePerDay: 50,
   },
 
   sending: {
@@ -256,12 +258,20 @@ export const defaults = {
 
   auth: {
     passwordMinLength: 10,
+    passwordMaxLength: 128,
+    nameMaxLength: 100,
     sessionDays: 30,
+    sessionRefreshHours: 24,
+    magicLinkMinutes: 5,
+    verificationHours: 24,
+    resetPasswordMinutes: 60,
     freshLoginMinutes: 15,
     require2faRoles: ["owner", "admin", "platform_admin"],
     rateLimit: {
       login: { max: 10, windowMinutes: 15 },
       passwordReset: { max: 3, windowMinutes: 60 },
+      /** Fallback limit for all other auth endpoints. */
+      general: { max: 100, windowSeconds: 60 },
     },
   },
 
@@ -289,6 +299,12 @@ export const defaults = {
       maintenance: 3,
     },
     backoffBaseMs: 2000,
+    /** How long BullMQ keeps finished job data in Valkey (only ids, no contents). */
+    keepCompletedSeconds: 24 * 3600,
+    keepCompletedCount: 1000,
+    keepFailedSeconds: 7 * 24 * 3600,
+    /** Running jobs may finish on shutdown (concept chapter 18: at most 60 seconds). */
+    shutdownGraceSeconds: 60,
   },
 
   schedules: {

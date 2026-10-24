@@ -51,13 +51,20 @@ async function loadMember(scope: WorkspaceScope, memberId: string) {
   return member;
 }
 
-async function ownerCount(scope: WorkspaceScope): Promise<number> {
+/**
+ * Locks all owner rows (always before any other member row, in a fixed order) and returns their
+ * number. Two owners demoting or removing each other at the same time are serialized, so the
+ * second one sees the result of the first ("letzter Inhaber" stays protected).
+ */
+async function lockOwners(scope: WorkspaceScope): Promise<number> {
   const owners = await scope.tx
     .select({ id: workspaceMembers.id })
     .from(workspaceMembers)
     .where(
       and(eq(workspaceMembers.workspaceId, scope.workspaceId), eq(workspaceMembers.role, "owner")),
-    );
+    )
+    .orderBy(asc(workspaceMembers.id))
+    .for("update");
   return owners.length;
 }
 
@@ -77,10 +84,11 @@ export async function changeMemberRole(
   const { memberId, role } = parsed.data;
 
   return withWorkspace(ctx, async (scope) => {
+    const owners = await lockOwners(scope);
     const member = await loadMember(scope, memberId);
     if (!member) return err(appError("NOT_FOUND"));
     if (!canManageRole(ctx.role, member.role, role)) return err(appError("OWNER_PROTECTED"));
-    if (member.role === "owner" && role !== "owner" && (await ownerCount(scope)) <= 1) {
+    if (member.role === "owner" && role !== "owner" && owners <= 1) {
       return err(appError("LAST_OWNER"));
     }
     await scope.tx
@@ -105,11 +113,11 @@ export async function removeMember(ctx: WorkspaceContext, memberId: string): Pro
   if (!z.uuid().safeParse(memberId).success) return err(appError("VALIDATION"));
 
   return withWorkspace(ctx, async (scope) => {
+    const owners = await lockOwners(scope);
     const member = await loadMember(scope, memberId);
     if (!member) return err(appError("NOT_FOUND"));
     if (!canManageRole(ctx.role, member.role)) return err(appError("OWNER_PROTECTED"));
-    if (member.role === "owner" && (await ownerCount(scope)) <= 1)
-      return err(appError("LAST_OWNER"));
+    if (member.role === "owner" && owners <= 1) return err(appError("LAST_OWNER"));
     await scope.tx
       .delete(workspaceMembers)
       .where(

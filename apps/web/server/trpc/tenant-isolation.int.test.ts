@@ -14,6 +14,7 @@ import {
   createTestWorkspace,
   type TestUser,
   type TestWorkspace,
+  userContext,
 } from "@ep/testing";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -97,7 +98,7 @@ const cases: Record<string, () => Promise<void>> = {
   "workspace.create": async () => {
     const created = await callerFor(b.owner, a.id).workspace.create({ name: "Neu von B" });
     expect(created.id).not.toBe(a.id);
-    expect(await workspaceService.getMembershipRole(deps, b.owner.id, a.id)).toBeNull();
+    expect(await workspaceService.getMembershipRole(userContext(deps, b.owner), a.id)).toBeNull();
   },
   "workspace.current": async () => {
     await expectCode(callerFor(b.owner, a.id).workspace.current(), "FORBIDDEN");
@@ -178,7 +179,7 @@ const cases: Record<string, () => Promise<void>> = {
       callerFor(b.owner, b.id).invitation.accept({ token: aInvitationToken }),
       "INVITATION_EMAIL_MISMATCH",
     );
-    expect(await workspaceService.getMembershipRole(deps, b.owner.id, a.id)).toBeNull();
+    expect(await workspaceService.getMembershipRole(userContext(deps, b.owner), a.id)).toBeNull();
   },
 };
 

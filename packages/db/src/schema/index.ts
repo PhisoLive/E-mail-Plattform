@@ -9,4 +9,5 @@ export * from "./files";
 export * from "./mailboxes";
 export * from "./ops";
 export * from "./runs";
+export * from "./suppressions";
 export * from "./workspaces";

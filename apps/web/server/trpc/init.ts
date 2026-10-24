@@ -72,8 +72,7 @@ export const workspaceProcedure = authedProcedure.use(async ({ ctx, meta, next }
   if (!workspaceId || !z.uuid().safeParse(workspaceId).success)
     throw toTrpcError(appError("FORBIDDEN"));
   const role: MemberRole | null = await workspaceService.getMembershipRole(
-    ctx.deps,
-    ctx.session.userId,
+    ctx.userCtx,
     workspaceId,
   );
   if (!role) throw toTrpcError(appError("FORBIDDEN"));

@@ -34,6 +34,10 @@ const config: NextConfig = {
     "bullmq",
     "nodemailer",
   ],
+  // Development request log without tokens in URLs (magic links, verification, invitations).
+  logging: {
+    incomingRequests: { ignore: [/\/api\/auth\//, /\/einladung\//, /[?&]token=/] },
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

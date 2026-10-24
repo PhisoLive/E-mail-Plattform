@@ -1,4 +1,4 @@
-import { Button } from "@ep/ui";
+import { buttonClasses } from "@ep/ui";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
@@ -14,14 +14,12 @@ export default async function HomePage() {
         {t("app.name")}
       </p>
       <h1 className="text-4xl font-semibold tracking-tight">{t("app.tagline")}</h1>
-      <div className="flex gap-3">
-        <Link href="/registrieren">
-          <Button size="lg">{t("auth.register.submit")}</Button>
+      <div className="flex flex-wrap gap-3">
+        <Link href="/registrieren" className={buttonClasses({ size: "lg" })}>
+          {t("auth.register.submit")}
         </Link>
-        <Link href="/login">
-          <Button size="lg" variant="secondary">
-            {t("auth.login.submit")}
-          </Button>
+        <Link href="/login" className={buttonClasses({ size: "lg", variant: "secondary" })}>
+          {t("auth.login.submit")}
         </Link>
       </div>
     </main>

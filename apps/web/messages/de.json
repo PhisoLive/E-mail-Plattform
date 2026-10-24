@@ -37,12 +37,12 @@
       "title": "Konto anlegen",
       "subtitle": "In zwei Minuten startklar. Keine Kreditkarte nötig.",
       "nameLabel": "Dein Name",
-      "passwordHint": "Mindestens 10 Zeichen.",
+      "passwordHint": "Mindestens {min} Zeichen.",
       "submit": "Konto anlegen",
       "haveAccount": "Schon registriert?",
       "toLogin": "Zur Anmeldung",
       "emailTaken": "Für diese E-Mail-Adresse gibt es schon ein Konto.",
-      "passwordTooShort": "Das Passwort braucht mindestens 10 Zeichen.",
+      "passwordTooShort": "Das Passwort braucht mindestens {min} Zeichen.",
       "passwordPwned": "Dieses Passwort ist aus einem Datenleck bekannt. Bitte wähle ein anderes."
     },
     "verify": {
@@ -66,6 +66,13 @@
       "used": "Diese Einladung wurde schon angenommen.",
       "invalid": "Diese Einladung gibt es nicht oder sie wurde zurückgezogen.",
       "accepted": "Willkommen im Team!"
+    },
+    "errors": {
+      "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+      "wrongPassword": "Das Passwort stimmt nicht.",
+      "passwordTooLong": "Das Passwort ist zu lang.",
+      "linkExpired": "Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere einfach einen neuen an.",
+      "verifyFailed": "Der Bestätigungslink ist abgelaufen oder ungültig. Melde dich an – wir schicken dir einen neuen."
     }
   },
   "onboarding": {
@@ -187,5 +194,21 @@
       "subject": "Anmeldung mit Zwei-Faktor-Code",
       "text": "Hallo,\n\ndein Konto ist mit der Zwei-Faktor-Anmeldung geschützt. Deshalb schicken wir dir keinen Anmeldelink. Bitte melde dich mit deinem Passwort und dem Code aus deiner Authenticator-App an.\n\nWenn du das nicht warst, kannst du diese E-Mail ignorieren."
     }
+  },
+  "pages": {
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "text": "Diese Seite gibt es nicht oder nicht mehr.",
+      "back": "Zur Startseite"
+    },
+    "error": {
+      "title": "Da ist etwas schiefgelaufen",
+      "text": "Wir konnten diese Seite gerade nicht laden. Versuch es noch einmal – meist klappt es dann.",
+      "retry": "Noch einmal versuchen",
+      "home": "Zur Startseite"
+    }
+  },
+  "nav": {
+    "main": "Hauptnavigation"
   }
 }

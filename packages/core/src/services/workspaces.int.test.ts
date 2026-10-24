@@ -39,7 +39,7 @@ describe("workspace service", () => {
       .from(auditLogs)
       .where(eq(auditLogs.workspaceId, result.value.id));
     expect(audit.map((entry) => entry.action)).toContain("workspace.created");
-    expect(await getMembershipRole(deps, owner.id, result.value.id)).toBe("owner");
+    expect(await getMembershipRole(userContext(deps, owner), result.value.id)).toBe("owner");
   });
 
   it("derives time zone and language from the country", async () => {
@@ -77,7 +77,7 @@ describe("workspace service", () => {
     const list = await listMyWorkspaces(userContext(deps, a.owner));
     expect(list.map((entry) => entry.id)).toEqual([a.id]);
     expect(list.map((entry) => entry.id)).not.toContain(b.id);
-    expect(await getMembershipRole(deps, a.owner.id, b.id)).toBeNull();
+    expect(await getMembershipRole(userContext(deps, a.owner), b.id)).toBeNull();
   });
 
   it("lets only owners and admins change settings", async () => {

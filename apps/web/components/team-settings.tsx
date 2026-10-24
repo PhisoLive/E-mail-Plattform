@@ -59,7 +59,7 @@ export function TeamSettings({
             <p className="text-sm text-text-muted">{t("common.loading")}</p>
           ) : null}
           {members.error ? (
-            <Alert tone="danger">{t(`errors.${errorCode(members.error)}` as never)}</Alert>
+            <Alert tone="danger">{t(`errors.${errorCode(members.error)}`)}</Alert>
           ) : null}
           {members.data ? (
             <ul aria-label={t("settings.team.members")} className="divide-y divide-border">
@@ -103,7 +103,7 @@ export function TeamSettings({
               <Alert tone="success">{t("settings.team.sent", { email: sentTo })}</Alert>
             ) : null}
             {invite.error ? (
-              <Alert tone="danger">{t(`errors.${errorCode(invite.error)}` as never)}</Alert>
+              <Alert tone="danger">{t(`errors.${errorCode(invite.error)}`)}</Alert>
             ) : null}
             <form
               className="grid gap-4 sm:grid-cols-[1fr_12rem_auto] sm:items-end"
@@ -138,6 +138,15 @@ export function TeamSettings({
             </form>
             <div className="flex flex-col gap-2">
               <h3 className="text-sm font-medium">{t("settings.team.pending")}</h3>
+              {invitations.isPending ? (
+                <p className="text-sm text-text-muted">{t("common.loading")}</p>
+              ) : null}
+              {invitations.error ? (
+                <Alert tone="danger">{t(`errors.${errorCode(invitations.error)}`)}</Alert>
+              ) : null}
+              {revoke.error ? (
+                <Alert tone="danger">{t(`errors.${errorCode(revoke.error)}`)}</Alert>
+              ) : null}
               {invitations.data && invitations.data.length === 0 ? (
                 <p className="text-sm text-text-muted">{t("settings.team.pendingEmpty")}</p>
               ) : null}
@@ -159,6 +168,9 @@ export function TeamSettings({
                       <Button
                         variant="ghost"
                         size="sm"
+                        loading={
+                          revoke.isPending && revoke.variables?.invitationId === invitation.id
+                        }
                         onClick={() => revoke.mutate({ invitationId: invitation.id })}
                       >
                         {t("settings.team.revoke")}

@@ -1,5 +1,6 @@
 /** Area D (part) – agent runs and their steps: complete protocol of every agent step (concept chapter 11). */
 import {
+  bigint,
   foreignKey,
   index,
   integer,
@@ -31,8 +32,8 @@ export const agentRuns = pgTable(
     outputTokens: integer("output_tokens").notNull().default(0),
     cacheReadTokens: integer("cache_read_tokens").notNull().default(0),
     cacheWriteTokens: integer("cache_write_tokens").notNull().default(0),
-    /** Cost in euro cents with two decimals precision (stored as hundredths of a cent). */
-    costMicroCents: integer("cost_micro_cents").notNull().default(0),
+    /** Cost in millionths of a euro cent (1 € = 10^8). bigint – no overflow for long runs. */
+    costMicroCents: bigint("cost_micro_cents", { mode: "number" }).notNull().default(0),
     toolCallCount: integer("tool_call_count").notNull().default(0),
     pauseReason: text("pause_reason"),
     error: text("error"),
@@ -72,7 +73,8 @@ export const agentRunSteps = pgTable(
     policyReason: text("policy_reason"),
     inputTokens: integer("input_tokens").notNull().default(0),
     outputTokens: integer("output_tokens").notNull().default(0),
-    costMicroCents: integer("cost_micro_cents").notNull().default(0),
+    /** Cost in millionths of a euro cent, like agent_runs.cost_micro_cents. */
+    costMicroCents: bigint("cost_micro_cents", { mode: "number" }).notNull().default(0),
     ...timestamps(),
   },
   (t) => [

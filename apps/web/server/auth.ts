@@ -1,7 +1,12 @@
 import "server-only";
 import { passkey as passkeyPlugin } from "@better-auth/passkey";
 import { defaults } from "@ep/config/defaults";
-import { accountService, emailHash } from "@ep/core";
+import { emailHash, ipHash } from "@ep/core";
+import {
+  type AuthAuditAction,
+  isTwoFactorEnabledForEmail,
+  recordAuthEvent,
+} from "@ep/core/system/accounts";
 import { account, passkey, session, twoFactor, user, verification } from "@ep/db";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -10,12 +15,35 @@ import { nextCookies } from "better-auth/next-js";
 import { haveIBeenPwned } from "better-auth/plugins/haveibeenpwned";
 import { magicLink } from "better-auth/plugins/magic-link";
 import { twoFactor as twoFactorPlugin } from "better-auth/plugins/two-factor";
-import { emailTranslator } from "./email-texts";
+import { appTranslator, emailTranslator, sanitizeDisplayName } from "./email-texts";
 import { webEnv } from "./env";
 import { runtime } from "./runtime";
 
 const minute = 60;
-const day = 24 * 60 * minute;
+const hour = 60 * minute;
+const day = 24 * hour;
+const limits = defaults.auth;
+const loginWindow = {
+  window: limits.rateLimit.login.windowMinutes * minute,
+  max: limits.rateLimit.login.max,
+};
+
+/** Paths whose successful completion is written to the audit log (concept chapter 16). */
+function auditAction(path: string, hadTwoFactorChallenge: boolean): AuthAuditAction | null {
+  switch (path) {
+    case "/sign-in/email":
+      return "auth.sign_in";
+    case "/magic-link/verify":
+      return "auth.sign_in_magic_link";
+    case "/two-factor/verify-totp":
+    case "/two-factor/verify-backup-code":
+      return hadTwoFactorChallenge ? "auth.sign_in_two_factor" : "auth.two_factor_enabled";
+    case "/change-password":
+      return "auth.password_changed";
+    default:
+      return null;
+  }
+}
 
 function createAuth() {
   const env = webEnv();
@@ -24,9 +52,15 @@ function createAuth() {
   const secure = env.WEB_URL.startsWith("https://");
   const origin = new URL(env.WEB_URL);
   const prefix = `${env.VALKEY_PREFIX}:auth:`;
+  const appName = appTranslator("name");
+  const requestIpHash = (headers: Headers | undefined) =>
+    ipHash(
+      core.deps.emailHashKey,
+      headers?.get("x-forwarded-for")?.split(",")[0]?.trim() ?? headers?.get("x-real-ip"),
+    );
 
   return betterAuth({
-    appName: "E-Mail-Plattform",
+    appName,
     baseURL: env.WEB_URL,
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [origin.origin],
@@ -34,7 +68,7 @@ function createAuth() {
       provider: "pg",
       schema: { user, session, account, verification, twoFactor, passkey },
     }),
-    // Rate limits and short-lived data live in Valkey, not in the database.
+    // Rate limits and short-lived data live in Valkey; sessions stay in Postgres (E-025).
     secondaryStorage: {
       get: (key) => redis.get(prefix + key),
       set: async (key, value, ttl) => {
@@ -59,9 +93,9 @@ function createAuth() {
       defaultCookieAttributes: { httpOnly: true, sameSite: "lax", secure },
     },
     session: {
-      expiresIn: defaults.auth.sessionDays * day,
-      updateAge: day,
-      freshAge: defaults.auth.freshLoginMinutes * minute,
+      expiresIn: limits.sessionDays * day,
+      updateAge: limits.sessionRefreshHours * hour,
+      freshAge: limits.freshLoginMinutes * minute,
       storeSessionInDatabase: true,
     },
     user: {
@@ -69,13 +103,27 @@ function createAuth() {
         platformRole: { type: "string", required: false, defaultValue: "user", input: false },
       },
     },
+    databaseHooks: {
+      user: {
+        // Display names end up in system mails (e.g. invitations): no control characters, limited length.
+        create: {
+          before: async (data) => ({ data: { ...data, name: sanitizeDisplayName(data.name) } }),
+        },
+        update: {
+          before: async (data) =>
+            typeof data.name === "string"
+              ? { data: { ...data, name: sanitizeDisplayName(data.name) } }
+              : { data },
+        },
+      },
+    },
     emailAndPassword: {
       enabled: true,
-      minPasswordLength: defaults.auth.passwordMinLength,
-      maxPasswordLength: 128,
+      minPasswordLength: limits.passwordMinLength,
+      maxPasswordLength: limits.passwordMaxLength,
       requireEmailVerification: true,
       autoSignIn: false,
-      resetPasswordTokenExpiresIn: 60 * minute,
+      resetPasswordTokenExpiresIn: limits.resetPasswordMinutes * minute,
       sendResetPassword: async ({ user: target, url }) => {
         await mailer.send({
           to: target.email,
@@ -88,7 +136,7 @@ function createAuth() {
       sendOnSignUp: true,
       sendOnSignIn: true,
       autoSignInAfterVerification: true,
-      expiresIn: day,
+      expiresIn: limits.verificationHours * hour,
       sendVerificationEmail: async ({ user: target, url }) => {
         await mailer.send({
           to: target.email,
@@ -100,29 +148,21 @@ function createAuth() {
     rateLimit: {
       enabled: env.AUTH_RATE_LIMIT === "on",
       storage: "secondary-storage",
-      window: 60,
-      max: 100,
+      window: limits.rateLimit.general.windowSeconds,
+      max: limits.rateLimit.general.max,
       customRules: {
-        "/sign-in/email": {
-          window: defaults.auth.rateLimit.login.windowMinutes * minute,
-          max: defaults.auth.rateLimit.login.max,
-        },
-        "/two-factor/verify-totp": {
-          window: defaults.auth.rateLimit.login.windowMinutes * minute,
-          max: defaults.auth.rateLimit.login.max,
-        },
-        "/sign-in/magic-link": {
-          window: defaults.auth.rateLimit.login.windowMinutes * minute,
-          max: defaults.auth.rateLimit.login.max,
-        },
+        "/sign-in/email": loginWindow,
+        "/two-factor/verify-totp": loginWindow,
+        "/two-factor/verify-backup-code": loginWindow,
+        "/sign-in/magic-link": loginWindow,
         "/request-password-reset": {
-          window: defaults.auth.rateLimit.passwordReset.windowMinutes * minute,
-          max: defaults.auth.rateLimit.passwordReset.max,
+          window: limits.rateLimit.passwordReset.windowMinutes * minute,
+          max: limits.rateLimit.passwordReset.max,
         },
       },
     },
     hooks: {
-      // Login limit per account in addition to the per-IP limit (concept chapter 16).
+      // Login limit per account in addition to the per-IP limit (concept chapter 16, E-024).
       before: createAuthMiddleware(async (ctx) => {
         if (env.AUTH_RATE_LIMIT !== "on") return;
         if (ctx.path !== "/sign-in/email" && ctx.path !== "/sign-in/magic-link") return;
@@ -130,22 +170,54 @@ function createAuth() {
         if (!email) return;
         const key = `${prefix}login-account:${emailHash(core.deps.emailHashKey, email)}`;
         const attempts = await redis.incr(key);
-        if (attempts === 1)
-          await redis.expire(key, defaults.auth.rateLimit.login.windowMinutes * minute);
-        if (attempts > defaults.auth.rateLimit.login.max) {
-          throw new APIError("TOO_MANY_REQUESTS", { message: "RATE_LIMITED" });
+        if (attempts === 1) await redis.expire(key, loginWindow.window);
+        if (attempts > loginWindow.max) {
+          throw new APIError("TOO_MANY_REQUESTS", {
+            code: "TOO_MANY_REQUESTS",
+            message: "RATE_LIMITED",
+          });
+        }
+      }),
+      // Audit trail of sign-ins and 2FA changes (concept chapter 16).
+      after: createAuthMiddleware(async (ctx) => {
+        const headers = ctx.headers;
+        const hash = requestIpHash(headers);
+        const newSession = ctx.context.newSession;
+        if (newSession) {
+          const hadChallenge = /(?:^|;\s*)(?:__Secure-)?ep\.two_factor=/.test(
+            headers?.get("cookie") ?? "",
+          );
+          const action = auditAction(ctx.path, hadChallenge);
+          if (action)
+            await recordAuthEvent(core.deps, {
+              userId: newSession.user.id,
+              action,
+              ...(hash ? { ipHash: hash } : {}),
+            });
+          return;
+        }
+        if (
+          ctx.path === "/two-factor/disable" &&
+          ctx.context.session &&
+          !(ctx.context.returned instanceof Error)
+        ) {
+          await recordAuthEvent(core.deps, {
+            userId: ctx.context.session.user.id,
+            action: "auth.two_factor_disabled",
+            ...(hash ? { ipHash: hash } : {}),
+          });
         }
       }),
     },
     plugins: [
-      twoFactorPlugin({ issuer: "E-Mail-Plattform" }),
+      twoFactorPlugin({ issuer: appName }),
       magicLink({
-        expiresIn: 5 * minute,
+        expiresIn: limits.magicLinkMinutes * minute,
         disableSignUp: true,
         sendMagicLink: async ({ email, url }) => {
           // Magic links do not pass the 2FA check of Better Auth. Accounts with 2FA therefore
           // get a hint to sign in with password and code instead of a link (ENTSCHEIDUNGEN E-018).
-          if (await accountService.isTwoFactorEnabledForEmail(core.deps, email)) {
+          if (await isTwoFactorEnabledForEmail(core.deps, email)) {
             await mailer.send({
               to: email,
               subject: emailTranslator("magicLinkTwoFactor.subject"),
@@ -160,7 +232,7 @@ function createAuth() {
           });
         },
       }),
-      passkeyPlugin({ rpID: origin.hostname, rpName: "E-Mail-Plattform", origin: origin.origin }),
+      passkeyPlugin({ rpID: origin.hostname, rpName: appName, origin: origin.origin }),
       ...(env.PASSWORD_BREACH_CHECK === "on" ? [haveIBeenPwned()] : []),
       nextCookies(),
     ],

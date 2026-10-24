@@ -35,7 +35,8 @@ export function proxy(request: NextRequest) {
   const csp = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' ${isDev ? "'unsafe-inline'" : `'nonce-${nonce}'`}`,
+    // Inline styles stay allowed (style attributes cannot carry a nonce); scripts stay strict.
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' blob: data:",
     "font-src 'self'",
     "connect-src 'self'",

@@ -19,9 +19,7 @@ export function InvitationAccept({ token }: { token: string }) {
   );
   return (
     <div className="flex flex-col gap-3">
-      {accept.error ? (
-        <Alert tone="danger">{t(`errors.${errorCode(accept.error)}` as never)}</Alert>
-      ) : null}
+      {accept.error ? <Alert tone="danger">{t(`errors.${errorCode(accept.error)}`)}</Alert> : null}
       <Button onClick={() => accept.mutate({ token })} loading={accept.isPending}>
         {t("auth.invitation.accept")}
       </Button>

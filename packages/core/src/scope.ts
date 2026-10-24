@@ -45,6 +45,7 @@ export async function withWorkspace<T>(
 ): Promise<T> {
   const callbacks: Array<() => Promise<void> | void> = [];
   const result = await ctx.deps.db.transaction(async (tx) => {
+    await tx.execute(sql`set local role ep_app`);
     await tx.execute(sql`select set_config('app.workspace_id', ${ctx.workspaceId}, true)`);
     return fn({
       tx,

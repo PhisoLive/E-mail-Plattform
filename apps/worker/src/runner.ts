@@ -51,7 +51,7 @@ export async function startWorkers(
       schedule.id,
       schedule.pattern
         ? { pattern: schedule.pattern, tz: defaults.schedules.timezone }
-        : { every: schedule.everyMs ?? 60_000 },
+        : { every: schedule.everyMs ?? defaults.schedules.syncDispatcherSeconds * 1000 },
       { name: schedule.jobName, data: {} },
     );
   }
@@ -62,7 +62,7 @@ export async function startWorkers(
       // Running jobs may finish (max. 60 s, concept chapter 18); no new jobs are taken.
       await Promise.race([
         Promise.all(workers.map((worker) => worker.close())),
-        new Promise((resolve) => setTimeout(resolve, 60_000)),
+        new Promise((resolve) => setTimeout(resolve, defaults.queues.shutdownGraceSeconds * 1000)),
       ]);
       await Promise.all([...queues.values()].map((queue) => queue.close()));
     },

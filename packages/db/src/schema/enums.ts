@@ -221,6 +221,17 @@ export const usageKind = pgEnum("usage_kind", [
   "domain_purchased",
   "stt_seconds",
 ]);
+/** Mirror of the Stripe subscription status. */
+export const subscriptionStatus = pgEnum("subscription_status", [
+  "incomplete",
+  "incomplete_expired",
+  "trialing",
+  "active",
+  "past_due",
+  "canceled",
+  "unpaid",
+  "paused",
+]);
 export const platformDomainMode = pgEnum("platform_domain_mode", ["dedicated", "shared_subdomain"]);
 
 // G – files, notifications, integrations

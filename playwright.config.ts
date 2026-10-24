@@ -26,21 +26,22 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: [
     {
-      command: "pnpm --filter @ep/edge start",
+      // run-app filters the environment per app (no MASTER_KEY in web and edge).
+      command: "pnpm exec tsx scripts/run-app.ts edge start",
       url: `http://127.0.0.1:${edgePort}/health`,
       timeout: 60_000,
       reuseExistingServer: false,
       stdout: "pipe",
     },
     {
-      command: "pnpm --filter @ep/worker start",
+      command: "pnpm exec tsx scripts/run-app.ts worker start",
       url: `http://127.0.0.1:${workerPort}/health`,
       timeout: 60_000,
       reuseExistingServer: false,
       stdout: "pipe",
     },
     {
-      command: "pnpm --filter @ep/web e2e:serve",
+      command: "pnpm exec tsx scripts/run-app.ts web e2e:serve",
       url: `http://127.0.0.1:${webPort}/api/health`,
       timeout: 300_000,
       reuseExistingServer: false,

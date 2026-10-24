@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   foreignKey,
   index,
   integer,
@@ -312,6 +313,7 @@ export const messages = pgTable(
   },
   (t) => [
     unique("messages_ws_id_uq").on(t.workspaceId, t.id),
+    check("messages_priority_range", sql`${t.priority} between 1 and 4`),
     uniqueIndex("messages_ws_idempotency_uq").on(t.workspaceId, t.idempotencyKey),
     uniqueIndex("messages_public_token_uq").on(t.publicToken),
     index("messages_scheduler_idx")

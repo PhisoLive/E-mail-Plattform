@@ -53,8 +53,11 @@ export function defaultJobOptions(queue: QueueName) {
   return {
     attempts: defaults.queues.attempts[queue],
     backoff: { type: "exponential" as const, delay: defaults.queues.backoffBaseMs, jitter: 0.5 },
-    removeOnComplete: { age: 24 * 3600, count: 1000 },
-    removeOnFail: { age: 7 * 24 * 3600 },
+    removeOnComplete: {
+      age: defaults.queues.keepCompletedSeconds,
+      count: defaults.queues.keepCompletedCount,
+    },
+    removeOnFail: { age: defaults.queues.keepFailedSeconds },
   };
 }
 

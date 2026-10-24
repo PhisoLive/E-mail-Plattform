@@ -41,7 +41,7 @@ export function CreateWorkspaceForm() {
           <p className="text-sm text-text-muted">{t("onboarding.createWorkspace.subtitle")}</p>
         </div>
         {create.error ? (
-          <Alert tone="danger">{t(`errors.${errorCode(create.error)}` as never)}</Alert>
+          <Alert tone="danger">{t(`errors.${errorCode(create.error)}`)}</Alert>
         ) : null}
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <Field id="workspace-name" label={t("onboarding.createWorkspace.nameLabel")}>

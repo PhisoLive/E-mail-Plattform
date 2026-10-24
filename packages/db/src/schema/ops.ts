@@ -13,7 +13,9 @@ import {
 } from "drizzle-orm/pg-core";
 import { id, timestamps, tz } from "./_common";
 import { user } from "./auth";
+import { messages } from "./campaigns";
 import { abuseStatus, channelKind, featureFlagScope, integrationKind } from "./enums";
+import { mailboxes } from "./mailboxes";
 import { secrets, workspaceId, workspaces } from "./workspaces";
 
 export const notifications = pgTable(
@@ -172,7 +174,19 @@ export const abuseReports = pgTable(
     decisionNote: text("decision_note"),
     ...timestamps(),
   },
-  (t) => [index("abuse_reports_status_idx").on(t.status, t.createdAt)],
+  (t) => [
+    index("abuse_reports_status_idx").on(t.status, t.createdAt),
+    foreignKey({
+      name: "abuse_reports_mailbox_fk",
+      columns: [t.workspaceId, t.mailboxId],
+      foreignColumns: [mailboxes.workspaceId, mailboxes.id],
+    }),
+    foreignKey({
+      name: "abuse_reports_message_fk",
+      columns: [t.workspaceId, t.messageId],
+      foreignColumns: [messages.workspaceId, messages.id],
+    }),
+  ],
 );
 
 export const featureFlags = pgTable(
@@ -185,7 +199,10 @@ export const featureFlags = pgTable(
     enabled: boolean("enabled").notNull().default(false),
     ...timestamps(),
   },
-  (t) => [uniqueIndex("feature_flags_key_scope_ws_uq").on(t.key, t.scope, t.workspaceId)],
+  // NULLS NOT DISTINCT: platform-wide flags (workspace_id NULL) must be unique as well.
+  (t) => [
+    unique("feature_flags_key_scope_ws_uq").on(t.key, t.scope, t.workspaceId).nullsNotDistinct(),
+  ],
 );
 
 export const platformSettings = pgTable("platform_settings", {

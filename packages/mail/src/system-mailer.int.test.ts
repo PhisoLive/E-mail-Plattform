@@ -9,7 +9,7 @@ describe("system mailer", () => {
     const mailer = createSystemMailer(testUrls.mailpitSmtp, "Plattform <no-reply@plattform.test>", {
       mode: "sandbox",
       allowlist: [],
-      sandboxHosts: ["127.0.0.1"],
+      sandboxEndpoints: [`127.0.0.1:${new URL(testUrls.mailpitSmtp).port}`],
     });
     const subject = `Test ${randomUUID()}`;
     await mailer.send({ to: "anna@beispiel.test", subject, text: "Hallo" });
@@ -25,7 +25,7 @@ describe("system mailer", () => {
     const mailer = createSystemMailer("smtp://smtp.example.com:587", "x@y.z", {
       mode: "sandbox",
       allowlist: [],
-      sandboxHosts: ["127.0.0.1"],
+      sandboxEndpoints: ["127.0.0.1:55102"],
     });
     await expect(mailer.send({ to: "a@b.de", subject: "x", text: "y" })).rejects.toThrow(
       SendBlockedError,

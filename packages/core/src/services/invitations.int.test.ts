@@ -132,3 +132,50 @@ describe("invitation service", () => {
     expect(list.ok && list.value.map((entry) => entry.email)).toEqual(["neu@beispiel.test"]);
   });
 });
+
+describe("invitation protections", () => {
+  it("does not let admins revoke or replace owner invitations", async () => {
+    const workspace = await createTestWorkspace(deps);
+    const admin = await addTestMember(deps, workspace, "admin");
+    const ownerInvite = await createInvitation(workspace.ownerCtx, {
+      email: "cfo@beispiel.test",
+      role: "owner",
+    });
+    if (!ownerInvite.ok) throw new Error("create failed");
+    expect(await revokeInvitation(admin.ctx, ownerInvite.value.id)).toEqual({
+      ok: false,
+      error: { code: "OWNER_PROTECTED" },
+    });
+    expect(
+      await createInvitation(admin.ctx, { email: "cfo@beispiel.test", role: "viewer" }),
+    ).toEqual({
+      ok: false,
+      error: { code: "OWNER_PROTECTED" },
+    });
+    expect(await previewInvitation(deps, ownerInvite.value.token)).toMatchObject({
+      ok: true,
+      value: { role: "owner", state: "valid" },
+    });
+    expect((await revokeInvitation(workspace.ownerCtx, ownerInvite.value.id)).ok).toBe(true);
+  });
+
+  it("limits invitation mails per workspace and day", async () => {
+    const workspace = await createTestWorkspace(deps);
+    for (let index = 0; index < 50; index++) {
+      const result = await createInvitation(workspace.ownerCtx, {
+        email: `person${index}@beispiel.test`,
+        role: "viewer",
+      });
+      expect(result.ok).toBe(true);
+    }
+    expect(
+      await createInvitation(workspace.ownerCtx, {
+        email: "eine-zu-viel@beispiel.test",
+        role: "viewer",
+      }),
+    ).toEqual({
+      ok: false,
+      error: { code: "RATE_LIMITED" },
+    });
+  });
+});

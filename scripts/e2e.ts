@@ -26,7 +26,10 @@ const env: NodeJS.ProcessEnv = {
   VALKEY_PREFIX: `e2e${randomBytes(3).toString("hex")}`,
   MAIL_SEND_MODE: "sandbox",
   MAIL_ALLOWLIST: "",
-  SANDBOX_MAIL_HOSTS: "127.0.0.1,localhost",
+  SANDBOX_MAIL_ENDPOINTS: [testUrls.greenmail.smtp, testUrls.greenmail.smtps]
+    .map((port) => `127.0.0.1:${port}`)
+    .concat(`127.0.0.1:${new URL(testUrls.mailpitSmtp).port}`)
+    .join(","),
   EMAIL_HASH_KEY: testKeys.emailHashKey,
   MASTER_KEY: testKeys.masterKey,
   MASTER_KEY_VERSION: "1",
@@ -58,7 +61,6 @@ const env: NodeJS.ProcessEnv = {
   CHECK_ADDRESS: "pruefadresse@plattform.test",
   NEXT_DIST_DIR: ".next-e2e",
   E2E_MAILPIT_API: testUrls.mailpitApi,
-  E2E_GREENMAIL_API: testUrls.greenmailApi,
   E2E_DATABASE_URL: databaseUrl,
 };
 

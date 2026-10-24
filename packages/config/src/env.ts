@@ -43,8 +43,11 @@ export const baseEnvSchema = z.object({
   MAIL_SEND_MODE: mailSendModeSchema.default("sandbox"),
   /** Staging only: addresses or `@domain` entries that may receive real mails. */
   MAIL_ALLOWLIST: csvList(),
-  /** Hosts that count as mail sandbox (GreenMail, Mailpit). Only these accept mail in sandbox mode. */
-  SANDBOX_MAIL_HOSTS: csvList("127.0.0.1,localhost,greenmail,mailpit"),
+  /**
+   * `host:port` endpoints of the mail sandboxes (GreenMail SMTP/SMTPS, Mailpit). In sandbox mode
+   * mails may only be handed to exactly these endpoints. Empty = nothing can be sent.
+   */
+  SANDBOX_MAIL_ENDPOINTS: csvList(),
   /** HMAC key for `email_hash` (concept chapter 7). Never rotated. */
   EMAIL_HASH_KEY: base64Key(32),
   /** Public base URL of the web app. */
@@ -116,9 +119,18 @@ export class EnvError extends Error {
  * `live` only in production, `allowlist` needs a non-empty allowlist.
  */
 export function checkSendModeSafety(
-  env: Pick<BaseEnv, "APP_ENV" | "MAIL_SEND_MODE" | "MAIL_ALLOWLIST">,
+  env: Pick<BaseEnv, "APP_ENV" | "MAIL_SEND_MODE" | "MAIL_ALLOWLIST"> & {
+    SANDBOX_MAIL_ENDPOINTS?: string[];
+  },
 ): string[] {
   const issues: string[] = [];
+  for (const endpoint of env.SANDBOX_MAIL_ENDPOINTS ?? []) {
+    if (!/^[a-z0-9.-]+:\d{1,5}$/.test(endpoint)) {
+      issues.push(
+        `SANDBOX_MAIL_ENDPOINTS entries must be host:port (got "${endpoint.replace(/[^a-z0-9.:-]/g, "?")}")`,
+      );
+    }
+  }
   if (env.MAIL_SEND_MODE === "live" && env.APP_ENV !== "production") {
     issues.push(`MAIL_SEND_MODE=live is only allowed with APP_ENV=production (got ${env.APP_ENV})`);
   }
@@ -133,11 +145,46 @@ export function checkSendModeSafety(
   return issues;
 }
 
+export type AppName = "web" | "edge" | "worker";
+
+/**
+ * Secrets an app must never receive (concept chapter 16): only the worker holds the master key
+ * and the sealed-box secret key; the worker and the edge service do not need the auth secret.
+ */
+export const forbiddenSecrets: Record<AppName, readonly string[]> = {
+  web: ["MASTER_KEY", "SEALED_BOX_SECRET_KEY"],
+  edge: ["MASTER_KEY", "SEALED_BOX_SECRET_KEY", "BETTER_AUTH_SECRET"],
+  worker: ["BETTER_AUTH_SECRET"],
+};
+
+/** Copy of an environment without the secrets the given app must not see. */
+export function envForApp(
+  app: AppName,
+  source: Record<string, string | undefined>,
+): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const [key, value] of Object.entries(source)) {
+    if (value !== undefined && !forbiddenSecrets[app].includes(key)) result[key] = value;
+  }
+  return result;
+}
+
 /** Parses and validates the environment. Never prints values, only variable names. */
 export function loadEnv<S extends z.ZodType<BaseEnv>>(
   schema: S,
   source: Record<string, string | undefined> = process.env,
+  app?: AppName,
 ): z.infer<S> {
+  if (app) {
+    const leaked = forbiddenSecrets[app].filter(
+      (key) => source[key] !== undefined && source[key] !== "",
+    );
+    if (leaked.length > 0) {
+      throw new EnvError(
+        leaked.map((key) => `${key}: must not be available to the ${app} process`),
+      );
+    }
+  }
   const result = schema.safeParse(source);
   if (!result.success) {
     throw new EnvError(
@@ -145,6 +192,13 @@ export function loadEnv<S extends z.ZodType<BaseEnv>>(
     );
   }
   const issues = checkSendModeSafety(result.data);
+  const relaxedEnv = result.data.APP_ENV === "development" || result.data.APP_ENV === "test";
+  if (
+    !relaxedEnv &&
+    (result.data as { PASSWORD_BREACH_CHECK?: string }).PASSWORD_BREACH_CHECK === "off"
+  ) {
+    issues.push("PASSWORD_BREACH_CHECK=off is only allowed in development and test");
+  }
   if (result.data.APP_ENV !== "test" && "AUTH_RATE_LIMIT" in result.data) {
     if ((result.data as { AUTH_RATE_LIMIT?: string }).AUTH_RATE_LIMIT === "off") {
       issues.push("AUTH_RATE_LIMIT=off is only allowed with APP_ENV=test");
@@ -155,3 +209,27 @@ export function loadEnv<S extends z.ZodType<BaseEnv>>(
   }
   return result.data;
 }
+
+/**
+ * Variables of the local tooling (tests, E2E, dev scripts) – documented here and in
+ * .env.example so every variable read anywhere in the repository is declared.
+ */
+export const toolingEnvSchema = z.object({
+  /** Next.js build directory (E2E uses `.next-e2e` to run next to `pnpm dev`). */
+  NEXT_DIST_DIR: z.string().optional(),
+  /** `production` builds the web app for E2E (default in CI), `dev` uses `next dev`. */
+  E2E_WEB_MODE: z.enum(["production", "dev"]).optional(),
+  /** Mailpit API of the test stack, read by the E2E helpers. */
+  E2E_MAILPIT_API: z.string().url().optional(),
+  /** E2E database, read by E2E checks of the audit log. */
+  E2E_DATABASE_URL: z.string().url().optional(),
+  /** Database of the current test run (set by the Vitest global setup). */
+  TEST_DATABASE_URL: z.string().url().optional(),
+  /** `1` skips starting the test stack (unit tests only). */
+  SKIP_TEST_INFRA: z.enum(["0", "1"]).optional(),
+  /** Mailpit and GreenMail APIs of the dev stack (local tools only). */
+  MAILPIT_API_URL: z.string().url().optional(),
+  GREENMAIL_API_URL: z.string().url().optional(),
+  /** Generated dev database password (compose dev stack). */
+  DEV_POSTGRES_PASSWORD: z.string().optional(),
+});

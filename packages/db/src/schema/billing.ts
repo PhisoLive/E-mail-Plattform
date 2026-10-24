@@ -14,7 +14,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { id, timestamps, tz } from "./_common";
-import { platformDomainMode, usageKind } from "./enums";
+import { platformDomainMode, subscriptionStatus, usageKind } from "./enums";
 import { mailboxes } from "./mailboxes";
 import { workspaceId, workspaces } from "./workspaces";
 
@@ -48,7 +48,7 @@ export const subscriptions = pgTable(
     planCode: text("plan_code")
       .notNull()
       .references(() => plans.code),
-    status: text("status").notNull(),
+    status: subscriptionStatus("status").notNull(),
     currentPeriodEnd: tz("current_period_end"),
     ...timestamps(),
   },

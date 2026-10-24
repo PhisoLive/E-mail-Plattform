@@ -9,7 +9,6 @@ export * from "./logger";
 export * from "./permissions";
 export * from "./result";
 export * from "./scope";
-export * as accountService from "./services/accounts";
 export * as invitationService from "./services/invitations";
 export * as memberService from "./services/members";
 export * as workspaceService from "./services/workspaces";

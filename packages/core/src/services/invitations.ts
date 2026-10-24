@@ -51,6 +51,32 @@ export async function createInvitation(
       );
     if (existingMember.length > 0) return err(appError("ALREADY_MEMBER"));
 
+    const since = new Date(ctx.deps.clock.now().getTime() - 86_400_000);
+    const [recent] = await scope.tx
+      .select({ count: sql<number>`count(*)::int` })
+      .from(invitations)
+      .where(and(eq(invitations.workspaceId, scope.workspaceId), gt(invitations.createdAt, since)));
+    if ((recent?.count ?? 0) >= defaults.invitation.maxPerWorkspacePerDay) {
+      return err(appError("RATE_LIMITED"));
+    }
+
+    const open = await scope.tx
+      .select({ role: invitations.role })
+      .from(invitations)
+      .where(
+        and(
+          eq(invitations.workspaceId, scope.workspaceId),
+          eq(invitations.email, email),
+          isNull(invitations.acceptedAt),
+          isNull(invitations.revokedAt),
+        ),
+      )
+      .for("update");
+    // Replacing an open invitation counts as revoking it: admins never touch owner invitations.
+    if (open.some((existing) => !canManageRole(ctx.role, existing.role))) {
+      return err(appError("OWNER_PROTECTED"));
+    }
+
     // Only one open invitation per address: older ones are revoked.
     await scope.tx
       .update(invitations)
@@ -76,6 +102,7 @@ export async function createInvitation(
         role,
         tokenHash: sha256Hex(token),
         expiresAt,
+        createdAt: ctx.deps.clock.now(),
         invitedBy: ctx.actor.type === "user" ? ctx.actor.id : null,
       })
       .returning({ id: invitations.id });
@@ -136,9 +163,9 @@ export async function revokeInvitation(
   if (!permission.ok) return permission;
   if (!z.uuid().safeParse(invitationId).success) return err(appError("VALIDATION"));
   return withWorkspace(ctx, async (scope) => {
-    const updated = await scope.tx
-      .update(invitations)
-      .set({ revokedAt: new Date() })
+    const [invitation] = await scope.tx
+      .select({ role: invitations.role })
+      .from(invitations)
       .where(
         and(
           eq(invitations.workspaceId, scope.workspaceId),
@@ -147,8 +174,13 @@ export async function revokeInvitation(
           isNull(invitations.revokedAt),
         ),
       )
-      .returning({ id: invitations.id });
-    if (updated.length === 0) return err(appError("NOT_FOUND"));
+      .for("update");
+    if (!invitation) return err(appError("NOT_FOUND"));
+    if (!canManageRole(ctx.role, invitation.role)) return err(appError("OWNER_PROTECTED"));
+    await scope.tx
+      .update(invitations)
+      .set({ revokedAt: new Date() })
+      .where(and(eq(invitations.workspaceId, scope.workspaceId), eq(invitations.id, invitationId)));
     await writeAudit(scope, {
       action: "invitation.revoked",
       objectType: "invitation",

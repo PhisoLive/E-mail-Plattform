@@ -26,7 +26,8 @@
     "infra:down": "tsx scripts/infra.ts down dev",
     "setup:env": "tsx scripts/setup-env.ts",
     "ops:rebuild-queues": "tsx scripts/ops.ts rebuild-queues",
-    "ops:set-trust": "tsx scripts/ops.ts set-trust"
+    "ops:set-trust": "tsx scripts/ops.ts set-trust",
+    "test:e2e:prod": "E2E_WEB_MODE=production tsx scripts/e2e.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",
@@ -36,6 +37,7 @@
     "@ep/testing": "workspace:*",
     "@playwright/test": "1.63.0",
     "@types/node": "^24.19.2",
+    "postgres": "3.4.9",
     "tsx": "^4.23.15",
     "turbo": "2.11.10",
     "typescript": "7.0.2",

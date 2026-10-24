@@ -1,6 +1,7 @@
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -24,7 +25,11 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // Reading the request headers renders every page dynamically. That is required for the
+  // nonce-based CSP: Next.js attaches the per-request nonce from proxy.ts to its scripts,
+  // which static pages cannot carry (ENTSCHEIDUNGEN E-026).
+  await headers();
   return (
     <html lang="de" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="min-h-dvh bg-bg font-sans text-text antialiased">

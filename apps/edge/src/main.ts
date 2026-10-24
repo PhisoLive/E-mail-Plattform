@@ -4,7 +4,7 @@ import { createCoreRuntime } from "@ep/core/runtime";
 import { serve } from "@hono/node-server";
 import { createEdgeApp } from "./app";
 
-const env = loadEnv(edgeEnvSchema);
+const env = loadEnv(edgeEnvSchema, process.env, "edge");
 const logger = createLogger("edge", env.LOG_LEVEL);
 const runtime = createCoreRuntime(env, { applicationName: "emailplattform-edge", dbPoolSize: 5 });
 const app = createEdgeApp(runtime.deps, runtime.redis);

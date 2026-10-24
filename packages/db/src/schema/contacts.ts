@@ -4,7 +4,6 @@ import {
   customType,
   foreignKey,
   index,
-  integer,
   jsonb,
   pgTable,
   primaryKey,
@@ -17,12 +16,10 @@ import { createdAt, deletedAt, id, timestamps, tz } from "./_common";
 import {
   contactStatus,
   formality,
-  globalSuppressionReason,
   importStatus,
   legalBasis,
   listKind,
   salutation,
-  suppressionReason,
   verificationStatus,
 } from "./enums";
 import { files } from "./files";
@@ -175,32 +172,3 @@ export const imports = pgTable(
     }),
   ],
 );
-
-/** One row per address and reason; lifting removes only that reason (concept chapter 7). */
-export const suppressions = pgTable(
-  "suppressions",
-  {
-    id: id(),
-    workspaceId: workspaceId(),
-    emailHash: text("email_hash").notNull(),
-    /** Plain address – removed when the contact is deleted; the hash stays. */
-    email: citext("email"),
-    reason: suppressionReason("reason").notNull(),
-    sourceMessageId: uuid("source_message_id"),
-    note: text("note"),
-    createdAt: createdAt(),
-  },
-  (t) => [
-    unique("suppressions_ws_id_uq").on(t.workspaceId, t.id),
-    uniqueIndex("suppressions_ws_hash_reason_uq").on(t.workspaceId, t.emailHash, t.reason),
-  ],
-);
-
-/** Platform-wide, only HMAC hashes (concept chapters 7 and 17). */
-export const globalSuppressions = pgTable("global_suppressions", {
-  emailHash: text("email_hash").primaryKey(),
-  reason: globalSuppressionReason("reason").notNull(),
-  firstSeenAt: tz("first_seen_at").notNull().defaultNow(),
-  lastSeenAt: tz("last_seen_at").notNull().defaultNow(),
-  count: integer("count").notNull().default(1),
-});
