@@ -6,6 +6,7 @@ import {
   createWorkspace,
   defaultPassword,
   enableTwoFactor,
+  gotoReady,
   login,
   mailpit,
   registerAndVerify,
@@ -52,7 +53,7 @@ test("Registrieren → Anmelden → 2FA → Arbeitsbereich → Mitglied einladen
     password: defaultPassword,
   };
   const inviteSent = new Date(Date.now() - 1000);
-  await ownerPage.goto("/einstellungen/team");
+  await gotoReady(ownerPage, "/einstellungen/team");
   await ownerPage.getByLabel("E-Mail-Adresse").fill(member.email);
   await ownerPage.getByLabel("Rolle").selectOption("member");
   await ownerPage.getByRole("button", { name: "Einladung senden" }).click();
@@ -71,7 +72,7 @@ test("Registrieren → Anmelden → 2FA → Arbeitsbereich → Mitglied einladen
   const memberPage = await (await browser.newContext()).newPage();
   await registerAndVerify(memberPage, member);
   await login(memberPage, member);
-  await memberPage.goto(invitationLink);
+  await gotoReady(memberPage, invitationLink);
   await expect(
     memberPage.getByRole("heading", { name: "Einladung zu Bäckerei Huber" }),
   ).toBeVisible();
@@ -88,7 +89,7 @@ test("Anmeldung per Magic Link", async ({ page }) => {
   await registerAndVerify(page, user);
   await page.context().clearCookies();
   const requested = new Date(Date.now() - 1000);
-  await page.goto("/login");
+  await gotoReady(page, "/login");
   await page.getByLabel("E-Mail-Adresse").fill(user.email);
   await page.getByRole("button", { name: "Anmeldelink per E-Mail schicken" }).click();
   await expect(
@@ -98,13 +99,13 @@ test("Anmeldung per Magic Link", async ({ page }) => {
     subject: "Dein Anmeldelink",
     after: requested,
   });
-  await page.goto(MailpitClient.firstLink(mail));
+  await gotoReady(page, MailpitClient.firstLink(mail));
   await expect(page.getByRole("heading", { name: "Dein Arbeitsbereich" })).toBeVisible();
 });
 
 test("Falsches Passwort und unbestätigte Adresse werden abgewiesen", async ({ page }) => {
   // Unknown address.
-  await page.goto("/login");
+  await gotoReady(page, "/login");
   await page.getByLabel("E-Mail-Adresse").fill(uniqueAddress("nobody"));
   await page.getByLabel("Passwort").fill("falsches-passwort-123");
   await page.getByRole("button", { name: "Anmelden", exact: true }).click();
@@ -114,7 +115,7 @@ test("Falsches Passwort und unbestätigte Adresse werden abgewiesen", async ({ p
   const user = { name: "Paula Passwort", email: uniqueAddress("pw"), password: defaultPassword };
   await registerAndVerify(page, user);
   await page.context().clearCookies();
-  await page.goto("/login");
+  await gotoReady(page, "/login");
   await page.getByLabel("E-Mail-Adresse").fill(user.email);
   await page.getByLabel("Passwort").fill("nicht-das-richtige-1");
   await page.getByRole("button", { name: "Anmelden", exact: true }).click();
@@ -126,13 +127,13 @@ test("Falsches Passwort und unbestätigte Adresse werden abgewiesen", async ({ p
     email: uniqueAddress("unverified"),
     password: defaultPassword,
   };
-  await page.goto("/registrieren");
+  await gotoReady(page, "/registrieren");
   await page.getByLabel("Dein Name").fill(unverified.name);
   await page.getByLabel("E-Mail-Adresse").fill(unverified.email);
   await page.getByLabel("Passwort").fill(unverified.password);
   await page.getByRole("button", { name: "Konto anlegen" }).click();
   await expect(page.getByRole("heading", { name: "Fast geschafft" })).toBeVisible();
-  await page.goto("/login");
+  await gotoReady(page, "/login");
   await page.getByLabel("E-Mail-Adresse").fill(unverified.email);
   await page.getByLabel("Passwort").fill(unverified.password);
   await page.getByRole("button", { name: "Anmelden", exact: true }).click();
@@ -140,7 +141,7 @@ test("Falsches Passwort und unbestätigte Adresse werden abgewiesen", async ({ p
 });
 
 test("Abgelaufene oder ungültige Anmeldelinks zeigen einen Hinweis", async ({ page }) => {
-  await page.goto("/login?error=INVALID_TOKEN");
+  await gotoReady(page, "/login?error=INVALID_TOKEN");
   await expect(
     page.getByText("Dieser Link ist abgelaufen oder wurde schon benutzt."),
   ).toBeVisible();
@@ -149,7 +150,7 @@ test("Abgelaufene oder ungültige Anmeldelinks zeigen einen Hinweis", async ({ p
 test("Keine CSP-Verletzungen auf öffentlichen Seiten und in der App", async ({ page }) => {
   const violations = collectCspViolations(page);
   for (const path of ["/", "/login", "/registrieren", "/gibt-es-nicht"]) {
-    await page.goto(path);
+    await gotoReady(page, path);
     await page.waitForLoadState("networkidle");
   }
   await expect(page.getByRole("heading", { name: "Seite nicht gefunden" })).toBeVisible();
@@ -179,7 +180,7 @@ test("Magic Link umgeht die Zwei-Faktor-Anmeldung nicht", async ({ page }) => {
   await page.context().clearCookies();
 
   const requested = new Date(Date.now() - 1000);
-  await page.goto("/login");
+  await gotoReady(page, "/login");
   await page.getByLabel("E-Mail-Adresse").fill(user.email);
   await page.getByRole("button", { name: "Anmeldelink per E-Mail schicken" }).click();
   const mail = await mailpit.waitForMail(user.email, {

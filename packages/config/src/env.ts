@@ -275,6 +275,8 @@ export const toolingEnvSchema = z.object({
   E2E_WEB_MODE: z.enum(["production", "dev"]).optional(),
   /** Mailpit API of the test stack, read by the E2E helpers. */
   E2E_MAILPIT_API: z.string().url().optional(),
+  /** `1` saves full-page screenshots of every visited route to test-results/screens. */
+  E2E_SCREENSHOTS: z.enum(["0", "1"]).optional(),
   /** E2E database, read by E2E checks of the audit log. */
   E2E_DATABASE_URL: z.string().url().optional(),
   /** Database of the current test run (set by the Vitest global setup). */

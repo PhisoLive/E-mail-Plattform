@@ -1,4 +1,8 @@
 {
   "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // E2E callbacks of page.evaluate() run in the browser.
+    "lib": ["ES2024", "DOM"]
+  },
   "include": ["scripts/**/*.ts", "e2e/**/*.ts", "*.config.ts"]
 }
