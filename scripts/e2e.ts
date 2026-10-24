@@ -20,7 +20,6 @@ const ports = appPorts.e2e;
 const env: NodeJS.ProcessEnv = {
   ...process.env,
   APP_ENV: "test",
-  NODE_ENV: process.env.NODE_ENV ?? "development",
   LOG_LEVEL: "warn",
   DATABASE_URL: databaseUrl,
   VALKEY_URL: testUrls.valkey,
