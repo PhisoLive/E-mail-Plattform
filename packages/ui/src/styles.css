@@ -1,81 +1,212 @@
 /*
  * Design tokens of the platform (concept chapter 13). Components use only these tokens.
- * Calm surfaces, one accent colour, neutral greys, soft corners (8–12 px), subtle shadows,
- * light and dark mode, spacing in 4 px steps.
+ *
+ * Character: calm, warm paper-like neutrals instead of cold grey, one accent colour
+ * ("Petrol" – a deep blue-green), soft corners (8–12 px), subtle shadows, spacing in 4 px steps.
+ * Light and dark mode: `.dark` / `.light` on <html> force a theme, otherwise the system
+ * preference decides.
  */
 :root {
   color-scheme: light;
-  --ep-bg: oklch(0.985 0.003 95);
-  --ep-surface: oklch(1 0 0);
-  --ep-surface-muted: oklch(0.965 0.004 95);
-  --ep-border: oklch(0.905 0.006 95);
-  --ep-border-strong: oklch(0.82 0.008 95);
-  --ep-text: oklch(0.22 0.012 260);
-  --ep-text-muted: oklch(0.47 0.012 260);
-  --ep-accent: oklch(0.47 0.12 175);
-  --ep-accent-hover: oklch(0.42 0.12 175);
-  --ep-accent-soft: oklch(0.95 0.035 175);
-  --ep-accent-text: oklch(0.99 0 0);
-  --ep-danger: oklch(0.52 0.19 27);
-  --ep-danger-soft: oklch(0.96 0.03 27);
-  --ep-warning: oklch(0.58 0.13 70);
-  --ep-warning-soft: oklch(0.96 0.045 85);
-  --ep-success: oklch(0.5 0.12 150);
-  --ep-success-soft: oklch(0.96 0.04 150);
-  --ep-focus: oklch(0.6 0.14 175);
+  --ep-bg: oklch(0.982 0.004 85);
+  --ep-sidebar: oklch(0.962 0.006 85);
+  --ep-surface: oklch(0.998 0.002 85);
+  --ep-surface-muted: oklch(0.955 0.006 85);
+  --ep-surface-hover: oklch(0.94 0.007 85);
+  --ep-border: oklch(0.9 0.007 85);
+  --ep-border-strong: oklch(0.82 0.009 85);
+  --ep-text: oklch(0.23 0.014 255);
+  --ep-text-muted: oklch(0.46 0.013 255);
+  --ep-text-subtle: oklch(0.52 0.012 255);
+  --ep-accent: oklch(0.46 0.095 200);
+  --ep-accent-hover: oklch(0.4 0.095 200);
+  --ep-accent-soft: oklch(0.94 0.03 200);
+  --ep-accent-strong-text: oklch(0.36 0.08 200);
+  --ep-accent-text: oklch(0.99 0.004 200);
+  --ep-danger: oklch(0.5 0.17 27);
+  --ep-danger-soft: oklch(0.96 0.025 27);
+  --ep-on-danger: oklch(0.99 0.004 27);
+  --ep-warning: oklch(0.53 0.12 70);
+  --ep-warning-soft: oklch(0.96 0.04 85);
+  --ep-success: oklch(0.48 0.11 155);
+  --ep-success-soft: oklch(0.955 0.035 155);
+  --ep-info: oklch(0.5 0.1 250);
+  --ep-info-soft: oklch(0.955 0.025 250);
+  --ep-focus: oklch(0.56 0.12 200);
+  --ep-overlay: oklch(0.2 0.01 255 / 0.4);
   --ep-radius-sm: 8px;
   --ep-radius-md: 10px;
   --ep-radius-lg: 12px;
-  --ep-shadow-sm: 0 1px 2px oklch(0.2 0.01 260 / 0.06);
-  --ep-shadow-md: 0 2px 8px oklch(0.2 0.01 260 / 0.07), 0 1px 2px oklch(0.2 0.01 260 / 0.05);
+  --ep-shadow-sm: 0 1px 2px oklch(0.25 0.02 255 / 0.06);
+  --ep-shadow-md: 0 1px 2px oklch(0.25 0.02 255 / 0.05), 0 4px 12px oklch(0.25 0.02 255 / 0.07);
+  --ep-shadow-lg: 0 2px 4px oklch(0.25 0.02 255 / 0.06), 0 12px 32px oklch(0.25 0.02 255 / 0.12);
 }
 
-.dark {
+:root.dark {
   color-scheme: dark;
-  --ep-bg: oklch(0.17 0.008 260);
-  --ep-surface: oklch(0.205 0.009 260);
-  --ep-surface-muted: oklch(0.24 0.01 260);
-  --ep-border: oklch(0.3 0.01 260);
-  --ep-border-strong: oklch(0.38 0.012 260);
-  --ep-text: oklch(0.95 0.004 95);
-  --ep-text-muted: oklch(0.74 0.01 260);
-  --ep-accent: oklch(0.72 0.11 175);
-  --ep-accent-hover: oklch(0.78 0.1 175);
-  --ep-accent-soft: oklch(0.3 0.045 175);
-  --ep-accent-text: oklch(0.17 0.01 260);
-  --ep-danger: oklch(0.72 0.15 27);
-  --ep-danger-soft: oklch(0.3 0.06 27);
-  --ep-warning: oklch(0.8 0.12 80);
+  --ep-bg: oklch(0.175 0.008 255);
+  --ep-sidebar: oklch(0.155 0.008 255);
+  --ep-surface: oklch(0.205 0.009 255);
+  --ep-surface-muted: oklch(0.235 0.01 255);
+  --ep-surface-hover: oklch(0.26 0.011 255);
+  --ep-border: oklch(0.29 0.011 255);
+  --ep-border-strong: oklch(0.37 0.012 255);
+  --ep-text: oklch(0.95 0.005 85);
+  --ep-text-muted: oklch(0.76 0.01 255);
+  --ep-text-subtle: oklch(0.66 0.011 255);
+  --ep-accent: oklch(0.74 0.09 195);
+  --ep-accent-hover: oklch(0.8 0.085 195);
+  --ep-accent-soft: oklch(0.29 0.04 200);
+  --ep-accent-strong-text: oklch(0.83 0.07 195);
+  --ep-accent-text: oklch(0.17 0.02 220);
+  --ep-danger: oklch(0.74 0.14 25);
+  --ep-danger-soft: oklch(0.29 0.06 25);
+  --ep-on-danger: oklch(0.17 0.02 25);
+  --ep-warning: oklch(0.82 0.12 80);
   --ep-warning-soft: oklch(0.3 0.05 80);
-  --ep-success: oklch(0.75 0.12 150);
-  --ep-success-soft: oklch(0.29 0.05 150);
-  --ep-focus: oklch(0.75 0.11 175);
-  --ep-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
-  --ep-shadow-md: 0 2px 10px oklch(0 0 0 / 0.35);
+  --ep-success: oklch(0.78 0.12 155);
+  --ep-success-soft: oklch(0.28 0.05 155);
+  --ep-info: oklch(0.78 0.09 250);
+  --ep-info-soft: oklch(0.28 0.04 250);
+  --ep-focus: oklch(0.78 0.09 195);
+  --ep-overlay: oklch(0.05 0.01 255 / 0.6);
+  --ep-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.35);
+  --ep-shadow-md: 0 2px 10px oklch(0 0 0 / 0.4);
+  --ep-shadow-lg: 0 12px 40px oklch(0 0 0 / 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+    --ep-bg: oklch(0.175 0.008 255);
+    --ep-sidebar: oklch(0.155 0.008 255);
+    --ep-surface: oklch(0.205 0.009 255);
+    --ep-surface-muted: oklch(0.235 0.01 255);
+    --ep-surface-hover: oklch(0.26 0.011 255);
+    --ep-border: oklch(0.29 0.011 255);
+    --ep-border-strong: oklch(0.37 0.012 255);
+    --ep-text: oklch(0.95 0.005 85);
+    --ep-text-muted: oklch(0.76 0.01 255);
+    --ep-text-subtle: oklch(0.66 0.011 255);
+    --ep-accent: oklch(0.74 0.09 195);
+    --ep-accent-hover: oklch(0.8 0.085 195);
+    --ep-accent-soft: oklch(0.29 0.04 200);
+    --ep-accent-strong-text: oklch(0.83 0.07 195);
+    --ep-accent-text: oklch(0.17 0.02 220);
+    --ep-danger: oklch(0.74 0.14 25);
+    --ep-danger-soft: oklch(0.29 0.06 25);
+    --ep-on-danger: oklch(0.17 0.02 25);
+    --ep-warning: oklch(0.82 0.12 80);
+    --ep-warning-soft: oklch(0.3 0.05 80);
+    --ep-success: oklch(0.78 0.12 155);
+    --ep-success-soft: oklch(0.28 0.05 155);
+    --ep-info: oklch(0.78 0.09 250);
+    --ep-info-soft: oklch(0.28 0.04 250);
+    --ep-focus: oklch(0.78 0.09 195);
+    --ep-overlay: oklch(0.05 0.01 255 / 0.6);
+    --ep-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.35);
+    --ep-shadow-md: 0 2px 10px oklch(0 0 0 / 0.4);
+    --ep-shadow-lg: 0 12px 40px oklch(0 0 0 / 0.5);
+  }
 }
 
 @theme inline {
   --color-bg: var(--ep-bg);
+  --color-sidebar: var(--ep-sidebar);
   --color-surface: var(--ep-surface);
   --color-surface-muted: var(--ep-surface-muted);
+  --color-surface-hover: var(--ep-surface-hover);
   --color-border: var(--ep-border);
   --color-border-strong: var(--ep-border-strong);
   --color-text: var(--ep-text);
   --color-text-muted: var(--ep-text-muted);
+  --color-text-subtle: var(--ep-text-subtle);
   --color-accent: var(--ep-accent);
   --color-accent-hover: var(--ep-accent-hover);
   --color-accent-soft: var(--ep-accent-soft);
+  --color-accent-strong: var(--ep-accent-strong-text);
   --color-accent-text: var(--ep-accent-text);
   --color-danger: var(--ep-danger);
   --color-danger-soft: var(--ep-danger-soft);
+  --color-on-danger: var(--ep-on-danger);
   --color-warning: var(--ep-warning);
   --color-warning-soft: var(--ep-warning-soft);
   --color-success: var(--ep-success);
   --color-success-soft: var(--ep-success-soft);
+  --color-info: var(--ep-info);
+  --color-info-soft: var(--ep-info-soft);
   --color-focus: var(--ep-focus);
+  --color-overlay: var(--ep-overlay);
   --radius-sm: var(--ep-radius-sm);
   --radius-md: var(--ep-radius-md);
   --radius-lg: var(--ep-radius-lg);
   --shadow-sm: var(--ep-shadow-sm);
   --shadow-md: var(--ep-shadow-md);
+  --shadow-lg: var(--ep-shadow-lg);
+}
+
+@keyframes ep-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ep-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ep-slide-in {
+  from {
+    transform: translateX(-16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes ep-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.ep-animate-fade {
+  animation: ep-fade-in 140ms ease-out;
+}
+
+.ep-animate-rise {
+  animation: ep-rise-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ep-animate-slide {
+  animation: ep-slide-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ep-skeleton {
+  animation: ep-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ep-animate-fade,
+  .ep-animate-rise,
+  .ep-animate-slide,
+  .ep-skeleton {
+    animation: none;
+  }
 }

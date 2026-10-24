@@ -5,6 +5,7 @@ const shared = [
   "apps/*/src/**/*.test.ts",
   "apps/web/server/**/*.test.ts",
   "apps/web/lib/**/*.test.ts",
+  "apps/web/components/**/*.test.ts",
 ];
 
 export default defineConfig({
@@ -17,6 +18,15 @@ export default defineConfig({
           name: "unit",
           include: shared,
           exclude: ["**/*.int.test.ts", "**/node_modules/**"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "components",
+          include: ["packages/ui/src/**/*.test.tsx", "apps/web/components/**/*.test.tsx"],
+          environment: "jsdom",
+          setupFiles: ["./packages/testing/src/dom-setup.ts"],
         },
       },
       {
