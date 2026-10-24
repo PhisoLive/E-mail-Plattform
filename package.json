@@ -11,10 +11,27 @@
     }
   },
   "scripts": {
-    "probe": "node -v"
+    "dev": "tsx scripts/dev.ts",
+    "build": "turbo run build",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "turbo run typecheck",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:e2e": "tsx scripts/e2e.ts",
+    "db:generate": "pnpm --filter @ep/db generate",
+    "db:migrate": "tsx scripts/db.ts migrate",
+    "db:seed": "tsx scripts/db.ts seed",
+    "infra:up": "tsx scripts/infra.ts up dev",
+    "infra:down": "tsx scripts/infra.ts down dev",
+    "setup:env": "tsx scripts/setup-env.ts",
+    "ops:rebuild-queues": "tsx scripts/ops.ts rebuild-queues",
+    "ops:set-trust": "tsx scripts/ops.ts set-trust"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",
+    "@ep/config": "workspace:*",
+    "@ep/db": "workspace:*",
     "@types/node": "^24.19.2",
     "tsx": "^4.23.15",
     "turbo": "2.11.10",

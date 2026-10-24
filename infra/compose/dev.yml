@@ -1,0 +1,106 @@
+# Development stack (concept chapter 18). All ports are bound to 127.0.0.1 only.
+# MAIL_SEND_MODE=sandbox: mails only reach GreenMail and Mailpit.
+name: emailplattform-dev
+
+x-defaults: &defaults
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  postgres:
+    <<: *defaults
+    image: postgres:18.6-alpine
+    environment:
+      POSTGRES_USER: emailplattform
+      POSTGRES_PASSWORD: ${DEV_POSTGRES_PASSWORD:-dev-only-password}
+      POSTGRES_DB: emailplattform
+    ports: ["127.0.0.1:${DEV_PG_PORT:-54432}:5432"]
+    volumes: [pgdata:/var/lib/postgresql]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U emailplattform -d emailplattform"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    deploy: { resources: { limits: { memory: 1g } } }
+
+  valkey:
+    <<: *defaults
+    image: valkey/valkey:8.1.10-alpine
+    # AOF persistence and noeviction are mandatory for BullMQ (concept chapter 2).
+    command:
+      [
+        "valkey-server",
+        "--appendonly",
+        "yes",
+        "--maxmemory",
+        "512mb",
+        "--maxmemory-policy",
+        "noeviction",
+      ]
+    ports: ["127.0.0.1:${DEV_VALKEY_PORT:-54379}:6379"]
+    volumes: [valkeydata:/data]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    deploy: { resources: { limits: { memory: 640m } } }
+
+  greenmail:
+    <<: *defaults
+    image: greenmail/standalone:2.1.14
+    environment:
+      GREENMAIL_OPTS: >-
+        -Dgreenmail.setup.test.all
+        -Dgreenmail.hostname=0.0.0.0
+        -Dgreenmail.users.login=email
+        -Dgreenmail.verbose
+    ports:
+      - "127.0.0.1:${DEV_GM_SMTP_PORT:-54025}:3025"
+      - "127.0.0.1:${DEV_GM_SMTPS_PORT:-54465}:3465"
+      - "127.0.0.1:${DEV_GM_IMAP_PORT:-54143}:3143"
+      - "127.0.0.1:${DEV_GM_IMAPS_PORT:-54993}:3993"
+      - "127.0.0.1:${DEV_GM_API_PORT:-54080}:8080"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /api/service/readiness HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q 'Service running' <&3",
+        ]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+    deploy: { resources: { limits: { memory: 512m } } }
+
+  mailpit:
+    <<: *defaults
+    image: axllent/mailpit:v1.32.0
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+      MP_MAX_MESSAGES: "5000"
+    ports:
+      - "127.0.0.1:${DEV_MAILPIT_SMTP_PORT:-54102}:1025"
+      - "127.0.0.1:${DEV_MAILPIT_HTTP_PORT:-54825}:8025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    deploy: { resources: { limits: { memory: 256m } } }
+
+  rspamd:
+    <<: *defaults
+    image: rspamd/rspamd:4.2.3
+    ports:
+      - "127.0.0.1:${DEV_RSPAMD_PORT:-54333}:11333"
+      - "127.0.0.1:${DEV_RSPAMD_CONTROLLER_PORT:-54334}:11334"
+    deploy: { resources: { limits: { memory: 512m } } }
+
+volumes:
+  pgdata:
+  valkeydata:
