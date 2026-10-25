@@ -22,10 +22,12 @@ export function UserMenu({
   user,
   collapsed,
   onOpenCommands,
+  onOpenHelp,
 }: {
   user: ShellUser;
   collapsed: boolean;
   onOpenCommands: () => void;
+  onOpenHelp: () => void;
 }) {
   const t = useTranslations("shell");
   const [theme, setTheme] = useTheme();
@@ -33,7 +35,7 @@ export function UserMenu({
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={collapsed ? t("userMenu") : undefined}
-        className="flex w-full min-w-0 items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus"
+        className="flex w-full min-w-0 items-center gap-3 rounded-md px-2 py-2 text-left transition-colors hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus"
       >
         <Avatar name={user.name} />
         {collapsed ? null : (
@@ -71,10 +73,7 @@ export function UserMenu({
         <DropdownMenuItem icon={<Keyboard aria-hidden="true" />} onSelect={onOpenCommands}>
           {t("commands")}
         </DropdownMenuItem>
-        <DropdownMenuItem
-          icon={<CircleQuestionMark aria-hidden="true" />}
-          onSelect={onOpenCommands}
-        >
+        <DropdownMenuItem icon={<CircleQuestionMark aria-hidden="true" />} onSelect={onOpenHelp}>
           {t("help")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />

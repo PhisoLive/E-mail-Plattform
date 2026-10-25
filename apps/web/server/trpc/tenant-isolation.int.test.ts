@@ -123,7 +123,8 @@ const cases: Record<string, () => Promise<void>> = {
   "workspace.onboarding": async () => {
     await expectCode(callerFor(b.owner, a.id).workspace.onboarding(), "FORBIDDEN");
     const own = await callerFor(b.owner, b.id).workspace.onboarding();
-    expect(own.steps.workspace).toBe(true);
+    // A has a mailbox, an agent and a campaign – none of them may count for B.
+    expect(own.steps).toMatchObject({ mailbox: false, agent: false, campaign: false });
   },
   "senderProfile.get": async () => {
     await expectCode(callerFor(b.owner, a.id).senderProfile.get(), "FORBIDDEN");

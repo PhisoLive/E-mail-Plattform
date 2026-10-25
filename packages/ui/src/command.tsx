@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { Dialog as RadixDialog } from "radix-ui";
 import type { ReactNode } from "react";
 import { cn } from "./cn";
+import { useFocusReturn } from "./focus-return";
 
 /**
  * Command palette (Ctrl+K / ⌘K, concept chapter 13): search, jump, run actions.
@@ -16,6 +17,7 @@ export function CommandDialog({
   title,
   placeholder,
   emptyText,
+  returnFocus,
   children,
 }: {
   open: boolean;
@@ -23,19 +25,23 @@ export function CommandDialog({
   title: string;
   placeholder: string;
   emptyText: string;
+  /** Where the focus goes after closing if the element it came from is gone. */
+  returnFocus?: () => HTMLElement | null;
   children: ReactNode;
 }) {
+  const focusReturn = useFocusReturn(returnFocus);
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
         <RadixDialog.Overlay className="ep-animate-fade fixed inset-0 z-50 bg-overlay" />
         <RadixDialog.Content
+          {...focusReturn}
           aria-describedby={undefined}
           className="ep-animate-rise fixed top-[10dvh] left-1/2 z-50 w-[calc(100vw-24px)] max-w-xl -translate-x-1/2 overflow-hidden rounded-lg border border-border bg-surface shadow-lg"
         >
           <RadixDialog.Title className="sr-only">{title}</RadixDialog.Title>
           <Cmdk label={title} loop className="flex flex-col">
-            <div className="flex items-center gap-2.5 border-b border-border px-4">
+            <div className="flex items-center gap-3 border-b border-border px-4">
               <Search aria-hidden="true" className="size-4 shrink-0 text-text-subtle" />
               <Cmdk.Input
                 placeholder={placeholder}
@@ -59,7 +65,7 @@ export function CommandGroup({ heading, children }: { heading: string; children:
   return (
     <Cmdk.Group
       heading={heading}
-      className="pb-1 [&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.08em] [&_[cmdk-group-heading]]:text-text-subtle"
+      className="pb-1 [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.08em] [&_[cmdk-group-heading]]:text-text-subtle"
     >
       {children}
     </Cmdk.Group>
@@ -89,8 +95,8 @@ export function CommandItem({
       {...(keywords ? { keywords } : {})}
       onSelect={onSelect}
       className={cn(
-        "flex h-10 cursor-pointer select-none items-center gap-3 rounded-md px-2.5 text-sm text-text",
-        "data-[selected=true]:bg-surface-hover [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-text-subtle",
+        "flex h-10 cursor-pointer select-none items-center gap-3 rounded-md px-3 text-sm text-text",
+        "data-[selected=true]:bg-surface-hover data-[selected=true]:shadow-[inset_3px_0_0_var(--ep-accent)] [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-text-subtle",
         className,
       )}
     >

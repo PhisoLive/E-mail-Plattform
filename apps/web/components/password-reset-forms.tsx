@@ -41,7 +41,7 @@ export function ForgotPasswordForm({ validMinutes }: { validMinutes: number }) {
         {sent ? (
           <Alert tone="success">{t("auth.reset.sent", { email, minutes: validMinutes })}</Alert>
         ) : (
-          <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <form method="post" className="flex flex-col gap-4" onSubmit={onSubmit}>
             <Field id="reset-email" label={t("common.email")}>
               <Input
                 id="reset-email"
@@ -121,7 +121,7 @@ export function NewPasswordForm({
             </Link>
           </>
         ) : token && !linkError ? (
-          <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+          <form method="post" className="flex flex-col gap-4" onSubmit={onSubmit}>
             <Field
               id="new-password"
               label={t("auth.reset.newPassword")}

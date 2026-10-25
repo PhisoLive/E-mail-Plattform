@@ -8,16 +8,16 @@ import {
   DrawerTrigger,
   IconButton,
   Kbd,
-  Toaster,
   TooltipProvider,
 } from "@ep/ui";
 import { Menu, Search } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { type ReactNode, useCallback, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { setPreferenceCookie } from "../../lib/preference-cookie";
+import { BrandMark } from "../brand-mark";
 import { CommandPalette } from "./command-palette";
-import { BrandMark, Sidebar } from "./sidebar";
+import { Sidebar } from "./sidebar";
 import { type ShellAgent, type ShellUser, type ShellWorkspace, sidebarCookie } from "./types";
 import { useModifierKey } from "./use-modifier-key";
 
@@ -30,6 +30,12 @@ export interface AppShellProps {
   inboxCount: number;
   children: ReactNode;
 }
+
+/**
+ * Has a shell been mounted before in this page? The app area and the operator area are separate
+ * route groups (E-048): navigating between them mounts a new shell, and the focus would be lost.
+ */
+let shellMountedBefore = false;
 
 /**
  * App shell (concept chapter 13): collapsible sidebar on large screens, top bar with a
@@ -52,6 +58,27 @@ export function AppShell({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
+  // Palette and help opened from the drawer: the drawer and the item are gone when they close.
+  const returnToMenu = useCallback(
+    () => (menuButton.current?.offsetParent ? menuButton.current : null),
+    [],
+  );
+  const effectRan = useRef(false);
+
+  useEffect(() => {
+    // React's strict mode runs the effect twice for the same instance – only the first run counts.
+    if (effectRan.current) return;
+    effectRan.current = true;
+    // A new shell after a navigation (not the first page load): focus the start of the content.
+    if (shellMountedBefore) {
+      const active = document.activeElement;
+      if (!active || active === document.body) {
+        document.getElementById("inhalt")?.focus({ preventScroll: true });
+      }
+    }
+    shellMountedBefore = true;
+  }, []);
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((value) => {
@@ -116,7 +143,7 @@ export function AppShell({
           <header className="sticky top-0 z-30 flex h-14 items-center gap-1 border-b border-border bg-bg/90 px-2 backdrop-blur-md lg:hidden">
             <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
               <DrawerTrigger asChild>
-                <IconButton label={t("openNavigation")}>
+                <IconButton ref={menuButton} label={t("openNavigation")}>
                   <Menu aria-hidden="true" />
                 </IconButton>
               </DrawerTrigger>
@@ -156,6 +183,7 @@ export function AppShell({
         user={user}
         workspaces={workspaces}
         active={active}
+        returnFocus={returnToMenu}
       />
 
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
@@ -163,6 +191,7 @@ export function AppShell({
           title={t("helpTitle")}
           description={t("helpText")}
           closeLabel={tCommon("close")}
+          returnFocus={returnToMenu}
         >
           <dl className="flex flex-col gap-3 text-sm">
             <div className="flex items-center justify-between gap-4">
@@ -175,20 +204,18 @@ export function AppShell({
             <div className="flex items-center justify-between gap-4">
               <dt className="text-text-muted">{t("shortcutClose")}</dt>
               <dd>
-                <Kbd>Esc</Kbd>
+                <Kbd>{t("keys.escape")}</Kbd>
               </dd>
             </div>
             <div className="flex items-center justify-between gap-4">
               <dt className="text-text-muted">{t("shortcutSkip")}</dt>
               <dd>
-                <Kbd>Tab</Kbd>
+                <Kbd>{t("keys.tab")}</Kbd>
               </dd>
             </div>
           </dl>
         </DialogContent>
       </Dialog>
-
-      <Toaster closeLabel={tCommon("close")} />
     </TooltipProvider>
   );
 }

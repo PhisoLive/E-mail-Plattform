@@ -8,9 +8,9 @@ import { useState } from "react";
 import { AgentTemplatePicker } from "../agents/agent-template-picker";
 import { SenderProfileForm } from "../settings/sender-profile-form";
 
-export function OnboardingSender({ canEdit, next }: { canEdit: boolean; next: string }) {
+export function OnboardingSender({ next }: { next: string }) {
   const router = useRouter();
-  return <SenderProfileForm compact canEdit={canEdit} onSaved={() => router.push(next)} />;
+  return <SenderProfileForm compact onSaved={() => router.push(next)} />;
 }
 
 export function OnboardingAgent({ next }: { next: string }) {

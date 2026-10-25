@@ -109,11 +109,23 @@ export const senderProfiles = pgTable(
       city?: string | null;
       country?: string | null;
     }>(),
+    /**
+     * Registered seat; may differ from the town of the address (§ 4a GmbHG, § 5 AktG). Not
+     * derived from the address – existing profiles of registered firms ask for it again.
+     */
+    seat: text("seat"),
     registerCourt: text("register_court"),
     registerNumber: text("register_number"),
     managingDirectors: text("managing_directors"),
-    /** Chair of the supervisory board – mandatory for AG and eG (§ 80 AktG, § 25a GenG). */
+    /** Chair of the supervisory board – mandatory for a German AG (§ 80 AktG), for an eG if it has one (§ 25a GenG). */
     supervisoryBoardChair: text("supervisory_board_chair"),
+    /** General partner of a GmbH & Co. KG (§ 125 Abs. 1 S. 2, § 177a HGB). */
+    generalPartner: jsonb("general_partner").$type<{
+      name: string;
+      seat: string;
+      registerCourt: string;
+      registerNumber: string;
+    }>(),
     vatId: text("vat_id"),
     phone: text("phone"),
     website: text("website"),

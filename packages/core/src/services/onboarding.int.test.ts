@@ -1,4 +1,9 @@
-import { addTestMember, createTestDeps, createTestWorkspace } from "@ep/testing";
+import {
+  addTestMember,
+  createPlaceholderObjects,
+  createTestDeps,
+  createTestWorkspace,
+} from "@ep/testing";
 import { describe, expect, it } from "vitest";
 import { getOnboardingStatus } from "./onboarding";
 import { updateSenderProfile } from "./sender-profile";
@@ -35,6 +40,24 @@ describe("onboarding status", () => {
     const status = await getOnboardingStatus(workspace.ownerCtx);
     expect(status.ok && status.value.steps.senderProfile).toBe(true);
     expect(status.ok && status.value.done).toBe(2);
+  });
+
+  it("counts mailbox, agent and campaign of the own workspace only", async () => {
+    const a = await createTestWorkspace(deps);
+    const b = await createTestWorkspace(deps);
+    await createPlaceholderObjects(deps, a);
+    const statusA = await getOnboardingStatus(a.ownerCtx);
+    expect(statusA.ok && statusA.value.steps).toMatchObject({
+      mailbox: true,
+      agent: true,
+      campaign: true,
+    });
+    const statusB = await getOnboardingStatus(b.ownerCtx);
+    expect(statusB.ok && statusB.value.steps).toMatchObject({
+      mailbox: false,
+      agent: false,
+      campaign: false,
+    });
   });
 
   it("reads only the own workspace", async () => {

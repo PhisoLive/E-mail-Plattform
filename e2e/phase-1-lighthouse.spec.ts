@@ -95,6 +95,9 @@ test("Lighthouse-Barrierefreiheit mindestens 95 auf Website und App", async () =
         });
         const lhr = result?.lhr;
         if (!lhr) throw new Error(`no Lighthouse result for ${path}`);
+        // Measure the intended page – not a login or onboarding page after a redirect.
+        const measured = new URL(lhr.finalDisplayedUrl);
+        expect(`${measured.pathname}${measured.search}`, `measured page for ${path}`).toBe(path);
         entry[formFactor] = lhr.categories.accessibility?.score ?? 0;
         for (const audit of Object.values(lhr.audits)) {
           if (audit.score !== null && audit.score < 1 && audit.scoreDisplayMode === "binary")

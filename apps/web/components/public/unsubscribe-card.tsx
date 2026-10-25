@@ -30,7 +30,7 @@ export function UnsubscribeCard({
         <span className="flex size-11 items-center justify-center rounded-full bg-accent-soft text-accent-strong">
           <MailX aria-hidden="true" className="size-5" />
         </span>
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <h1 className="text-xl font-semibold tracking-tight">{texts.title}</h1>
           <p className="text-sm text-text-muted">{texts.text}</p>
         </div>

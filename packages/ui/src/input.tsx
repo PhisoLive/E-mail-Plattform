@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import type {
   InputHTMLAttributes,
   LabelHTMLAttributes,
@@ -22,7 +23,7 @@ export function Input({ className, invalid, ...props }: InputProps) {
       className={cn(
         control,
         "h-9 px-3",
-        invalid ? "border-danger" : "border-border-strong",
+        invalid ? "border-danger" : "border-border-control",
         className,
       )}
       aria-invalid={invalid || undefined}
@@ -43,7 +44,7 @@ export function Textarea({ className, invalid, rows = 4, ...props }: TextareaPro
       className={cn(
         control,
         "px-3 py-2 leading-relaxed",
-        invalid ? "border-danger" : "border-border-strong",
+        invalid ? "border-danger" : "border-border-control",
         className,
       )}
       aria-invalid={invalid || undefined}
@@ -57,22 +58,30 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   ref?: Ref<HTMLSelectElement>;
 }
 
-/** Native select (keyboard and screen-reader friendly, works on every phone). */
+/**
+ * Native select (keyboard and screen-reader friendly, works on every phone). The arrow is an
+ * icon in token colour on top of the field, so it follows light and dark mode.
+ */
 export function Select({ className, invalid, children, ...props }: SelectProps) {
   return (
-    <select
-      className={cn(
-        control,
-        "h-9 appearance-none bg-[length:16px] bg-[right_10px_center] bg-no-repeat pr-9 pl-3",
-        "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
-        invalid ? "border-danger" : "border-border-strong",
-        className,
-      )}
-      aria-invalid={invalid || undefined}
-      {...props}
-    >
-      {children}
-    </select>
+    <div className="relative w-full">
+      <select
+        className={cn(
+          control,
+          "h-9 appearance-none pr-9 pl-3",
+          invalid ? "border-danger" : "border-border-control",
+          className,
+        )}
+        aria-invalid={invalid || undefined}
+        {...props}
+      >
+        {children}
+      </select>
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-text-subtle"
+      />
+    </div>
   );
 }
 
@@ -105,11 +114,11 @@ export interface FieldProps {
 /** Label, control, hint and error with correct aria wiring (ids `<id>-hint`, `<id>-error`). */
 export function Field({ id, label, hint, error, requiredMark, children, className }: FieldProps) {
   return (
-    <div className={cn("flex flex-col gap-1.5", className)}>
+    <div className={cn("flex flex-col gap-2", className)}>
       <Label htmlFor={id}>
         {label}
         {requiredMark ? (
-          <span className="ml-0.5 text-danger" aria-hidden="true">
+          <span className="ml-1 text-danger" aria-hidden="true">
             {requiredMark}
           </span>
         ) : null}

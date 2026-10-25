@@ -105,7 +105,7 @@ export function TwoFactorSetup({ enabled, required }: { enabled: boolean; requir
           </>
         ) : null}
         {step === "password" ? (
-          <form className="flex max-w-sm flex-col gap-4" onSubmit={onPassword}>
+          <form method="post" className="flex max-w-sm flex-col gap-4" onSubmit={onPassword}>
             <Field id="tf-password" label={t("settings.profile.passwordConfirm")}>
               <Input
                 id="tf-password"
@@ -124,7 +124,7 @@ export function TwoFactorSetup({ enabled, required }: { enabled: boolean; requir
           </form>
         ) : null}
         {step === "verify" && uri ? (
-          <form className="flex flex-col gap-4" onSubmit={onVerify}>
+          <form method="post" className="flex flex-col gap-4" onSubmit={onVerify}>
             <p className="text-sm">{t("settings.profile.scanQr")}</p>
             <div
               className="flex flex-wrap items-center gap-4"

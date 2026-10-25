@@ -27,8 +27,8 @@ export default async function PricingPage() {
         </div>
         <ul className="grid gap-3 sm:grid-cols-2">
           {included.map((item) => (
-            <li key={item} className="flex items-start gap-2.5 text-sm">
-              <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
+            <li key={item} className="flex items-start gap-3 text-sm">
+              <Check aria-hidden="true" className="mt-1 size-4 shrink-0 text-accent" />
               {t(`included.${item}`)}
             </li>
           ))}

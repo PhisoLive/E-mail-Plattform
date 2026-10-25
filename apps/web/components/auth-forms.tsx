@@ -90,7 +90,7 @@ export function LoginForm({ magicLinkMinutes }: { magicLinkMinutes: number }) {
         </div>
         {error ? <Alert tone="danger">{error}</Alert> : null}
         {info ? <Alert tone="success">{info}</Alert> : null}
-        <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
+        <form method="post" className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
           <Field id="email" label={t("common.email")}>
             <Input
               id="email"
@@ -174,7 +174,7 @@ export function TwoFactorForm() {
           <p className="text-sm text-text-muted">{t("auth.twoFactor.subtitle")}</p>
         </div>
         {error ? <Alert tone="danger">{error}</Alert> : null}
-        <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+        <form method="post" className="flex flex-col gap-4" onSubmit={onSubmit}>
           <Field id="code" label={t("auth.twoFactor.codeLabel")}>
             <Input
               id="code"
@@ -250,7 +250,7 @@ export function RegisterForm({ minPasswordLength }: { minPasswordLength: number 
           <p className="text-sm text-text-muted">{t("auth.register.subtitle")}</p>
         </div>
         {error ? <Alert tone="danger">{error}</Alert> : null}
-        <form className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
+        <form method="post" className="flex flex-col gap-4" onSubmit={onSubmit} noValidate>
           <Field id="name" label={t("auth.register.nameLabel")}>
             <Input
               id="name"

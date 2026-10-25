@@ -1,0 +1,1 @@
+ALTER TABLE "sender_profiles" ADD COLUMN "general_partner" jsonb;

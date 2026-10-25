@@ -6,7 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { adminNav, agentsNav, isActive, mainNav, type NavItem, settingsLink } from "./nav";
+import { BrandMark } from "../brand-mark";
+import { adminNav, agentsNav, isActive, mainNav, type NavLinkItem, settingsLink } from "./nav";
 import type { ShellAgent, ShellUser, ShellWorkspace } from "./types";
 import { useModifierKey } from "./use-modifier-key";
 import { UserMenu } from "./user-menu";
@@ -33,13 +34,16 @@ function NavLink({
   collapsed,
   active,
   trailing,
+  collapsedLabel,
   onNavigate,
 }: {
-  item: NavItem;
+  item: NavLinkItem;
   label: string;
   collapsed: boolean;
   active: boolean;
   trailing?: ReactNode;
+  /** Name in the collapsed sidebar, e.g. with the inbox counter; also shows a dot. */
+  collapsedLabel?: string;
   onNavigate?: () => void;
 }) {
   const Icon = item.icon;
@@ -47,10 +51,10 @@ function NavLink({
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
-      aria-label={collapsed ? label : undefined}
+      aria-label={collapsed ? (collapsedLabel ?? label) : undefined}
       onClick={onNavigate}
       className={cn(
-        "group flex h-9 min-w-0 items-center gap-2.5 rounded-md px-2.5 text-[13.5px] transition-colors",
+        "group relative flex h-9 min-w-0 items-center gap-3 rounded-md px-3 text-[13.5px] transition-colors",
         "focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-focus",
         collapsed && "justify-center px-0",
         active
@@ -65,12 +69,15 @@ function NavLink({
           active ? "text-accent" : "text-text-subtle group-hover:text-text-muted",
         )}
       />
+      {collapsed && collapsedLabel ? (
+        <span aria-hidden="true" className="absolute top-2 right-2 size-2 rounded-full bg-accent" />
+      ) : null}
       {collapsed ? null : <span className="min-w-0 flex-1 truncate">{label}</span>}
       {collapsed ? null : trailing}
     </Link>
   );
   return collapsed ? (
-    <Tooltip content={label} side="right">
+    <Tooltip content={collapsedLabel ?? label} side="right">
       {link}
     </Tooltip>
   ) : (
@@ -128,7 +135,7 @@ export function Sidebar({
         ) : null}
       </div>
 
-      <div className="mt-2 flex flex-col gap-1.5">
+      <div className="mt-2 flex flex-col gap-2">
         {collapsed ? (
           <Tooltip content={newCampaign} side="right">
             <Link
@@ -168,11 +175,11 @@ export function Sidebar({
           <button
             type="button"
             onClick={onOpenCommands}
-            className="flex h-9 items-center gap-2.5 rounded-md border border-border bg-surface px-2.5 text-left text-[13px] text-text-subtle shadow-sm transition-colors hover:border-border-strong hover:text-text-muted focus-visible:outline-2 focus-visible:outline-focus"
+            className="flex h-9 items-center gap-3 rounded-md border border-border bg-surface px-3 text-left text-[13px] text-text-subtle shadow-sm transition-colors hover:border-border-strong hover:text-text-muted focus-visible:outline-2 focus-visible:outline-focus"
           >
             <Search aria-hidden="true" className="size-4 shrink-0" />
             <span className="flex-1 truncate">{search}</span>
-            <span className="flex items-center gap-0.5" aria-hidden="true">
+            <span className="flex items-center gap-1" aria-hidden="true">
               <Kbd>{modifier}</Kbd>
               <Kbd>K</Kbd>
             </span>
@@ -182,7 +189,7 @@ export function Sidebar({
 
       <nav aria-label={tNav("main")} className="mt-3 flex min-h-0 flex-1 flex-col">
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <ul className="flex flex-col gap-0.5">
+          <ul className="flex flex-col gap-1">
             {mainNav.map((item) => (
               <li key={item.key}>
                 <NavLink
@@ -191,22 +198,25 @@ export function Sidebar({
                   collapsed={collapsed}
                   active={isActive(pathname, item.href)}
                   onNavigate={onNavigate}
-                  trailing={
-                    item.key === "inbox" && inboxCount > 0 ? (
-                      <span className="tabular rounded-full bg-accent-soft px-1.5 text-[11px] font-medium text-accent-strong">
-                        {inboxCount}
-                        <span className="sr-only"> {t("waiting")}</span>
-                      </span>
-                    ) : undefined
-                  }
+                  {...(item.key === "inbox" && inboxCount > 0
+                    ? {
+                        collapsedLabel: t("inboxWithCount", { count: inboxCount }),
+                        trailing: (
+                          <span className="tabular rounded-full bg-accent-soft px-2 text-[11px] font-medium text-accent-strong">
+                            <span aria-hidden="true">{inboxCount}</span>
+                            <span className="sr-only">{t("waiting", { count: inboxCount })}</span>
+                          </span>
+                        ),
+                      }
+                    : {})}
                 />
               </li>
             ))}
           </ul>
 
-          <div className="mt-5 flex flex-col gap-0.5">
+          <div className="mt-5 flex flex-col gap-1">
             {collapsed ? null : (
-              <div className="flex h-7 items-center justify-between px-2.5">
+              <div className="flex h-7 items-center justify-between px-3">
                 <h2 className="text-[11px] font-medium uppercase tracking-[0.08em] text-text-subtle">
                   {t("agentsSection")}
                 </h2>
@@ -229,11 +239,11 @@ export function Sidebar({
               onNavigate={onNavigate}
             />
             {collapsed ? null : agents.length === 0 ? (
-              <p className="px-2.5 pt-1 text-xs leading-relaxed text-text-subtle">
+              <p className="px-3 pt-1 text-xs leading-relaxed text-text-subtle">
                 {t("agentsEmpty")}
               </p>
             ) : (
-              <ul aria-label={t("agentsSection")} className="flex flex-col gap-0.5 pt-1">
+              <ul aria-label={t("agentsSection")} className="flex flex-col gap-1 pt-1">
                 {agents.map((agent) => (
                   <li key={agent.id}>
                     <Link
@@ -241,7 +251,7 @@ export function Sidebar({
                       aria-current={pathname === `/agenten/${agent.id}` ? "page" : undefined}
                       onClick={onNavigate}
                       className={cn(
-                        "flex h-8 min-w-0 items-center gap-2.5 rounded-md px-2.5 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-focus",
+                        "flex h-8 min-w-0 items-center gap-3 rounded-md px-3 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-focus",
                         pathname === `/agenten/${agent.id}`
                           ? "bg-surface font-medium text-text shadow-sm ring-1 ring-border"
                           : "text-text-muted hover:bg-surface-hover hover:text-text",
@@ -251,7 +261,7 @@ export function Sidebar({
                       <span className="truncate">{agent.name}</span>
                     </Link>
                     {agent.conversations.length > 0 ? (
-                      <ul className="ml-[22px] flex flex-col border-l border-border pl-2">
+                      <ul className="ml-6 flex flex-col border-l border-border pl-2">
                         {agent.conversations.map((conversation) => {
                           const href = `/chat/${agent.id}/${conversation.id}`;
                           return (
@@ -280,7 +290,7 @@ export function Sidebar({
             )}
           </div>
         </div>
-        <div className="mt-2 flex flex-col gap-0.5">
+        <div className="mt-2 flex flex-col gap-1">
           <NavLink
             item={settingsLink}
             label={tNav("settings")}
@@ -288,10 +298,10 @@ export function Sidebar({
             active={isActive(pathname, settingsLink.href)}
             onNavigate={onNavigate}
           />
-          {user.isPlatformAdmin ? (
+          {user.adminLabel ? (
             <NavLink
               item={adminNav}
-              label={tNav("admin")}
+              label={user.adminLabel}
               collapsed={collapsed}
               active={isActive(pathname, adminNav.href)}
               onNavigate={onNavigate}
@@ -312,7 +322,7 @@ export function Sidebar({
             <button
               type="button"
               onClick={onOpenHelp}
-              className="flex h-9 items-center gap-2.5 rounded-md px-2.5 text-[13.5px] text-text-muted hover:bg-surface-hover hover:text-text focus-visible:outline-2 focus-visible:outline-focus"
+              className="flex h-9 items-center gap-3 rounded-md px-3 text-[13.5px] text-text-muted hover:bg-surface-hover hover:text-text focus-visible:outline-2 focus-visible:outline-focus"
             >
               <CircleQuestionMark aria-hidden="true" className="size-[18px] text-text-subtle" />
               {t("help")}
@@ -320,31 +330,15 @@ export function Sidebar({
           )}
         </div>
       </nav>
-      <div className="flex flex-col gap-0.5 border-t border-border pt-2">
+      <div className="flex flex-col gap-1 border-t border-border pt-2">
         <WorkspaceSwitcher active={active} workspaces={workspaces} collapsed={collapsed} />
-        <UserMenu user={user} collapsed={collapsed} onOpenCommands={onOpenCommands} />
+        <UserMenu
+          user={user}
+          collapsed={collapsed}
+          onOpenCommands={onOpenCommands}
+          onOpenHelp={onOpenHelp}
+        />
       </div>
     </div>
-  );
-}
-
-/** Logo mark: two overlapping rounded shapes in the accent colour – an envelope abstracted. */
-export function BrandMark({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className={cn("size-6 shrink-0", className)}
-      fill="none"
-    >
-      <rect x="2" y="4" width="20" height="16" rx="5" className="fill-accent" />
-      <path
-        d="M6.5 9.5 12 13l5.5-3.5"
-        className="stroke-accent-text"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

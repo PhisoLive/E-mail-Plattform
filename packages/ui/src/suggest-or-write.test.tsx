@@ -75,4 +75,44 @@ describe("SuggestOrWrite", () => {
     await userEvent.click(screen.getByRole("button", { name: "Ergänzen" }));
     expect(onChange).toHaveBeenLastCalledWith("Kurz – vervollständigt", "ai");
   });
+
+  it("names the chip group by its label when there is no text field", () => {
+    render(
+      <SuggestOrWrite
+        label="Ansprache"
+        allowFreeText={false}
+        suggestions={[
+          { id: "sie", label: "Sie" },
+          { id: "du", label: "Du" },
+        ]}
+        value="Sie"
+        onChange={() => {}}
+        suggestionsLabel="Vorschläge"
+      />,
+    );
+    const group = screen.getByRole("group", { name: "Ansprache" });
+    expect(group.querySelectorAll("button")).toHaveLength(2);
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(document.querySelector("label")).toBeNull();
+  });
+
+  it("describes the chip group with the explanation in both modes", () => {
+    for (const allowFreeText of [true, false]) {
+      render(
+        <SuggestOrWrite
+          label="Ansprache"
+          allowFreeText={allowFreeText}
+          explain="Wie du die Empfänger ansprichst."
+          suggestions={[{ id: "sie", label: "Sie" }]}
+          value=""
+          onChange={() => {}}
+          suggestionsLabel="Vorschläge"
+        />,
+      );
+      expect(screen.getByRole("group")).toHaveAccessibleDescription(
+        "Wie du die Empfänger ansprichst.",
+      );
+      cleanup();
+    }
+  });
 });

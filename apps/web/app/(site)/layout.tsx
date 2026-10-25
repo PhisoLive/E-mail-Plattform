@@ -2,7 +2,7 @@ import { buttonClasses } from "@ep/ui";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
-import { BrandMark } from "../../components/shell/sidebar";
+import { BrandMark } from "../../components/brand-mark";
 
 const legal = [
   { href: "/impressum", key: "imprint" },

@@ -2,7 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 import { setPreferenceCookie } from "./preference-cookie";
-import { parseTheme, type ThemePreference, themeCookie } from "./theme";
+import { parseTheme, type ThemePreference, themeColorFor, themeCookie } from "./theme";
 
 const listeners = new Set<() => void>();
 /** Last choice in this tab – the Cookie Store API writes asynchronously. */
@@ -26,6 +26,10 @@ export function applyTheme(next: ThemePreference): void {
   const root = document.documentElement;
   root.classList.remove("light", "dark");
   if (next !== "system") root.classList.add(next);
+  // Keep the meta tags rendered by the layout, only their colour changes.
+  for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+    meta.content = themeColorFor(next, meta.media.includes("dark") ? "dark" : "light");
+  }
   for (const listener of listeners) listener();
 }
 

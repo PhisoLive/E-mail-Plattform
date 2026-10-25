@@ -22,7 +22,7 @@ export function TabsTrigger({ className, ...props }: ComponentProps<typeof Radix
   return (
     <RadixTabs.Trigger
       className={cn(
-        "-mb-px shrink-0 border-b-2 border-transparent px-3 py-2 text-sm text-text-muted transition-colors hover:text-text focus-visible:outline-2 focus-visible:outline-focus data-[state=active]:border-accent data-[state=active]:font-medium data-[state=active]:text-text",
+        "-mb-px shrink-0 border-b-2 border-transparent px-3 py-2 text-sm text-text-muted transition-colors hover:text-text focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus data-[state=active]:border-accent data-[state=active]:font-medium data-[state=active]:text-text",
         className,
       )}
       {...props}

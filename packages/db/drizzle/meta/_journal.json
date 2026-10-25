@@ -36,6 +36,20 @@
       "when": 1792872726046,
       "tag": "0004_sender_profile_board",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792881617623,
+      "tag": "0005_sender_general_partner",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792883229740,
+      "tag": "0006_sender_seat",
+      "breakpoints": true
     }
   ]
 }

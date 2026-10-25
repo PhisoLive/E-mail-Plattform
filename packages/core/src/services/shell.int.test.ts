@@ -1,3 +1,4 @@
+import { defaults } from "@ep/config/defaults";
 import { conversations, threads } from "@ep/db";
 import {
   addTestMember,
@@ -33,7 +34,7 @@ describe("shell summary", () => {
     if (!result.ok) return;
     expect(result.value.inboxOpen).toBe(2);
     expect(result.value.agents).toHaveLength(1);
-    expect(result.value.agents[0]?.conversations).toHaveLength(3);
+    expect(result.value.agents[0]?.conversations).toHaveLength(defaults.shell.sidebarConversations);
   });
 
   it("shows nobody else's conversations and nothing of other workspaces", async () => {

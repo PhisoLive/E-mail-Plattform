@@ -24,6 +24,8 @@ export interface CreatedInvitation {
   /** Plain token – only returned once to send the invitation mail, never stored. */
   token: string;
   workspaceName: string;
+  /** Time zone of the workspace – the expiry date in the mail follows it. */
+  workspaceTimezone: string;
 }
 
 export async function createInvitation(
@@ -107,7 +109,7 @@ export async function createInvitation(
       })
       .returning({ id: invitations.id });
     const [workspace] = await scope.tx
-      .select({ name: workspaces.name })
+      .select({ name: workspaces.name, timezone: workspaces.timezone })
       .from(workspaces)
       .where(eq(workspaces.id, scope.workspaceId));
     if (!invitation || !workspace) return err(appError("INTERNAL"));
@@ -117,7 +119,15 @@ export async function createInvitation(
       objectId: invitation.id,
       data: { role },
     });
-    return ok({ id: invitation.id, email, role, expiresAt, token, workspaceName: workspace.name });
+    return ok({
+      id: invitation.id,
+      email,
+      role,
+      expiresAt,
+      token,
+      workspaceName: workspace.name,
+      workspaceTimezone: workspace.timezone,
+    });
   });
 }
 

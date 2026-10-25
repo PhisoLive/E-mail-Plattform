@@ -36,7 +36,7 @@ export function ChoiceCards<T extends string>({
             <label
               key={choice.value}
               className={cn(
-                "relative flex cursor-pointer items-start gap-3 rounded-lg border bg-surface px-4 py-3.5 shadow-sm transition-colors",
+                "relative flex cursor-pointer items-start gap-3 rounded-lg border bg-surface px-4 py-4 shadow-sm transition-colors",
                 "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus",
                 checked
                   ? "border-accent ring-1 ring-accent"
@@ -62,7 +62,7 @@ export function ChoiceCards<T extends string>({
                   {choice.icon}
                 </span>
               ) : null}
-              <span className="flex min-w-0 flex-col gap-0.5">
+              <span className="flex min-w-0 flex-col gap-1">
                 <span className="text-sm font-medium text-text">{choice.title}</span>
                 {choice.description ? (
                   <span className="text-xs text-text-muted">{choice.description}</span>

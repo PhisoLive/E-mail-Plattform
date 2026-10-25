@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { Dialog as RadixDialog } from "radix-ui";
 import type { ReactNode } from "react";
 import { cn } from "./cn";
+import { useFocusReturn } from "./focus-return";
 
 export const Dialog = RadixDialog.Root;
 export const DialogTrigger = RadixDialog.Trigger;
@@ -16,6 +17,7 @@ export function DialogContent({
   children,
   className,
   wide = false,
+  returnFocus,
 }: {
   title: ReactNode;
   description?: ReactNode;
@@ -23,11 +25,15 @@ export function DialogContent({
   children: ReactNode;
   className?: string;
   wide?: boolean;
+  /** Where the focus goes after closing if the element it came from is gone. */
+  returnFocus?: () => HTMLElement | null;
 }) {
+  const focusReturn = useFocusReturn(returnFocus);
   return (
     <RadixDialog.Portal>
       <RadixDialog.Overlay className="ep-animate-fade fixed inset-0 z-50 bg-overlay" />
       <RadixDialog.Content
+        {...focusReturn}
         className={cn(
           "ep-animate-rise fixed top-1/2 left-1/2 z-50 flex max-h-[min(90dvh,720px)] w-[calc(100vw-24px)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-lg",
           wide ? "max-w-2xl" : "max-w-md",
@@ -47,7 +53,7 @@ export function DialogContent({
           </div>
           <RadixDialog.Close
             aria-label={closeLabel}
-            className="-mt-1 -mr-1 inline-flex size-8 items-center justify-center rounded-md text-text-muted hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus"
+            className="-mt-1 -mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-text-muted hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-focus"
           >
             <X className="size-4" aria-hidden="true" />
           </RadixDialog.Close>

@@ -38,7 +38,7 @@ export const teamRouter = router({
           workspace: invitation.workspaceName,
           role: roleTranslator(invitation.role),
           url,
-          date: formatDateDe(invitation.expiresAt),
+          date: formatDateDe(invitation.expiresAt, invitation.workspaceTimezone),
         }),
       });
       return {

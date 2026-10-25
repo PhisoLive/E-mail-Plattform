@@ -1,4 +1,5 @@
 import { Alert, Card, CardBody } from "@ep/ui";
+import { TRPCError } from "@trpc/server";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -15,12 +16,28 @@ export default async function InvitationPage({ params }: { params: Promise<{ tok
   const { token } = await params;
   const t = await getTranslations();
   const caller = await serverCaller();
-  const preview = await caller.invitation.preview({ token }).catch(() => null);
+  // Unknown, revoked or malformed tokens get a clear answer; other errors reach the error page.
+  const preview = await caller.invitation.preview({ token }).catch((error: unknown) => {
+    if (error instanceof TRPCError && (error.code === "NOT_FOUND" || error.code === "BAD_REQUEST"))
+      return null;
+    throw error;
+  });
   if (!preview) {
     return (
       <Card>
-        <CardBody className="py-6">
-          <Alert tone="danger">{t("auth.invitation.invalid")}</Alert>
+        <CardBody className="flex flex-col gap-4 py-6">
+          <h1 className="text-xl font-semibold tracking-tight">
+            {t("auth.invitation.invalidTitle")}
+          </h1>
+          <p className="text-sm text-text-muted">{t("auth.invitation.invalid")}</p>
+          <div className="flex flex-wrap gap-3 text-sm">
+            <Link className="font-medium text-accent hover:underline" href="/login">
+              {t("auth.login.submit")}
+            </Link>
+            <Link className="font-medium text-accent hover:underline" href="/">
+              {t("pages.notFound.back")}
+            </Link>
+          </div>
         </CardBody>
       </Card>
     );

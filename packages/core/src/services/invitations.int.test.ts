@@ -30,6 +30,8 @@ describe("invitation service", () => {
     });
     expect(created.ok).toBe(true);
     if (!created.ok) return;
+    // The expiry date in the mail follows the time zone of the workspace.
+    expect(created.value.workspaceTimezone).toBe("Europe/Berlin");
 
     const [row] = await deps.db
       .select()

@@ -38,7 +38,7 @@ export function DropdownMenuItem({
   return (
     <RadixMenu.Item
       className={cn(
-        "flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-text outline-none select-none data-[highlighted]:bg-surface-hover data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:text-text-muted",
+        "flex cursor-default items-center gap-2 rounded-md px-3 py-2 text-sm text-text outline-none select-none data-[highlighted]:bg-surface-hover data-[highlighted]:shadow-[inset_3px_0_0_var(--ep-accent)] data-[disabled]:opacity-50 [&_svg]:size-4 [&_svg]:text-text-muted",
         className,
       )}
       {...props}
@@ -52,7 +52,7 @@ export function DropdownMenuItem({
 export function DropdownMenuLabel({ className, ...props }: ComponentProps<typeof RadixMenu.Label>) {
   return (
     <RadixMenu.Label
-      className={cn("px-2.5 pt-1.5 pb-1 text-xs font-medium text-text-subtle", className)}
+      className={cn("px-3 pt-2 pb-1 text-xs font-medium text-text-subtle", className)}
       {...props}
     />
   );
@@ -75,12 +75,12 @@ export function DropdownMenuRadioItem({
   return (
     <RadixMenu.RadioItem
       className={cn(
-        "relative flex cursor-default items-center gap-2 rounded-md py-1.5 pr-2.5 pl-7 text-sm text-text outline-none select-none data-[highlighted]:bg-surface-hover",
+        "relative flex cursor-default items-center gap-2 rounded-md py-2 pr-3 pl-7 text-sm text-text outline-none select-none data-[highlighted]:bg-surface-hover data-[highlighted]:shadow-[inset_3px_0_0_var(--ep-accent)]",
         className,
       )}
       {...props}
     >
-      <RadixMenu.ItemIndicator className="absolute left-2.5 inline-flex size-2 rounded-full bg-accent" />
+      <RadixMenu.ItemIndicator className="absolute left-3 inline-flex size-2 rounded-full bg-accent" />
       {children}
     </RadixMenu.RadioItem>
   );

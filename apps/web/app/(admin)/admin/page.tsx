@@ -7,12 +7,14 @@ import { adminSections } from "../../../lib/admin";
 import { requirePlatformAdmin } from "../../../server/app-context";
 
 export async function generateMetadata(): Promise<Metadata> {
+  // The title must not reveal the area either (E-041).
+  await requirePlatformAdmin();
   const t = await getTranslations("admin");
   return { title: t("title") };
 }
 
 export default async function AdminPage() {
-  await requirePlatformAdmin("/admin");
+  await requirePlatformAdmin();
   const t = await getTranslations("admin");
   const tCommon = await getTranslations("common");
   return (

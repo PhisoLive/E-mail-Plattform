@@ -25,15 +25,15 @@ export function CardHeader({
 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
-    <div className="flex items-start justify-between gap-4 px-5 pt-4 pb-3">
+    <div className="flex flex-col gap-3 px-5 pt-4 pb-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
       <div className="flex min-w-0 items-start gap-3">
-        {icon ? <span className="mt-0.5 text-text-muted [&_svg]:size-[18px]">{icon}</span> : null}
-        <div className="flex min-w-0 flex-col gap-0.5">
+        {icon ? <span className="mt-1 text-text-muted [&_svg]:size-[18px]">{icon}</span> : null}
+        <div className="flex min-w-0 flex-col gap-1">
           <Heading className="text-[15px] font-semibold tracking-tight text-text">{title}</Heading>
           {description ? <p className="text-[13px] text-text-muted">{description}</p> : null}
         </div>
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action ? <div className="shrink-0 self-start">{action}</div> : null}
     </div>
   );
 }

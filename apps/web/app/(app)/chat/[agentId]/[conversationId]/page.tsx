@@ -67,7 +67,7 @@ export default async function ChatPage({
             <p id="chat-hint" className="text-xs text-text-subtle">
               {t("hint")}
             </p>
-            <div className="flex gap-1.5">
+            <div className="flex gap-2">
               <Button variant="ghost" size="sm" disabled icon={<Mic aria-hidden="true" />}>
                 <span className="sr-only sm:not-sr-only">{t("voice")}</span>
               </Button>

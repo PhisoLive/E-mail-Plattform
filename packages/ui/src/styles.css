@@ -15,6 +15,8 @@
   --ep-surface-hover: oklch(0.94 0.007 85);
   --ep-border: oklch(0.9 0.007 85);
   --ep-border-strong: oklch(0.82 0.009 85);
+  /* Boundary of form controls and state indicators: at least 3:1 against every surface (WCAG 1.4.11). */
+  --ep-border-control: oklch(0.6 0.01 85);
   --ep-text: oklch(0.23 0.014 255);
   --ep-text-muted: oklch(0.46 0.013 255);
   --ep-text-subtle: oklch(0.52 0.012 255);
@@ -51,6 +53,7 @@
   --ep-surface-hover: oklch(0.26 0.011 255);
   --ep-border: oklch(0.29 0.011 255);
   --ep-border-strong: oklch(0.37 0.012 255);
+  --ep-border-control: oklch(0.54 0.012 255);
   --ep-text: oklch(0.95 0.005 85);
   --ep-text-muted: oklch(0.76 0.01 255);
   --ep-text-subtle: oklch(0.66 0.011 255);
@@ -85,6 +88,7 @@
     --ep-surface-hover: oklch(0.26 0.011 255);
     --ep-border: oklch(0.29 0.011 255);
     --ep-border-strong: oklch(0.37 0.012 255);
+    --ep-border-control: oklch(0.54 0.012 255);
     --ep-text: oklch(0.95 0.005 85);
     --ep-text-muted: oklch(0.76 0.01 255);
     --ep-text-subtle: oklch(0.66 0.011 255);
@@ -110,6 +114,12 @@
   }
 }
 
+/* Spacing: every Tailwind step (p-1, gap-2, …) is a multiple of this 4 px token. Half steps
+ * (p-2.5 …) are not used – the grid stays at 4, 8, 12, 16 px (concept chapter 13). */
+@theme {
+  --spacing: 0.25rem; /* 4 px at the default font size; grows with the user font size */
+}
+
 @theme inline {
   --color-bg: var(--ep-bg);
   --color-sidebar: var(--ep-sidebar);
@@ -118,6 +128,7 @@
   --color-surface-hover: var(--ep-surface-hover);
   --color-border: var(--ep-border);
   --color-border-strong: var(--ep-border-strong);
+  --color-border-control: var(--ep-border-control);
   --color-text: var(--ep-text);
   --color-text-muted: var(--ep-text-muted);
   --color-text-subtle: var(--ep-text-subtle);

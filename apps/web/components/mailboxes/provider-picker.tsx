@@ -46,7 +46,7 @@ export function ProviderPicker() {
           <CardBody className="flex flex-col gap-4">
             <Alert tone="info">
               <span className="flex items-start gap-2">
-                <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+                <Info aria-hidden="true" className="mt-1 size-4 shrink-0" />
                 {t(`providers.${provider}.hint`)}
               </span>
             </Alert>

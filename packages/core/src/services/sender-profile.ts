@@ -4,7 +4,7 @@ import { z } from "zod";
 import { writeAudit } from "../audit";
 import type { WorkspaceContext } from "../context";
 import { appError } from "../errors";
-import { requirePermission } from "../permissions";
+import { can, requirePermission } from "../permissions";
 import { err, ok, type Result } from "../result";
 import { withWorkspace } from "../scope";
 import {
@@ -34,14 +34,23 @@ export const senderProfileInput = z.object({
       country: text(4),
     })
     .nullish(),
+  seat: text(240),
   registerCourt: text(400),
   registerNumber: text(100),
   managingDirectors: text(1000),
   supervisoryBoardChair: text(400),
+  generalPartner: z
+    .object({
+      name: text(400),
+      seat: text(240),
+      registerCourt: text(240),
+      registerNumber: text(100),
+    })
+    .nullish(),
   vatId: text(60),
   phone: text(60),
-  website: text(600),
-  privacyUrl: text(600),
+  website: text(4000),
+  privacyUrl: text(4000),
 });
 
 export interface SenderProfileView {
@@ -50,6 +59,8 @@ export interface SenderProfileView {
   required: SenderField[];
   optional: SenderField[];
   complete: boolean;
+  /** Rights of the requesting member in the workspace this profile belongs to. */
+  canEdit: boolean;
 }
 
 type ProfileRow = typeof senderProfiles.$inferSelect;
@@ -67,10 +78,12 @@ function toProfile(
       city: row?.address?.city ?? null,
       country: row?.address?.country ?? (country === "other" ? "DE" : country),
     },
+    seat: row?.seat ?? null,
     registerCourt: row?.registerCourt ?? null,
     registerNumber: row?.registerNumber ?? null,
     managingDirectors: row?.managingDirectors ?? null,
     supervisoryBoardChair: row?.supervisoryBoardChair ?? null,
+    generalPartner: row?.generalPartner ?? null,
     vatId: row?.vatId ?? null,
     phone: row?.phone ?? null,
     website: row?.website ?? null,
@@ -93,12 +106,14 @@ export async function getSenderProfile(ctx: WorkspaceContext): Promise<Result<Se
       .from(senderProfiles)
       .where(eq(senderProfiles.workspaceId, scope.workspaceId));
     const profile = toProfile(row, workspace.country);
+    const context = { kind: workspace.kind, country: profile.address.country };
     return ok({
       profile,
       workspace,
-      required: requiredSenderFields(profile.legalForm, workspace.kind),
-      optional: optionalSenderFields(profile.legalForm, workspace.kind),
-      complete: isSenderProfileComplete(profile, workspace.kind),
+      required: requiredSenderFields(profile.legalForm, context),
+      optional: optionalSenderFields(profile.legalForm, context),
+      complete: isSenderProfileComplete(profile, workspace),
+      canEdit: can(ctx.role, "settings.manage"),
     });
   });
 }
@@ -126,10 +141,12 @@ export async function updateSenderProfile(
       legalForm: profile.legalForm,
       companyName: profile.companyName,
       address: profile.address,
+      seat: profile.seat,
       registerCourt: profile.registerCourt,
       registerNumber: profile.registerNumber,
       managingDirectors: profile.managingDirectors,
       supervisoryBoardChair: profile.supervisoryBoardChair,
+      generalPartner: profile.generalPartner,
       vatId: profile.vatId,
       phone: profile.phone,
       website: profile.website,

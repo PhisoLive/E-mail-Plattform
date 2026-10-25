@@ -87,7 +87,7 @@ export default async function HomePage() {
             const Icon = feature.icon;
             return (
               <li key={feature.key} className="flex gap-4">
-                <Icon aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-accent" />
+                <Icon aria-hidden="true" className="mt-1 size-5 shrink-0 text-accent" />
                 <div className="flex flex-col gap-1">
                   <h3 className="text-[15px] font-semibold">
                     {t(`features.${feature.key}.title`)}

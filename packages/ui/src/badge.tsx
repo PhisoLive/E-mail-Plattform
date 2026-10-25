@@ -20,7 +20,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 text-xs font-medium whitespace-nowrap",
+        "inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-medium whitespace-nowrap",
         tones[tone],
         className,
       )}
@@ -47,7 +47,7 @@ export function StatusDot({
   showLabel?: boolean;
 }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-[13px] text-text">
+    <span className="inline-flex items-center gap-2 text-[13px] text-text">
       <span aria-hidden="true" className={cn("inline-block size-2 rounded-full", dots[status])} />
       {showLabel ? label : <span className="sr-only">{label}</span>}
     </span>

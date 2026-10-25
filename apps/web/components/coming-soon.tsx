@@ -39,7 +39,7 @@ export function ComingSoon({
                 <li key={item} className="flex items-start gap-2">
                   <CircleDashed
                     aria-hidden="true"
-                    className="mt-0.5 size-4 shrink-0 text-text-subtle"
+                    className="mt-1 size-4 shrink-0 text-text-subtle"
                   />
                   <span>{item}</span>
                 </li>

@@ -4,11 +4,15 @@ import { type Browser, expect, type Page, test } from "@playwright/test";
 import {
   collectTextErrors,
   createOwnerSession,
+  defaultPassword,
   type E2eObjects,
   expectNoHorizontalOverflow,
   gotoReady,
   insertDetailObjects,
+  login,
   type OwnerSession,
+  registerAndVerify,
+  uniqueAddress,
   withE2eSql,
 } from "./helpers";
 
@@ -250,11 +254,42 @@ test("Befehlspalette mit Strg+K: suchen, springen, Darstellung wechseln", async 
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/postfaecher\/verbinden$/);
 
-  await page.getByRole("button", { name: "Suchen und springen" }).first().click();
+  const opener = page.getByRole("button", { name: "Suchen und springen" }).first();
+  await opener.click();
   await expect(palette).toBeVisible();
   await expectAccessible(page, "Befehlspalette");
   await page.keyboard.press("Escape");
   await expect(palette).toBeHidden();
+  // The focus returns to where it was, also when the palette opens via the shortcut.
+  await expect(opener).toBeFocused();
+  const templates = page
+    .getByRole("navigation", { name: "Hauptnavigation" })
+    .getByRole("link", { name: "Vorlagen" });
+  await templates.focus();
+  await page.keyboard.press("Control+k");
+  await expect(palette).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(templates).toBeFocused();
+
+  // From a menu item (profile menu → help) back to the menu's button.
+  const userMenu = page.getByRole("button", { name: /Profilmenü/ });
+  await userMenu.click();
+  await page.getByRole("menuitem", { name: "Hilfe" }).click();
+  await expect(page.getByRole("dialog", { name: "Hilfe und Tastenkürzel" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(userMenu).toBeFocused();
+
+  // Help: closed with Esc and with the close button, the focus goes back to „Hilfe“.
+  const sidebar = page.getByRole("complementary", { name: "Seitenleiste" });
+  const help = sidebar.getByRole("button", { name: "Hilfe" });
+  const helpDialog = page.getByRole("dialog", { name: "Hilfe und Tastenkürzel" });
+  await help.click();
+  await expect(helpDialog).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(help).toBeFocused();
+  await help.click();
+  await helpDialog.getByRole("button", { name: "Schließen" }).click();
+  await expect(help).toBeFocused();
 });
 
 test("Dunkelmodus: Wahl bleibt erhalten, Kontraste stimmen", async ({ browser }) => {
@@ -270,6 +305,8 @@ test("Dunkelmodus: Wahl bleibt erhalten, Kontraste stimmen", async ({ browser })
     await gotoReady(page, path);
     await expectAccessible(page, `${path} (dunkel)`);
   }
+  await gotoReady(page, "/einstellungen/absender");
+  expect(await fieldBorderContrast(page)).toBeGreaterThanOrEqual(3);
 
   // Without a choice the system setting decides.
   const system = await (
@@ -284,7 +321,29 @@ test("Dunkelmodus: Wahl bleibt erhalten, Kontraste stimmen", async ({ browser })
   await gotoReady(page, "/einstellungen/profil");
   await page.getByRole("radio", { name: "Hell" }).click();
   await expect(page.locator("html")).not.toHaveClass(/\bdark\b/);
+  await gotoReady(page, "/einstellungen/absender");
+  expect(await fieldBorderContrast(page)).toBeGreaterThanOrEqual(3);
 });
+
+/** Contrast between the border of the first text field and the card it sits on (WCAG 1.4.11). */
+async function fieldBorderContrast(page: Page): Promise<number> {
+  const [border, background] = await page
+    .getByRole("form", { name: "Absenderprofil" })
+    .getByRole("textbox")
+    .first()
+    .evaluate((field) => {
+      let surface: Element | null = field.parentElement;
+      while (surface && getComputedStyle(surface).backgroundColor === "rgba(0, 0, 0, 0)") {
+        surface = surface.parentElement;
+      }
+      return [
+        getComputedStyle(field).borderTopColor,
+        surface ? getComputedStyle(surface).backgroundColor : "rgb(255, 255, 255)",
+      ];
+    });
+  const [lighter, darker] = [luminance(border), luminance(background)].sort((a, b) => b - a);
+  return ((lighter ?? 0) + 0.05) / ((darker ?? 0) + 0.05);
+}
 
 test("Absenderprofil speichert die Pflichtangaben je Rechtsform", async ({ browser }) => {
   const page = await ownerPage(browser);
@@ -302,7 +361,14 @@ test("Absenderprofil speichert die Pflichtangaben je Rechtsform", async ({ brows
     "true",
   );
 
-  await form.getByRole("textbox", { name: "Firma", exact: true }).fill("Bäckerei Huber GmbH");
+  // A firm name without its legal form gets a hint (never a block) and a line of its own.
+  const firm = form.getByRole("textbox", { name: "Firma", exact: true });
+  await firm.fill("Bäckerei Huber");
+  await expect(firm).toHaveAccessibleDescription(/keinen Rechtsformzusatz/);
+  await expect(page.getByText("Rechtsform: Gesellschaft mit beschränkter Haftung")).toBeVisible();
+  await firm.fill("Bäckerei Huber GmbH");
+  await expect(firm).not.toHaveAccessibleDescription(/keinen Rechtsformzusatz/);
+  await expect(page.getByText("Rechtsform: Gesellschaft mit beschränkter Haftung")).toBeHidden();
   await form
     .getByRole("textbox", { name: "Straße und Hausnummer", exact: true })
     .fill("Hauptstraße 1");
@@ -312,11 +378,14 @@ test("Absenderprofil speichert die Pflichtangaben je Rechtsform", async ({ brows
     .getByRole("textbox", { name: "Registergericht", exact: true })
     .fill("Amtsgericht München");
   await form.getByRole("textbox", { name: "Registernummer", exact: true }).fill("HRB 123456");
+  // The registered seat may differ from the town of the address.
+  await form.getByRole("textbox", { name: "Sitz", exact: true }).fill("Grünwald");
   await form
     .getByRole("textbox", { name: "Geschäftsführung", exact: true })
     .fill("Anna Huber, Max Huber");
   await form.getByRole("textbox", { name: "USt-IdNr.", exact: true }).fill("de 123 456 789");
   await expect(page.getByText("Amtsgericht München, HRB 123456")).toBeVisible();
+  await expect(page.getByText("Sitz: Grünwald")).toBeVisible();
   await form.getByRole("button", { name: "Speichern" }).click();
   await expect(page.getByText("Absenderprofil gespeichert.")).toBeVisible();
 
@@ -330,26 +399,69 @@ test("Absenderprofil speichert die Pflichtangaben je Rechtsform", async ({ brows
   await expect(form.getByText("Vollständig", { exact: true })).toBeVisible();
 
   const [row] = await withE2eSql(
-    (sql) => sql<{ legalForm: string; managingDirectors: string; registerCourt: string }[]>`
+    (sql) => sql<
+      { legalForm: string; managingDirectors: string; registerCourt: string; seat: string }[]
+    >`
       select legal_form as "legalForm", managing_directors as "managingDirectors",
-        register_court as "registerCourt"
+        register_court as "registerCourt", seat
       from sender_profiles where workspace_id = ${objects.workspaceId}`,
   );
   expect(row).toEqual({
     legalForm: "gmbh",
     managingDirectors: "Anna Huber, Max Huber",
     registerCourt: "Amtsgericht München",
+    seat: "Grünwald",
   });
 
   // The start page counts the step, the unsubscribe page shows the details.
   await gotoReady(page, "/einstellungen/abmeldeseite");
   await expect(page.getByText("Amtsgericht München, HRB 123456")).toBeVisible();
+  await expect(page.getByText("Sitz: Grünwald")).toBeVisible();
+
+  // The legal forms and labels follow the country of the address.
+  await gotoReady(page, "/einstellungen/absender");
+  await form.getByLabel("Land", { exact: true }).selectOption("CH");
+  await expect(form.getByLabel("Rechtsform").locator("option", { hasText: "UG" })).toHaveCount(0);
+  await expect(
+    form.getByRole("textbox", { name: "Handelsregisteramt", exact: true }),
+  ).toBeVisible();
 });
 
 test("Betreiberbereich nur für platform_admin", async ({ browser }) => {
+  // Without a session and as a normal member the area answers like an unknown route (E-041).
+  const anonymous = await (await browser.newContext()).newPage();
+  for (const path of ["/admin", "/admin/system", "/admin/gibt-es-nicht"]) {
+    const response = await anonymous.goto(path);
+    expect(response?.status(), path).toBe(404);
+    expect(anonymous.url()).toContain(path);
+    await expect(anonymous.getByText("Seite nicht gefunden")).toBeVisible();
+    await expect(anonymous).not.toHaveTitle(/Betreiberbereich|Systemzustand/);
+    // Not even the route tree in the payload names the area – also not for a prefetch.
+    const variants: Record<string, string>[] = [{}, { "next-router-prefetch": "1", rsc: "1" }];
+    for (const headers of variants) {
+      const body = await (await anonymous.request.get(path, { headers })).text();
+      expect(body, `${path} ${JSON.stringify(headers)}`).not.toMatch(
+        /\(admin\)|Betreiberbereich|Systemzustand/,
+      );
+    }
+  }
+  // Neither the pages nor the scripts of anonymous visitors carry texts of the operator area.
+  for (const path of ["/login", "/u/unbekannt"]) {
+    const html = await (await anonymous.request.get(path)).text();
+    expect(html, path).not.toContain("Betreiberbereich");
+    const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((match) => match[1]);
+    expect(scripts.length, path).toBeGreaterThan(0);
+    for (const src of scripts) {
+      const code = await (await anonymous.request.get(src ?? "")).text();
+      expect(code, `${path} ${src}`).not.toMatch(/Betreiberbereich|Systemzustand/);
+    }
+  }
+
   const page = await ownerPage(browser);
-  await gotoReady(page, "/admin");
+  const response = await page.goto("/admin/system");
+  expect(response?.status()).toBe(404);
   await expect(page.getByText("Seite nicht gefunden")).toBeVisible();
+  await expect(page).not.toHaveTitle(/Systemzustand/);
 
   await withE2eSql(
     (sql) =>
@@ -374,6 +486,23 @@ test("Betreiberbereich nur für platform_admin", async ({ browser }) => {
   await expect(page.getByText("Seite nicht gefunden")).toBeVisible();
 });
 
+test("Betreiberbereich verlangt die Zwei-Faktor-Anmeldung", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  const admin = { name: "Ada Admin", email: uniqueAddress("admin"), password: defaultPassword };
+  await registerAndVerify(page, admin);
+  await login(page, admin);
+  await withE2eSql(
+    (sql) =>
+      sql`update "user" set platform_role = 'platform_admin' where lower(email) = ${admin.email.toLowerCase()}`,
+  );
+  await gotoReady(page, "/admin");
+  await expect(page).toHaveURL(/\/einstellungen\/profil$/);
+  await expect(
+    page.getByRole("button", { name: "Zwei-Faktor-Anmeldung einrichten" }),
+  ).toBeVisible();
+});
+
 test("Team: Rolle ändern und Mitglied entfernen", async ({ browser }) => {
   const page = await ownerPage(browser);
   const memberEmail = `kollegin-${randomUUID().slice(0, 8)}@beispiel.test`;
@@ -393,12 +522,22 @@ test("Team: Rolle ändern und Mitglied entfernen", async ({ browser }) => {
     "Admin",
   );
 
-  await page.getByRole("button", { name: "Aktionen für Klara Kollegin" }).click();
+  // Opened from the menu, cancelled: the focus returns to the menu button of the row.
+  const rowActions = page.getByRole("button", { name: "Aktionen für Klara Kollegin" });
+  await rowActions.click();
   await page.getByRole("menuitem", { name: "Aus dem Team entfernen" }).click();
   const dialog = page.getByRole("dialog", { name: "Klara Kollegin aus dem Team entfernen?" });
+  await dialog.getByRole("button", { name: "Abbrechen" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(rowActions).toBeFocused();
+
+  await rowActions.click();
+  await page.getByRole("menuitem", { name: "Aus dem Team entfernen" }).click();
   await dialog.getByRole("button", { name: "Entfernen" }).click();
   await expect(page.getByText("Aus dem Team entfernt.")).toBeVisible();
   await expect(members).not.toContainText("Klara Kollegin");
+  // The row is gone – the keyboard position stays in the list.
+  await expect(members).toBeFocused();
 });
 
 test("Neuer Auftrag: Vorschlag wählen oder selbst schreiben", async ({ browser }) => {

@@ -54,7 +54,7 @@ export async function OnboardingChecklist({ status }: { status: OnboardingStatus
                 <Link
                   href={step.href}
                   className={cn(
-                    "flex h-full items-start gap-2.5 rounded-md border px-3 py-2.5 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-focus",
+                    "flex h-full items-start gap-3 rounded-md border px-3 py-3 text-[13px] transition-colors focus-visible:outline-2 focus-visible:outline-focus",
                     done
                       ? "border-transparent bg-surface-muted text-text-muted"
                       : "border-border hover:border-border-strong hover:bg-surface-hover",

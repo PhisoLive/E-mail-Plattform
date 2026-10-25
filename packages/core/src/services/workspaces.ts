@@ -1,3 +1,4 @@
+import { defaults } from "@ep/config/defaults";
 import { senderProfiles, user, workspaceMembers, workspaces } from "@ep/db";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
@@ -14,11 +15,15 @@ const countryDefaults = {
   DE: { timezone: "Europe/Berlin", language: "de-DE" },
   AT: { timezone: "Europe/Vienna", language: "de-AT" },
   CH: { timezone: "Europe/Zurich", language: "de-CH" },
-  other: { timezone: "Europe/Berlin", language: "de-DE" },
+  other: { timezone: defaults.workspace.timezone, language: defaults.workspace.defaultLanguage },
 } as const;
 
 export const createWorkspaceInput = z.object({
-  name: z.string().trim().min(2).max(80),
+  name: z
+    .string()
+    .trim()
+    .min(defaults.workspace.nameMinLength)
+    .max(defaults.workspace.nameMaxLength),
   kind: z.enum(["business", "private"]).default("business"),
   country: z.enum(["DE", "AT", "CH", "other"]).default("DE"),
 });
@@ -30,6 +35,8 @@ export interface WorkspaceSummary {
   slug: string;
   role: MemberRole;
   trustLevel: string;
+  /** IANA time zone; dates in the interface follow it. */
+  timezone: string;
 }
 
 export async function createWorkspace(
@@ -86,6 +93,7 @@ export async function createWorkspace(
       slug: workspace.slug,
       role: "owner",
       trustLevel: workspace.trustLevel,
+      timezone: workspace.timezone,
     });
   });
 }
@@ -100,6 +108,7 @@ export async function listMyWorkspaces(ctx: UserContext): Promise<WorkspaceSumma
         slug: workspaces.slug,
         role: workspaceMembers.role,
         trustLevel: workspaces.trustLevel,
+        timezone: workspaces.timezone,
       })
       .from(workspaceMembers)
       .innerJoin(workspaces, eq(workspaces.id, workspaceMembers.workspaceId))
@@ -166,7 +175,12 @@ export async function getWorkspace(ctx: WorkspaceContext): Promise<Result<Worksp
 }
 
 export const updateWorkspaceInput = z.object({
-  name: z.string().trim().min(2).max(80).optional(),
+  name: z
+    .string()
+    .trim()
+    .min(defaults.workspace.nameMinLength)
+    .max(defaults.workspace.nameMaxLength)
+    .optional(),
   timezone: z.string().min(3).max(64).optional(),
   defaultFormality: z.enum(["sie", "du"]).optional(),
   defaultLanguage: z.enum(["de-DE", "de-AT", "de-CH", "en"]).optional(),
@@ -203,6 +217,7 @@ export async function updateWorkspace(
 export async function getUserProfile(ctx: UserContext): Promise<{
   name: string;
   email: string;
+  emailVerified: boolean;
   twoFactorEnabled: boolean;
   platformRole: string;
 } | null> {
@@ -211,6 +226,7 @@ export async function getUserProfile(ctx: UserContext): Promise<{
       .select({
         name: user.name,
         email: user.email,
+        emailVerified: user.emailVerified,
         twoFactorEnabled: user.twoFactorEnabled,
         platformRole: user.platformRole,
       })
@@ -220,6 +236,7 @@ export async function getUserProfile(ctx: UserContext): Promise<{
       ? {
           name: row.name,
           email: row.email,
+          emailVerified: row.emailVerified,
           twoFactorEnabled: row.twoFactorEnabled ?? false,
           platformRole: row.platformRole,
         }

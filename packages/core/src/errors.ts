@@ -41,21 +41,44 @@ export const errorCodes = [
 
 export type ErrorCode = (typeof errorCodes)[number];
 
+/**
+ * Values the UI text of a code needs (concept Anhang D: `{anzahl}`, `{limit}`). Thresholds from
+ * defaults.ts are filled in by the UI. Never personal data or secrets.
+ */
+export interface ErrorParams {
+  PREFLIGHT_PLACEHOLDER: { anzahl: number };
+  SEND_UNVERIFIED: { anzahl: number };
+  PLAN_LIMIT: { limit: string };
+}
+export type ErrorCodeWithParams = keyof ErrorParams;
+
 export interface AppError {
   code: ErrorCode;
-  /** Parameters for the UI text, e.g. { anzahl: 3 }. Never personal data or secrets. */
+  /** Parameters for the UI text, see ErrorParams. */
   params?: Record<string, string | number>;
   /** Field errors for forms (field name → error code). */
   fields?: Record<string, string>;
 }
 
-export const appError = (
-  code: ErrorCode,
+/** Codes listed in ErrorParams can only be created with their values. */
+export function appError<C extends ErrorCodeWithParams>(
+  code: C,
+  params: ErrorParams[C],
+  fields?: AppError["fields"],
+): AppError;
+/** Other codes may carry diagnostic values (entity, state …) that their text does not show. */
+export function appError(
+  code: Exclude<ErrorCode, ErrorCodeWithParams>,
   params?: AppError["params"],
   fields?: AppError["fields"],
-): AppError => {
+): AppError;
+export function appError(
+  code: ErrorCode,
+  params?: Record<string, string | number>,
+  fields?: AppError["fields"],
+): AppError {
   const error: AppError = { code };
   if (params) error.params = params;
   if (fields) error.fields = fields;
   return error;
-};
+}

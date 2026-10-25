@@ -1,3 +1,4 @@
+import { defaults } from "@ep/config/defaults";
 import { buttonClasses, Card, CardBody, CardHeader, EmptyState, PageHeader, Stat } from "@ep/ui";
 import { CheckCheck, Inbox, Mailbox, Plus, Send } from "lucide-react";
 import type { Metadata } from "next";
@@ -47,7 +48,10 @@ export default async function StartPage() {
               key={kpi}
               label={t(`kpis.${kpi}.label`)}
               value={t("kpiEmpty")}
-              hint={t(`kpis.${kpi}.hint`)}
+              hint={t(`kpis.${kpi}.hint`, {
+                hours: defaults.metrics.deliveredAfterHours,
+                days: defaults.metrics.inboxRateDays,
+              })}
             />
           ))}
         </div>
@@ -61,6 +65,14 @@ export default async function StartPage() {
               className="py-8"
               title={t("doneTodayEmptyTitle")}
               description={t("doneTodayEmpty")}
+              action={
+                <Link
+                  href="/auftraege/neu"
+                  className={buttonClasses({ variant: "secondary", size: "sm" })}
+                >
+                  {t("startFirst")}
+                </Link>
+              }
             />
           </CardBody>
         </Card>
@@ -71,6 +83,14 @@ export default async function StartPage() {
               className="py-8"
               title={t("waitingEmptyTitle")}
               description={t("waitingEmpty")}
+              action={
+                <Link
+                  href="/posteingang"
+                  className={buttonClasses({ variant: "secondary", size: "sm" })}
+                >
+                  {t("toInbox")}
+                </Link>
+              }
             />
           </CardBody>
         </Card>

@@ -1,4 +1,3 @@
-import { can } from "@ep/core/permissions";
 import { PageHeader } from "@ep/ui";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -12,11 +11,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SenderSettingsPage() {
   const t = await getTranslations("senderProfile");
-  const { active } = await requireAppContext({ path: "/einstellungen/absender" });
+  await requireAppContext({ path: "/einstellungen/absender" });
   return (
     <div className="flex flex-col">
       <PageHeader title={t("title")} description={t("description")} />
-      <SenderProfileForm canEdit={can(active.role, "settings.manage")} />
+      <SenderProfileForm />
     </div>
   );
 }

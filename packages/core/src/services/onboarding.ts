@@ -32,7 +32,7 @@ export async function getOnboardingStatus(
   return withWorkspace(ctx, async (scope) => {
     const ws = scope.workspaceId;
     const [workspace] = await scope.tx
-      .select({ kind: workspaces.kind })
+      .select({ kind: workspaces.kind, country: workspaces.country })
       .from(workspaces)
       .where(eq(workspaces.id, ws));
     if (!workspace) return err(appError("NOT_FOUND"));
@@ -55,7 +55,7 @@ export async function getOnboardingStatus(
     const steps: Record<OnboardingStep, boolean> = {
       workspace: true,
       mailbox: (mailboxCount?.value ?? 0) > 0,
-      senderProfile: profile ? isSenderProfileComplete(profile, workspace.kind) : false,
+      senderProfile: profile ? isSenderProfileComplete(profile, workspace) : false,
       agent: (agentCount?.value ?? 0) > 0,
       campaign: (campaignCount?.value ?? 0) > 0,
     };

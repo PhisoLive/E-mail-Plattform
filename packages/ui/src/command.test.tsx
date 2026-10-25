@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { CommandDialog, CommandGroup, CommandItem } from "./command";
 
@@ -41,6 +42,30 @@ function Palette({ onSelect }: { onSelect: (value: string) => void }) {
   );
 }
 
+function Opener() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Öffnen
+      </button>
+      <CommandDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Befehlspalette"
+        placeholder="Suchen …"
+        emptyText="Nichts gefunden"
+      >
+        <CommandGroup heading="Springen zu">
+          <CommandItem value="nav-start" onSelect={() => setOpen(false)}>
+            Start
+          </CommandItem>
+        </CommandGroup>
+      </CommandDialog>
+    </>
+  );
+}
+
 describe("CommandDialog", () => {
   it("is a named dialog with a combobox and filters while typing", async () => {
     const onSelect = vi.fn();
@@ -51,6 +76,16 @@ describe("CommandDialog", () => {
     expect(screen.queryByRole("option", { name: "Start" })).not.toBeInTheDocument();
     await userEvent.keyboard("{Enter}");
     expect(onSelect).toHaveBeenCalledWith("templates");
+  });
+
+  it("returns the focus to where it was after closing without a trigger", async () => {
+    render(<Opener />);
+    const opener = screen.getByRole("button", { name: "Öffnen" });
+    await userEvent.click(opener);
+    expect(screen.getByRole("dialog", { name: "Befehlspalette" })).toBeInTheDocument();
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await vi.waitFor(() => expect(opener).toHaveFocus());
   });
 
   it("shows the empty text when nothing matches", async () => {

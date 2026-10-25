@@ -70,6 +70,8 @@ export function SuggestOrWrite({
   ]
     .filter(Boolean)
     .join(" ");
+  // The chips get the explanation too; without a text field they carry hint and error as well.
+  const chipsDescribedBy = allowFreeText ? (explain ? `${fieldId}-explain` : "") : describedBy;
 
   async function runAiFill() {
     if (!aiFill) return;
@@ -83,10 +85,17 @@ export function SuggestOrWrite({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-0.5">
-        <label htmlFor={fieldId} className="text-[13px] font-medium text-text">
-          {label}
-        </label>
+      <div className="flex flex-col gap-1">
+        {allowFreeText ? (
+          <label htmlFor={fieldId} className="text-[13px] font-medium text-text">
+            {label}
+          </label>
+        ) : (
+          // Without a text field the chips are the control: the label names their group.
+          <p id={`${fieldId}-label`} className="text-[13px] font-medium text-text">
+            {label}
+          </p>
+        )}
         {explain ? (
           <p id={`${fieldId}-explain`} className="text-xs text-text-muted">
             {explain}
@@ -94,8 +103,12 @@ export function SuggestOrWrite({
         ) : null}
       </div>
       {visible.length > 0 ? (
-        <fieldset className="flex flex-wrap gap-1.5">
-          <legend className="sr-only">{suggestionsLabel}</legend>
+        <fieldset
+          className="flex flex-wrap gap-2"
+          {...(allowFreeText ? {} : { "aria-labelledby": `${fieldId}-label` })}
+          {...(chipsDescribedBy ? { "aria-describedby": chipsDescribedBy } : {})}
+        >
+          {allowFreeText ? <legend className="sr-only">{suggestionsLabel}</legend> : null}
           {visible.map((suggestion) => {
             const selected = value === suggestionValue(suggestion);
             return (

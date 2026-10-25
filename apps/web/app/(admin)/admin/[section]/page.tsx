@@ -13,9 +13,12 @@ export async function generateMetadata({
 }: {
   params: Promise<{ section: string }>;
 }): Promise<Metadata> {
+  // The title must not reveal the area or its sections either (E-041).
+  await requirePlatformAdmin();
   const section = adminSectionBySlug((await params).section);
+  if (!section) notFound();
   const t = await getTranslations("admin");
-  return { title: section ? t(`sections.${section.key}.title`) : t("title") };
+  return { title: t(`sections.${section.key}.title`) };
 }
 
 export default async function AdminSectionPage({
@@ -24,7 +27,7 @@ export default async function AdminSectionPage({
   params: Promise<{ section: string }>;
 }) {
   const { section: slug } = await params;
-  await requirePlatformAdmin(`/admin/${slug}`);
+  await requirePlatformAdmin();
   const section = adminSectionBySlug(slug);
   if (!section) notFound();
   const t = await getTranslations("admin");

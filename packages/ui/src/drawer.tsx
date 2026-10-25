@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { Dialog as RadixDialog } from "radix-ui";
 import type { ReactNode } from "react";
 import { cn } from "./cn";
+import { useFocusReturn } from "./focus-return";
 
 export const Drawer = RadixDialog.Root;
 export const DrawerTrigger = RadixDialog.Trigger;
@@ -21,10 +22,12 @@ export function DrawerContent({
   children: ReactNode;
   className?: string;
 }) {
+  const focusReturn = useFocusReturn();
   return (
     <RadixDialog.Portal>
       <RadixDialog.Overlay className="ep-animate-fade fixed inset-0 z-50 bg-overlay" />
       <RadixDialog.Content
+        {...focusReturn}
         aria-describedby={undefined}
         className={cn(
           "ep-animate-slide fixed inset-y-0 left-0 z-50 flex w-[min(300px,86vw)] flex-col border-r border-border bg-sidebar shadow-lg",

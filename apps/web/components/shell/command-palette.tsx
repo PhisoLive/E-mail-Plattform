@@ -26,12 +26,14 @@ export function CommandPalette({
   user,
   workspaces,
   active,
+  returnFocus,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: ShellUser;
   workspaces: ShellWorkspace[];
   active: ShellWorkspace | null;
+  returnFocus?: () => HTMLElement | null;
 }) {
   const t = useTranslations("shell.palette");
   const tNav = useTranslations("nav");
@@ -59,6 +61,7 @@ export function CommandPalette({
       title={t("title")}
       placeholder={t("placeholder")}
       emptyText={t("empty")}
+      {...(returnFocus ? { returnFocus } : {})}
     >
       <CommandGroup heading={t("actions")}>
         {actions.map((action) => {
@@ -77,18 +80,21 @@ export function CommandPalette({
         })}
       </CommandGroup>
       <CommandGroup heading={t("jump")}>
-        {[...mainNav, agentsNav, ...(user.isPlatformAdmin ? [adminNav] : [])].map((item) => {
+        {[
+          ...[...mainNav, agentsNav].map((item) => ({ ...item, label: tNav(item.key) })),
+          ...(user.adminLabel ? [{ ...adminNav, label: user.adminLabel }] : []),
+        ].map((item) => {
           const Icon = item.icon;
           return (
             <CommandItem
               key={item.key}
               value={`nav-${item.key}`}
-              keywords={[tNav(item.key)]}
+              keywords={[item.label]}
               icon={<Icon aria-hidden="true" />}
               hint={<CornerDownLeft aria-hidden="true" className="size-3.5" />}
               onSelect={() => go(item.href)}
             >
-              {tNav(item.key)}
+              {item.label}
             </CommandItem>
           );
         })}

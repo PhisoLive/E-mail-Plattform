@@ -7,7 +7,7 @@ export const emailTranslator = createTranslator({ locale: "de", messages, namesp
 export const roleTranslator = createTranslator({ locale: "de", messages, namespace: "roles" });
 export const appTranslator = createTranslator({ locale: "de", messages, namespace: "app" });
 
-export function formatDateDe(date: Date, timeZone = "Europe/Berlin"): string {
+export function formatDateDe(date: Date, timeZone: string = defaults.workspace.timezone): string {
   return new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone }).format(date);
 }
 

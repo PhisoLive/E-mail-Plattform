@@ -22,7 +22,7 @@ export function Tooltip({
         <RadixTooltip.Content
           side={side}
           sideOffset={6}
-          className="ep-animate-fade z-50 max-w-64 rounded-md bg-text px-2.5 py-1.5 text-xs leading-snug text-bg shadow-md"
+          className="ep-animate-fade z-50 max-w-64 rounded-md bg-text px-3 py-2 text-xs leading-snug text-bg shadow-md"
         >
           {content}
         </RadixTooltip.Content>

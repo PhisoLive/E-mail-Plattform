@@ -7,7 +7,8 @@ export interface ShellWorkspace {
 export interface ShellUser {
   name: string;
   email: string;
-  isPlatformAdmin: boolean;
+  /** Label of the operator area – only set for platform admins. */
+  adminLabel?: string;
 }
 
 export interface ShellAgent {

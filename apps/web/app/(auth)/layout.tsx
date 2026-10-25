@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
-import { BrandMark } from "../../components/shell/sidebar";
+import { BrandMark } from "../../components/brand-mark";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   const t = useTranslations("app");

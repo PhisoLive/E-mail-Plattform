@@ -10,6 +10,7 @@ const gmbh = {
   legalForm: "gmbh",
   companyName: "Bäckerei Huber GmbH",
   address: { street: "Hauptstraße 1", postalCode: "80331", city: "München" },
+  seat: "München",
   registerCourt: "Amtsgericht München",
   registerNumber: "HRB 123456",
   managingDirectors: "Anna Huber",
@@ -126,5 +127,61 @@ describe("sender profile service", () => {
       .from(senderProfiles)
       .where(eq(senderProfiles.workspaceId, workspace.id));
     expect(rows).toHaveLength(1);
+  });
+
+  it("stores the general partner of a GmbH & Co. KG with its supervisory board, drops left-overs", async () => {
+    const workspace = await createTestWorkspace(deps);
+    const saved = await updateSenderProfile(workspace.ownerCtx, {
+      ...gmbh,
+      legalForm: "gmbh_co_kg",
+      companyName: "Huber Bau GmbH & Co. KG",
+      registerNumber: "HRA 98765",
+      supervisoryBoardChair: "Otto Aufsicht",
+      vatId: null,
+      generalPartner: {
+        name: "Huber Verwaltungs GmbH",
+        seat: "München",
+        registerCourt: "Amtsgericht München",
+        registerNumber: "HRB 4711",
+      },
+    });
+    expect(saved.ok).toBe(true);
+    const view = await getSenderProfile(workspace.ownerCtx);
+    expect(view.ok && view.value.profile.generalPartner).toEqual({
+      name: "Huber Verwaltungs GmbH",
+      seat: "München",
+      registerCourt: "Amtsgericht München",
+      registerNumber: "HRB 4711",
+    });
+    expect(view.ok && view.value.profile.supervisoryBoardChair).toBe("Otto Aufsicht");
+    expect(view.ok && view.value.complete).toBe(true);
+
+    // Switching to a sole trader drops register, partner and board.
+    await updateSenderProfile(workspace.ownerCtx, {
+      ...gmbh,
+      legalForm: "einzelunternehmen",
+      companyName: "Malerei Huber",
+      supervisoryBoardChair: "Otto Aufsicht",
+    });
+    const [row] = await deps.db
+      .select()
+      .from(senderProfiles)
+      .where(eq(senderProfiles.workspaceId, workspace.id));
+    expect(row).toMatchObject({
+      legalForm: "einzelunternehmen",
+      registerNumber: null,
+      seat: null,
+      supervisoryBoardChair: null,
+      generalPartner: null,
+    });
+  });
+
+  it("tells the form whether the requesting member may edit", async () => {
+    const workspace = await createTestWorkspace(deps);
+    const viewer = await addTestMember(deps, workspace, "viewer");
+    const own = await getSenderProfile(workspace.ownerCtx);
+    const other = await getSenderProfile(viewer.ctx);
+    expect(own.ok && own.value.canEdit).toBe(true);
+    expect(other.ok && other.value.canEdit).toBe(false);
   });
 });

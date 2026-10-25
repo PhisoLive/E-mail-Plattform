@@ -34,7 +34,14 @@ export interface RampProfile {
 const minutes = (m: number) => m * 60;
 
 export const defaults = {
+  /** App shell: how many agents and recent conversations per agent the sidebar shows. */
+  shell: {
+    sidebarAgents: 6,
+    sidebarConversations: 3,
+  },
   workspace: {
+    nameMinLength: 2,
+    nameMaxLength: 80,
     timezone: "Europe/Berlin",
     defaultLanguage: "de-DE",
     defaultFormality: "sie",
@@ -112,6 +119,8 @@ export const defaults = {
   },
 
   campaign: {
+    /** The assistant continues once the goal has at least this many characters. */
+    goalMinLength: 5,
     bouncePauseFirst100: 0.08,
     unsubscribePausePercent: 0.03,
     complaintPausePercent: 0.003,
@@ -206,6 +215,11 @@ export const defaults = {
     recheckAfterGreenHours: 24,
   },
 
+  /** Definitions of the start page figures (concept chapter 13). */
+  metrics: {
+    deliveredAfterHours: 72,
+    inboxRateDays: 30,
+  },
   notify: {
     emailBundleMinutes: 15,
   },

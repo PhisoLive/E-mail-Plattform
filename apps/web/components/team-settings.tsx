@@ -31,10 +31,11 @@ import {
   toast,
 } from "@ep/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Ellipsis, MailPlus, UserMinus, Users } from "lucide-react";
+import { Ellipsis, MailPlus, ShieldAlert, UserMinus, Users } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { type FormEvent, useState } from "react";
-import { errorCode, useTRPC } from "../lib/trpc";
+import { type FormEvent, useRef, useState } from "react";
+import { useTRPC } from "../lib/trpc";
+import { useErrorMessage } from "../lib/use-error-message";
 
 const roles: readonly MemberRole[] = ["owner", "admin", "member", "viewer"];
 
@@ -50,16 +51,26 @@ export function TeamSettings({
   invitationDays: number;
 }) {
   const t = useTranslations();
+  const errorMessage = useErrorMessage();
   const format = useFormatter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const members = useQuery(trpc.team.members.queryOptions());
-  const invitations = useQuery({ ...trpc.team.invitations.queryOptions(), enabled: canManage });
+  // Role from the same request as the list – both always belong to the same workspace.
+  const myRole = members.data?.find((member) => member.userId === currentUserId)?.role ?? actorRole;
+  const mayManage = members.data ? canManageRole(myRole, "viewer") : canManage;
+  const invitations = useQuery({
+    ...trpc.team.invitations.queryOptions(),
+    enabled: mayManage,
+  });
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<MemberRole>("member");
   const [sentTo, setSentTo] = useState<string | null>(null);
-  const [removing, setRemoving] = useState<{ id: string; name: string } | null>(null);
+  const [removing, setRemoving] = useState<{ id: string; name: string; self: boolean } | null>(
+    null,
+  );
 
+  const memberList = useRef<HTMLUListElement>(null);
   const refreshMembers = () =>
     queryClient.invalidateQueries({ queryKey: trpc.team.members.queryKey() });
 
@@ -83,16 +94,30 @@ export function TeamSettings({
       onSuccess: async () => {
         toast.success(t("settings.team.roleChanged"));
         await refreshMembers();
+        // After demoting oneself the menu button disappears with the rights.
+        requestAnimationFrame(() => {
+          if (!document.activeElement || document.activeElement === document.body) {
+            memberList.current?.focus({ preventScroll: true });
+          }
+        });
       },
-      onError: (error) => toast.error(t(`errors.${errorCode(error)}`)),
+      onError: (error) => toast.error(errorMessage(error)),
     }),
   );
   const remove = useMutation(
     trpc.team.removeMember.mutationOptions({
       onSuccess: async () => {
+        const self = removing?.self ?? false;
         setRemoving(null);
+        if (self) {
+          // Without membership the workspace is gone for this user: start over with a full load.
+          window.location.assign("/start");
+          return;
+        }
         toast.success(t("settings.team.removed"));
         await refreshMembers();
+        // The row and its menu are gone: keep the keyboard position in the list.
+        requestAnimationFrame(() => memberList.current?.focus({ preventScroll: true }));
       },
     }),
   );
@@ -120,7 +145,7 @@ export function TeamSettings({
           {members.error ? (
             <ErrorState
               title={t("settings.team.loadError")}
-              description={t(`errors.${errorCode(members.error)}`)}
+              description={errorMessage(members.error)}
               action={
                 <Button variant="secondary" size="sm" onClick={() => members.refetch()}>
                   {t("common.retry")}
@@ -129,10 +154,15 @@ export function TeamSettings({
             />
           ) : null}
           {members.data ? (
-            <ul aria-label={t("settings.team.members")} className="-my-1 divide-y divide-border">
+            <ul
+              ref={memberList}
+              tabIndex={-1}
+              aria-label={t("settings.team.members")}
+              className="-my-1 divide-y divide-border rounded-md outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
+            >
               {members.data.map((member) => {
                 const self = member.userId === currentUserId;
-                const manageable = canManage && canManageRole(actorRole, member.role);
+                const manageable = mayManage && canManageRole(myRole, member.role);
                 return (
                   <li key={member.id} className="flex items-center gap-3 py-3">
                     <Avatar name={member.name} />
@@ -140,17 +170,18 @@ export function TeamSettings({
                       <span className="truncate text-sm font-medium">
                         {member.name}
                         {self ? (
-                          <span className="ml-1.5 font-normal text-text-muted">
+                          <span className="ml-2 font-normal text-text-muted">
                             ({t("settings.team.you")})
                           </span>
                         ) : null}
                       </span>
                       <span className="truncate text-[13px] text-text-muted">{member.email}</span>
                     </div>
-                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                       {!member.twoFactorEnabled &&
                       (member.role === "owner" || member.role === "admin") ? (
-                        <Badge tone="warning" className="hidden sm:inline-flex">
+                        <Badge tone="warning">
+                          <ShieldAlert aria-hidden="true" className="size-3.5" />
                           {t("settings.team.twoFactorMissing")}
                         </Badge>
                       ) : null}
@@ -178,7 +209,7 @@ export function TeamSettings({
                               }}
                             >
                               {roles
-                                .filter((option) => canManageRole(actorRole, member.role, option))
+                                .filter((option) => canManageRole(myRole, member.role, option))
                                 .map((option) => (
                                   <DropdownMenuRadioItem key={option} value={option}>
                                     {t(`roles.${option}`)}
@@ -189,7 +220,11 @@ export function TeamSettings({
                             <DropdownMenuItem
                               icon={<UserMinus aria-hidden="true" />}
                               className="text-danger"
-                              onSelect={() => setRemoving({ id: member.id, name: member.name })}
+                              onSelect={() => {
+                                // A failed earlier attempt must not show up for this member.
+                                remove.reset();
+                                setRemoving({ id: member.id, name: member.name, self });
+                              }}
                             >
                               {self ? t("settings.team.leave") : t("settings.team.remove")}
                             </DropdownMenuItem>
@@ -205,7 +240,7 @@ export function TeamSettings({
         </CardBody>
       </Card>
 
-      {canManage ? (
+      {mayManage ? (
         <Card>
           <CardHeader
             icon={<MailPlus aria-hidden="true" />}
@@ -216,10 +251,9 @@ export function TeamSettings({
             {sentTo ? (
               <Alert tone="success">{t("settings.team.sent", { email: sentTo })}</Alert>
             ) : null}
-            {invite.error ? (
-              <Alert tone="danger">{t(`errors.${errorCode(invite.error)}`)}</Alert>
-            ) : null}
+            {invite.error ? <Alert tone="danger">{errorMessage(invite.error)}</Alert> : null}
             <form
+              method="post"
               className="grid gap-4 sm:grid-cols-[1fr_11rem_auto] sm:items-end"
               onSubmit={onInvite}
             >
@@ -240,7 +274,7 @@ export function TeamSettings({
                   onChange={(event) => setRole(event.target.value as MemberRole)}
                 >
                   {(["admin", "member", "viewer", "owner"] as const)
-                    .filter((value) => canManageRole(actorRole, "member", value))
+                    .filter((value) => canManageRole(myRole, "member", value))
                     .map((value) => (
                       <option key={value} value={value}>
                         {t(`roles.${value}`)}
@@ -258,11 +292,9 @@ export function TeamSettings({
                 <LoadingState label={t("common.loading")} lines={2} />
               ) : null}
               {invitations.error ? (
-                <Alert tone="danger">{t(`errors.${errorCode(invitations.error)}`)}</Alert>
+                <Alert tone="danger">{errorMessage(invitations.error)}</Alert>
               ) : null}
-              {revoke.error ? (
-                <Alert tone="danger">{t(`errors.${errorCode(revoke.error)}`)}</Alert>
-              ) : null}
+              {revoke.error ? <Alert tone="danger">{errorMessage(revoke.error)}</Alert> : null}
               {invitations.data && invitations.data.length === 0 ? (
                 <EmptyState
                   className="py-6"
@@ -307,13 +339,19 @@ export function TeamSettings({
       <Dialog open={removing !== null} onOpenChange={(open) => (open ? null : setRemoving(null))}>
         {removing ? (
           <DialogContent
-            title={t("settings.team.removeTitle", { name: removing.name })}
-            description={t("settings.team.removeText")}
+            title={
+              removing.self
+                ? t("settings.team.leaveTitle")
+                : t("settings.team.removeTitle", { name: removing.name })
+            }
+            description={
+              removing.self ? t("settings.team.leaveText") : t("settings.team.removeText")
+            }
             closeLabel={t("common.close")}
           >
             {remove.error ? (
               <Alert tone="danger" className="mb-4">
-                {t(`errors.${errorCode(remove.error)}`)}
+                {errorMessage(remove.error)}
               </Alert>
             ) : null}
             <div className="flex justify-end gap-2">
@@ -325,7 +363,7 @@ export function TeamSettings({
                 loading={remove.isPending}
                 onClick={() => remove.mutate({ memberId: removing.id })}
               >
-                {t("settings.team.removeConfirm")}
+                {removing.self ? t("settings.team.leaveConfirm") : t("settings.team.removeConfirm")}
               </Button>
             </div>
           </DialogContent>

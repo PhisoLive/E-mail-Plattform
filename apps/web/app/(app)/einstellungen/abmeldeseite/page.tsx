@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { UnsubscribeCard } from "../../../../components/public/unsubscribe-card";
+import { imprintLines } from "../../../../lib/imprint";
 import { requireAppContext } from "../../../../server/app-context";
 import { activeCaller } from "../../../../server/workspace-caller";
 
@@ -17,14 +18,10 @@ export default async function UnsubscribeSettingsPage() {
   const t = await getTranslations("unsubscribeSettings");
   const tPage = await getTranslations("unsubscribe");
   const tCommon = await getTranslations("common");
-  const { profile, complete } = await (await activeCaller()).senderProfile.get();
-  const place = [profile.address.postalCode, profile.address.city].filter(Boolean).join(" ");
-  const senderLines = [
-    profile.companyName,
-    [profile.address.street, place].filter(Boolean).join(", "),
-    [profile.registerCourt, profile.registerNumber].filter(Boolean).join(", "),
-    profile.managingDirectors,
-  ].filter((line): line is string => Boolean(line));
+  const tImprint = await getTranslations("imprint");
+  const { profile, complete, workspace } = await (await activeCaller()).senderProfile.get();
+  // The same lines as under every business mail (concept chapter 13: sender with details).
+  const senderLines = imprintLines(profile, workspace, tImprint);
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("title")} description={t("description")} />

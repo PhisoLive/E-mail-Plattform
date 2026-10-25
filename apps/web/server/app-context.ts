@@ -7,16 +7,19 @@ import { serverCaller } from "./caller";
 import { currentSession, selectedWorkspaceId } from "./session";
 import type { SessionInfo } from "./trpc/context";
 
+type WorkspaceEntry = {
+  id: string;
+  name: string;
+  slug: string;
+  role: MemberRole;
+  trustLevel: string;
+  timezone: string;
+};
+
 export interface AppContext {
   session: SessionInfo;
-  workspaces: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    role: MemberRole;
-    trustLevel: string;
-  }>;
-  active: { id: string; name: string; slug: string; role: MemberRole; trustLevel: string } | null;
+  workspaces: WorkspaceEntry[];
+  active: WorkspaceEntry | null;
   needsTwoFactor: boolean;
 }
 
@@ -64,16 +67,20 @@ export async function shellContext(): Promise<AppContext | null> {
 }
 
 /**
- * Guard of the operator area (concept chapter 14): only `platform_admin`, always with 2FA.
- * Everyone else gets a 404 so the area does not reveal itself.
+ * Context of a platform admin, or null for everyone else – anonymous visitors included, so the
+ * operator area answers like an unknown route and reveals nothing (concept chapter 14, E-041).
  */
-export async function requirePlatformAdmin(path: string): Promise<AppContext> {
-  const context = await requireAppContext({
-    path,
-    allowWithoutWorkspace: true,
-    allowWithoutTwoFactor: true,
-  });
-  if (context.session.platformRole !== "platform_admin") notFound();
+export async function platformAdminContext(): Promise<AppContext | null> {
+  const context = await load();
+  if (context?.session.platformRole !== "platform_admin") return null;
+  return context;
+}
+
+/** Guard of every page in the operator area: platform admin with 2FA, otherwise 404. */
+export async function requirePlatformAdmin(): Promise<AppContext> {
+  const context = await platformAdminContext();
+  if (!context) notFound();
+  // Platform admins always need a second factor (concept chapter 14).
   if (!context.session.twoFactorEnabled) redirect("/einstellungen/profil");
   return context;
 }

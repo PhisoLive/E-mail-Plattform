@@ -42,7 +42,7 @@ export function ProfileDetails({
     <Card>
       <CardHeader icon={<UserRound aria-hidden="true" />} title={t("detailsTitle")} />
       <CardBody>
-        <form className="grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
+        <form method="post" className="grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
           <Field id="profile-name" label={t("name")} hint={t("nameHint")}>
             <Input
               id="profile-name"
@@ -147,7 +147,7 @@ export function PasswordChange({ minLength, maxLength }: { minLength: number; ma
         description={t("passwordHint")}
       />
       <CardBody>
-        <form className="grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
+        <form method="post" className="grid gap-4 sm:grid-cols-2" onSubmit={onSubmit}>
           <Field id="password-current" label={t("currentPassword")}>
             <Input
               id="password-current"

@@ -35,7 +35,7 @@ export function DetailTabs({
       <PageHeader
         eyebrow={eyebrow}
         title={
-          <span className="flex flex-wrap items-center gap-2.5">
+          <span className="flex flex-wrap items-center gap-3">
             <span className="min-w-0 break-words">{title}</span>
             {status ? <Badge tone="neutral">{status}</Badge> : null}
           </span>

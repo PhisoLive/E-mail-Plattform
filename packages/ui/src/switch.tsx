@@ -8,7 +8,7 @@ export function Switch({ className, ...props }: ComponentProps<typeof RadixSwitc
   return (
     <RadixSwitch.Root
       className={cn(
-        "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-transparent bg-border-strong transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus data-[state=checked]:bg-accent disabled:opacity-50",
+        "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-transparent bg-border-control transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus data-[state=checked]:bg-accent disabled:opacity-50",
         className,
       )}
       {...props}

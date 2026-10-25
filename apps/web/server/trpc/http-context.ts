@@ -2,7 +2,7 @@ import "server-only";
 import { webEnv } from "../env";
 import { runtime } from "../runtime";
 import { requestIpHash, sessionFromHeaders, workspaceCookie } from "../session";
-import type { TrpcContext } from "./context";
+import type { SessionInfo, TrpcContext } from "./context";
 
 function readCookie(header: string | null, name: string): string | null {
   if (!header) return null;
@@ -17,9 +17,14 @@ export async function createHttpContext(request: Request): Promise<TrpcContext> 
   return createContextFromHeaders(request.headers);
 }
 
-export async function createContextFromHeaders(requestHeaders: Headers): Promise<TrpcContext> {
+/** `session` may be passed in when the caller already read it for this request. */
+export async function createContextFromHeaders(
+  requestHeaders: Headers,
+  knownSession?: SessionInfo | null,
+): Promise<TrpcContext> {
   const { core, mailer } = runtime();
-  const session = await sessionFromHeaders(requestHeaders);
+  const session =
+    knownSession === undefined ? await sessionFromHeaders(requestHeaders) : knownSession;
   const workspaceId =
     requestHeaders.get("x-workspace-id") ??
     readCookie(requestHeaders.get("cookie"), workspaceCookie);

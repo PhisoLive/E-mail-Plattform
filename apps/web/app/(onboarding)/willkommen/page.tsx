@@ -1,4 +1,3 @@
-import { can } from "@ep/core/permissions";
 import { buttonClasses, Card, CardBody } from "@ep/ui";
 import { Mailbox, PartyPopper } from "lucide-react";
 import type { Metadata } from "next";
@@ -6,11 +5,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
+import { BrandMark } from "../../../components/brand-mark";
 import { CreateWorkspaceForm } from "../../../components/create-workspace-form";
 import { OnboardingProgress } from "../../../components/onboarding/onboarding-progress";
 import { OnboardingAgent, OnboardingSender } from "../../../components/onboarding/onboarding-steps";
 import { nextStepHref, onboardingFlow, stepBySlug } from "../../../components/onboarding/steps";
-import { BrandMark } from "../../../components/shell/sidebar";
 import { requireAppContext } from "../../../server/app-context";
 import { activeCaller } from "../../../server/workspace-caller";
 
@@ -68,6 +67,9 @@ export default async function WelcomePage({
     </Frame>
   );
 
+  // Owners and admins secure their account first (concept chapter 16) – also before they create
+  // another workspace; the layout checks the same for full page loads.
+  if (context.active && context.needsTwoFactor) redirect("/einstellungen/profil");
   if (!context.active || neu === "1") {
     return frame(
       <>
@@ -85,9 +87,6 @@ export default async function WelcomePage({
       </>,
     );
   }
-  // Owners and admins secure their account first (concept chapter 16).
-  if (context.needsTwoFactor) redirect("/einstellungen/profil");
-
   const status = await (await activeCaller()).workspace.onboarding();
   const step =
     stepBySlug(schritt) ??
@@ -95,7 +94,7 @@ export default async function WelcomePage({
     onboardingFlow[0];
   const next = nextStepHref(step.slug);
   const heading = (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <h1 className="text-2xl font-semibold tracking-tight">{t(`${step.key}.title`)}</h1>
       <p className="text-sm text-text-muted">{t(`${step.key}.text`)}</p>
     </div>
@@ -131,7 +130,7 @@ export default async function WelcomePage({
     case "senderProfile":
       body = (
         <div className="flex flex-col gap-3">
-          <OnboardingSender canEdit={can(context.active.role, "settings.manage")} next={next} />
+          <OnboardingSender next={next} />
           <div className="flex justify-end">{skip}</div>
         </div>
       );

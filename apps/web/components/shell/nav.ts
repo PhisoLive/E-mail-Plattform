@@ -11,8 +11,15 @@ import {
   Users,
 } from "lucide-react";
 
+/** A link of the sidebar. */
+export interface NavLinkItem {
+  key: string;
+  href: string;
+  icon: LucideIcon;
+}
+
 /** Main navigation of the app shell (concept chapter 13). Texts: de.json `nav.<key>`. */
-export interface NavItem {
+export interface NavItem extends NavLinkItem {
   key:
     | "start"
     | "inbox"
@@ -21,10 +28,7 @@ export interface NavItem {
     | "templates"
     | "mailboxes"
     | "agents"
-    | "settings"
-    | "admin";
-  href: string;
-  icon: LucideIcon;
+    | "settings";
 }
 
 export const mainNav: NavItem[] = [
@@ -44,7 +48,8 @@ export const settingsLink: NavItem = {
   icon: Settings,
 };
 
-export const adminNav: NavItem = { key: "admin", href: "/admin", icon: Shield };
+/** Operator area – its label comes from the server and only for platform admins (E-041). */
+export const adminNav = { key: "admin", href: "/admin", icon: Shield } as const;
 
 /** Settings sections (concept chapter 13: Profil, Team, Absender, Abmeldeseite, Tarif, Datenschutz, Benachrichtigungen, Verbindungen, API). */
 export const settingsNav = [

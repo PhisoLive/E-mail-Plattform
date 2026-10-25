@@ -1,5 +1,6 @@
 "use client";
 
+import { defaults } from "@ep/config/defaults";
 import {
   Alert,
   Badge,
@@ -20,13 +21,21 @@ const steps = ["recipients", "message", "details", "check", "send"] as const;
 const tones = ["friendly", "factual", "casual", "formal"] as const;
 
 /** Start of the click assistant: the goal in your own words, then the five steps (chapter 9). */
-export function NewCampaign({ template }: { template: TemplateKey | null }) {
+export function NewCampaign({
+  template,
+  defaultFormality,
+}: {
+  template: TemplateKey | null;
+  /** Default of the workspace (concept chapter 7: contact, then agent, then workspace). */
+  defaultFormality: "sie" | "du" | "auto";
+}) {
   const t = useTranslations("newCampaign");
   const tTemplates = useTranslations("templates.items");
   const [goal, setGoal] = useState(template ? tTemplates(`${template}.goal`) : "");
   const [tone, setTone] = useState(t("tones.friendly"));
-  const [formality, setFormality] = useState(t("formality.sie"));
+  const [formality, setFormality] = useState(t(`formality.${defaultFormality}`));
   const [showNext, setShowNext] = useState(false);
+  const tooShort = goal.trim().length < defaults.campaign.goalMinLength;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_17rem]">
@@ -81,7 +90,16 @@ export function NewCampaign({ template }: { template: TemplateKey | null }) {
           {showNext ? <Alert tone="info">{t("nextSoon")}</Alert> : null}
         </CardBody>
         <CardFooter>
-          <Button disabled={goal.trim().length < 5} onClick={() => setShowNext(true)}>
+          {tooShort ? (
+            <p id="campaign-goal-short" className="mr-auto text-xs text-text-muted">
+              {t("goalTooShort")}
+            </p>
+          ) : null}
+          <Button
+            disabled={tooShort}
+            aria-describedby={tooShort ? "campaign-goal-short" : undefined}
+            onClick={() => setShowNext(true)}
+          >
             {t("continue")}
           </Button>
         </CardFooter>
@@ -96,7 +114,7 @@ export function NewCampaign({ template }: { template: TemplateKey | null }) {
             <li
               key={step}
               className={cn(
-                "flex items-start gap-3 rounded-md px-2.5 py-2",
+                "flex items-start gap-3 rounded-md px-3 py-2",
                 index === 0 ? "bg-surface shadow-sm ring-1 ring-border" : "",
               )}
             >

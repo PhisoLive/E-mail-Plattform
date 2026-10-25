@@ -1,10 +1,11 @@
 "use client";
 
 import {
+  designationHints,
   directorsRole,
   isLegalForm,
   type LegalForm,
-  legalForms,
+  legalFormsFor,
   optionalSenderFields,
   requiredSenderFields,
   type SenderField,
@@ -30,7 +31,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BadgeCheck, Building, Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { type FormEvent, useMemo, useState } from "react";
-import { errorCode, useTRPC } from "../../lib/trpc";
+import { useTRPC } from "../../lib/trpc";
+import { useErrorMessage } from "../../lib/use-error-message";
+import { useImprintLines } from "../imprint-lines";
 
 interface FormState {
   legalForm: LegalForm | "";
@@ -39,10 +42,15 @@ interface FormState {
   postalCode: string;
   city: string;
   country: string;
+  seat: string;
   registerCourt: string;
   registerNumber: string;
   managingDirectors: string;
   supervisoryBoardChair: string;
+  generalPartnerName: string;
+  generalPartnerSeat: string;
+  generalPartnerRegisterCourt: string;
+  generalPartnerRegisterNumber: string;
   vatId: string;
   phone: string;
   website: string;
@@ -64,10 +72,17 @@ function toInput(state: FormState) {
       city: value(state.city),
       country: state.country,
     },
+    seat: value(state.seat),
     registerCourt: value(state.registerCourt),
     registerNumber: value(state.registerNumber),
     managingDirectors: value(state.managingDirectors),
     supervisoryBoardChair: value(state.supervisoryBoardChair),
+    generalPartner: {
+      name: value(state.generalPartnerName),
+      seat: value(state.generalPartnerSeat),
+      registerCourt: value(state.generalPartnerRegisterCourt),
+      registerNumber: value(state.generalPartnerRegisterNumber),
+    },
     vatId: value(state.vatId),
     phone: value(state.phone),
     website: value(state.website),
@@ -75,26 +90,31 @@ function toInput(state: FormState) {
   };
 }
 
+/**
+ * Sender profile with the mandatory details per legal form. Whether the user may edit comes from
+ * the same request as the data, so both always belong to the same workspace. The editor is only
+ * rebuilt after an own save – a background refetch (reconnect, focus) keeps what was typed.
+ */
 export function SenderProfileForm({
-  canEdit,
   onSaved,
   compact = false,
 }: {
-  canEdit: boolean;
   onSaved?: () => void;
   compact?: boolean;
 }) {
   const t = useTranslations("senderProfile");
-  const tErrors = useTranslations("errors");
+  const errorMessage = useErrorMessage();
   const trpc = useTRPC();
   const query = useQuery(trpc.senderProfile.get.queryOptions());
+  const [version, setVersion] = useState(0);
 
   if (query.isPending) return <LoadingState label={t("loading")} lines={6} />;
-  if (query.error)
+  // A failed refetch in the background keeps the editor and what was typed.
+  if (!query.data)
     return (
       <ErrorState
         title={t("loadError")}
-        description={tErrors(errorCode(query.error))}
+        description={errorMessage(query.error)}
         action={
           <Button variant="secondary" size="sm" onClick={() => query.refetch()}>
             {t("retry")}
@@ -104,30 +124,49 @@ export function SenderProfileForm({
     );
   const { profile, workspace } = query.data;
   return (
-    <SenderProfileEditor
-      key={query.dataUpdatedAt}
-      initial={{
-        legalForm: profile.legalForm ?? "",
-        companyName: profile.companyName ?? "",
-        street: profile.address.street ?? "",
-        postalCode: profile.address.postalCode ?? "",
-        city: profile.address.city ?? "",
-        country: profile.address.country,
-        registerCourt: profile.registerCourt ?? "",
-        registerNumber: profile.registerNumber ?? "",
-        managingDirectors: profile.managingDirectors ?? "",
-        supervisoryBoardChair: profile.supervisoryBoardChair ?? "",
-        vatId: profile.vatId ?? "",
-        phone: profile.phone ?? "",
-        website: profile.website ?? "",
-        privacyUrl: profile.privacyUrl ?? "",
-      }}
-      workspace={workspace}
-      complete={query.data.complete}
-      canEdit={canEdit}
-      compact={compact}
-      {...(onSaved ? { onSaved } : {})}
-    />
+    <>
+      {query.error ? (
+        <Alert tone="warning" className="mb-4">
+          {t("refreshError")}
+        </Alert>
+      ) : null}
+      <SenderProfileEditor
+        key={version}
+        initial={{
+          legalForm: profile.legalForm ?? "",
+          companyName: profile.companyName ?? "",
+          street: profile.address.street ?? "",
+          postalCode: profile.address.postalCode ?? "",
+          city: profile.address.city ?? "",
+          country: profile.address.country,
+          seat: profile.seat ?? "",
+          registerCourt: profile.registerCourt ?? "",
+          registerNumber: profile.registerNumber ?? "",
+          managingDirectors: profile.managingDirectors ?? "",
+          supervisoryBoardChair: profile.supervisoryBoardChair ?? "",
+          generalPartnerName: profile.generalPartner?.name ?? "",
+          generalPartnerSeat: profile.generalPartner?.seat ?? "",
+          generalPartnerRegisterCourt: profile.generalPartner?.registerCourt ?? "",
+          generalPartnerRegisterNumber: profile.generalPartner?.registerNumber ?? "",
+          vatId: profile.vatId ?? "",
+          phone: profile.phone ?? "",
+          website: profile.website ?? "",
+          privacyUrl: profile.privacyUrl ?? "",
+        }}
+        workspace={workspace}
+        complete={query.data.complete}
+        canEdit={query.data.canEdit}
+        compact={compact}
+        onStored={() => {
+          setVersion((current) => current + 1);
+          // The editor is rebuilt with the saved values; keep the keyboard position.
+          requestAnimationFrame(() =>
+            document.getElementById("sender-save")?.focus({ preventScroll: true }),
+          );
+          onSaved?.();
+        }}
+      />
+    </>
   );
 }
 
@@ -137,17 +176,18 @@ function SenderProfileEditor({
   complete,
   canEdit,
   compact,
-  onSaved,
+  onStored,
 }: {
   initial: FormState;
   workspace: { kind: "business" | "private"; country: "DE" | "AT" | "CH" | "other" };
   complete: boolean;
   canEdit: boolean;
   compact: boolean;
-  onSaved?: () => void;
+  /** Called once the saved profile has been read back. */
+  onStored: () => void;
 }) {
   const t = useTranslations("senderProfile");
-  const tErrors = useTranslations("errors");
+  const errorMessage = useErrorMessage();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const [state, setState] = useState<FormState>(initial);
@@ -156,18 +196,32 @@ function SenderProfileEditor({
   );
   const business = workspace.kind === "business";
   const form = state.legalForm || null;
+  // The rules follow the country of the sender address (Germany, Austria, Switzerland).
   const required = useMemo(
-    () => requiredSenderFields(form, workspace.kind),
-    [form, workspace.kind],
+    () => requiredSenderFields(form, { kind: workspace.kind, country: state.country }),
+    [form, workspace.kind, state.country],
   );
   const optional = useMemo(
-    () => optionalSenderFields(form, workspace.kind),
-    [form, workspace.kind],
+    () => optionalSenderFields(form, { kind: workspace.kind, country: state.country }),
+    [form, workspace.kind, state.country],
   );
   const shown = (field: SenderField) => required.includes(field) || optional.includes(field);
   const isRequired = (field: SenderField) => required.includes(field);
-  const role = directorsRole(form);
+  const role = directorsRole(form, state.country);
   const countryKey = state.country === "AT" ? "AT" : state.country === "CH" ? "CH" : "DE";
+  // Associations have their own registers (Vereinsregister, ZVR in Austria); German
+  // partnerships, cooperatives and partnerships of professions have their own register parts.
+  const registerKey = form === "ev" ? (`${countryKey}ev` as const) : countryKey;
+  const numberHintKey =
+    countryKey === "DE" && form && ["ek", "ohg", "kg", "gmbh_co_kg"].includes(form)
+      ? "DEhra"
+      : countryKey === "DE" && form === "eg"
+        ? "DEeg"
+        : countryKey === "DE" && form === "partg"
+          ? "DEpartg"
+          : registerKey;
+  const offeredForms = legalFormsFor(state.country);
+  const formOptions = form && !offeredForms.includes(form) ? [...offeredForms, form] : offeredForms;
 
   const save = useMutation(
     trpc.senderProfile.update.mutationOptions({
@@ -176,7 +230,7 @@ function SenderProfileEditor({
         toast.success(t("saved"));
         await queryClient.invalidateQueries({ queryKey: trpc.senderProfile.get.queryKey() });
         await queryClient.invalidateQueries({ queryKey: trpc.workspace.onboarding.queryKey() });
-        onSaved?.();
+        onStored();
       },
       onError: (error) => {
         const fields = (
@@ -211,6 +265,7 @@ function SenderProfileEditor({
 
   const errorText = (field: SenderField) => {
     const error = fieldErrors[field];
+    if (field === "legalForm" && error === "invalid") return t("legalFormUnavailable");
     return error ? t(`fieldErrors.${error}`) : undefined;
   };
 
@@ -263,15 +318,18 @@ function SenderProfileEditor({
     );
   };
 
-  const preview = previewLines(state, t, role, countryKey);
-  const missing = required.filter((field) => {
-    if (field === "street" || field === "postalCode" || field === "city")
-      return !state[field].trim();
-    return field in state && !String(state[field as keyof FormState]).trim();
-  }).length;
+  const current = toInput(state);
+  const preview = useImprintLines(current, workspace);
+  // Hints only: a register may allow a spelling no pattern knows (concept chapter 8, E-053).
+  const hints = designationHints(current, workspace);
+  const missing =
+    (business && (!form || !offeredForms.includes(form)) ? 1 : 0) +
+    required.filter((field) => field in state && !String(state[field as keyof FormState]).trim())
+      .length;
 
   return (
     <form
+      method="post"
       noValidate
       onSubmit={onSubmit}
       className="flex flex-col gap-6"
@@ -318,9 +376,9 @@ function SenderProfileEditor({
                 }
               >
                 <option value="">{t("legalFormChoose")}</option>
-                {legalForms.map((value) => (
+                {formOptions.map((value) => (
                   <option key={value} value={value}>
-                    {t(`legalForms.${value}`)}
+                    {t(`legalForms.${countryKey}.${value}`)}
                   </option>
                 ))}
               </Select>
@@ -329,7 +387,11 @@ function SenderProfileEditor({
           {textField("companyName", {
             autoComplete: "organization",
             label: business ? t("fields.companyName") : t("fields.privateName"),
-            ...(business ? { hint: t("companyNameHint") } : {}),
+            ...(business
+              ? {
+                  hint: hints.includes("companyName") ? t("designationHint") : t("companyNameHint"),
+                }
+              : {}),
           })}
           {textField("street", { autoComplete: "street-address" })}
           {textField("postalCode", { autoComplete: "postal-code", inputMode: "numeric" })}
@@ -354,22 +416,42 @@ function SenderProfileEditor({
       {business &&
       (shown("registerCourt") || shown("managingDirectors") || shown("supervisoryBoardChair")) ? (
         <Card>
-          <CardHeader title={t("registerTitle")} description={t("registerHint")} />
+          <CardHeader title={t("registerTitle")} description={t(`registerHint.${countryKey}`)} />
           <CardBody className="grid gap-4 sm:grid-cols-2">
             {textField("registerCourt", {
-              label: t(`registerCourt.${countryKey}`),
-              hint: t(`registerCourtHint.${countryKey}`),
+              label: t(`registerCourt.${registerKey}`),
+              hint: t(`registerCourtHint.${registerKey}`),
             })}
             {textField("registerNumber", {
-              label: t(`registerNumber.${countryKey}`),
-              hint: t(`registerNumberHint.${countryKey}`),
+              label: t(`registerNumber.${registerKey}`),
+              hint: t(`registerNumberHint.${numberHintKey}`),
+            })}
+            {textField("seat", { autoComplete: "off", hint: t("seatHint") })}
+            {textField("generalPartnerName", {
+              hint: hints.includes("generalPartnerName")
+                ? t("generalPartnerDesignationHint")
+                : t("generalPartnerHint"),
+            })}
+            {textField("generalPartnerSeat")}
+            {textField("generalPartnerRegisterCourt", {
+              label: t(`generalPartnerRegisterCourt.${countryKey}`),
+              hint: t(`registerCourtHint.${countryKey}`),
+            })}
+            {textField("generalPartnerRegisterNumber", {
+              label: t(`generalPartnerRegisterNumber.${countryKey}`),
+              hint: t(`generalPartnerRegisterNumberHint.${countryKey}`),
             })}
             {textField("managingDirectors", {
               multiline: true,
               label: t(`directors.${role ?? "management"}`),
               hint: t("directorsHint"),
             })}
-            {textField("supervisoryBoardChair")}
+            {textField("supervisoryBoardChair", {
+              ...(form === "gmbh_co_kg"
+                ? { label: t("fields.generalPartnerSupervisoryBoardChair") }
+                : {}),
+              ...(isRequired("supervisoryBoardChair") ? {} : { hint: t("supervisoryBoardHint") }),
+            })}
           </CardBody>
         </Card>
       ) : null}
@@ -405,48 +487,18 @@ function SenderProfileEditor({
 
       {save.error &&
       !(save.error.data as { appError?: { fields?: unknown } } | undefined)?.appError?.fields ? (
-        <Alert tone="danger">{tErrors(errorCode(save.error))}</Alert>
+        <Alert tone="danger">{errorMessage(save.error)}</Alert>
       ) : null}
       {Object.keys(fieldErrors).length > 0 ? (
         <Alert tone="danger">{t("fixFields", { count: Object.keys(fieldErrors).length })}</Alert>
       ) : null}
       {canEdit ? (
         <div className="flex justify-end">
-          <Button type="submit" loading={save.isPending}>
+          <Button id="sender-save" type="submit" loading={save.isPending}>
             {compact ? t("saveAndContinue") : t("save")}
           </Button>
         </div>
       ) : null}
     </form>
   );
-}
-
-function previewLines(
-  state: FormState,
-  t: ReturnType<typeof useTranslations<"senderProfile">>,
-  role: ReturnType<typeof directorsRole>,
-  countryKey: "DE" | "AT" | "CH",
-): string[] {
-  const lines: string[] = [];
-  const name = [state.companyName.trim()].filter(Boolean).join(" ");
-  if (name) lines.push(name);
-  const place = [state.postalCode.trim(), state.city.trim()].filter(Boolean).join(" ");
-  const address = [state.street.trim(), place].filter(Boolean).join(", ");
-  if (address) lines.push(address);
-  if (state.legalForm && state.city.trim() && state.registerNumber.trim()) {
-    lines.push(t("preview.seat", { city: state.city.trim() }));
-  }
-  if (state.registerCourt.trim() || state.registerNumber.trim()) {
-    lines.push(
-      [state.registerCourt.trim(), state.registerNumber.trim()].filter(Boolean).join(", "),
-    );
-  }
-  if (state.managingDirectors.trim()) {
-    lines.push(`${t(`directors.${role ?? "management"}`)}: ${state.managingDirectors.trim()}`);
-  }
-  if (state.supervisoryBoardChair.trim()) {
-    lines.push(`${t("fields.supervisoryBoardChair")}: ${state.supervisoryBoardChair.trim()}`);
-  }
-  if (state.vatId.trim()) lines.push(`${t(`vatId.${countryKey}`)}: ${state.vatId.trim()}`);
-  return lines;
 }

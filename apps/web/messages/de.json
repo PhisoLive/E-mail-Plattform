@@ -4,20 +4,13 @@
     "tagline": "Du sagst das Ziel, nicht die E-Mail."
   },
   "common": {
-    "save": "Speichern",
-    "saving": "Wird gespeichert …",
     "cancel": "Abbrechen",
     "continue": "Weiter",
-    "back": "Zurück",
     "loading": "Wird geladen …",
     "retry": "Noch einmal versuchen",
     "email": "E-Mail-Adresse",
     "password": "Passwort",
-    "name": "Name",
     "or": "oder",
-    "remove": "Entfernen",
-    "copy": "Kopieren",
-    "copied": "Kopiert",
     "signOut": "Abmelden",
     "skipToContent": "Zum Inhalt springen",
     "close": "Schließen",
@@ -29,7 +22,7 @@
       "subtitle": "Melde dich an, um deine E-Mails erledigen zu lassen.",
       "submit": "Anmelden",
       "magicLink": "Anmeldelink per E-Mail schicken",
-      "magicLinkSent": "Wir haben dir einen Anmeldelink an {email} geschickt. Er gilt {minutes} Minuten.",
+      "magicLinkSent": "Wir haben dir einen Anmeldelink an {email} geschickt. {minutes, plural, one {Er gilt # Minute.} other {Er gilt # Minuten.}}",
       "noAccount": "Noch kein Konto?",
       "toRegister": "Jetzt registrieren",
       "invalid": "E-Mail-Adresse oder Passwort stimmen nicht.",
@@ -67,8 +60,8 @@
       "loginFirst": "Melde dich mit {email} an oder registriere dich, um die Einladung anzunehmen.",
       "expired": "Diese Einladung ist abgelaufen. Bitte lass dich neu einladen.",
       "used": "Diese Einladung wurde schon angenommen.",
-      "invalid": "Diese Einladung gibt es nicht oder sie wurde zurückgezogen.",
-      "accepted": "Willkommen im Team!"
+      "invalid": "Diese Einladung gibt es nicht oder sie wurde zurückgezogen. Bitte die Person, die dich eingeladen hat, um eine neue Einladung.",
+      "invalidTitle": "Einladung nicht gefunden"
     },
     "errors": {
       "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
@@ -81,7 +74,7 @@
       "requestTitle": "Passwort vergessen",
       "requestText": "Gib deine E-Mail-Adresse ein. Wir schicken dir einen Link, mit dem du ein neues Passwort festlegst.",
       "requestSubmit": "Link schicken",
-      "sent": "Falls es ein Konto mit {email} gibt, ist der Link unterwegs. Er gilt {minutes} Minuten.",
+      "sent": "Falls es ein Konto mit {email} gibt, ist der Link unterwegs. {minutes, plural, one {Er gilt # Minute.} other {Er gilt # Minuten.}}",
       "backToLogin": "Zurück zur Anmeldung",
       "newTitle": "Neues Passwort",
       "newText": "Lege ein neues Passwort fest. Danach meldest du dich damit an.",
@@ -127,7 +120,7 @@
       "mailbox": {
         "title": "Verbinde dein Postfach",
         "text": "Deine Mails gehen von deiner eigenen Adresse raus – Antworten landen wie gewohnt bei dir.",
-        "detail": "Wir unterstützen GMX, WEB.DE, T-Online, IONOS, Gmail und jeden Anbieter mit IMAP und SMTP. Das Passwort wird sofort verschlüsselt.",
+        "detail": "Wir unterstützen GMX, WEB.DE, T-Online, IONOS, Gmail und jeden Anbieter, der den Abruf mit E-Mail-Programmen erlaubt. Das Passwort wird sofort verschlüsselt.",
         "action": "Postfach verbinden"
       },
       "senderProfile": {
@@ -152,12 +145,12 @@
     "subtitle": "Was erledigt ist und was auf dich wartet.",
     "newCampaign": "Neuer Auftrag",
     "connectMailbox": "Postfach verbinden",
-    "kpiTitle": "Kennzahlen der letzten 30 Tage",
+    "kpiTitle": "Kennzahlen",
     "kpiEmpty": "–",
     "kpis": {
       "delivered": {
         "label": "Zugestellt",
-        "hint": "Gesendet und 72 Stunden ohne Rückläufer"
+        "hint": "{hours, plural, one {Gesendet und # Stunde ohne Rückläufer} other {Gesendet und # Stunden ohne Rückläufer}}"
       },
       "replies": {
         "label": "Antworten",
@@ -169,11 +162,11 @@
       },
       "approvals": {
         "label": "Offene Freigaben",
-        "hint": "Warten auf deine Entscheidung"
+        "hint": "Warten jetzt auf deine Entscheidung"
       },
       "inboxRate": {
         "label": "Posteingangs-Quote",
-        "hint": "Anteil der Tests im Posteingang"
+        "hint": "{days, plural, one {Posteingang oder Werbung-Reiter, letzter Tag} other {Posteingang oder Werbung-Reiter, letzte # Tage}}"
       }
     },
     "doneToday": "Heute erledigt",
@@ -187,10 +180,11 @@
     "runningEmpty": "Starte einen Auftrag mit einem Ziel in deinen Worten.",
     "mailboxes": "Postfächer",
     "mailboxesEmptyTitle": "Noch kein Postfach",
-    "mailboxesEmpty": "Verbinde dein Postfach – hier siehst du dann die Ampel für jedes."
+    "mailboxesEmpty": "Verbinde dein Postfach – hier siehst du dann die Ampel für jedes.",
+    "startFirst": "Ersten Auftrag starten",
+    "toInbox": "Zum Posteingang"
   },
   "settings": {
-    "title": "Einstellungen",
     "profile": {
       "title": "Profil",
       "twoFactorTitle": "Zwei-Faktor-Anmeldung",
@@ -234,8 +228,11 @@
       "removeText": "Die Person verliert sofort den Zugriff auf diesen Arbeitsbereich. Du kannst sie später wieder einladen.",
       "removeConfirm": "Entfernen",
       "removed": "Aus dem Team entfernt.",
-      "inviteHint": "Die Einladung gilt {days} Tage. Inhaber und Admins brauchen die Zwei-Faktor-Anmeldung.",
-      "pendingEmptyHint": "Lade jemanden ein – die Einladung erscheint dann hier."
+      "inviteHint": "{days, plural, one {Die Einladung gilt # Tag.} other {Die Einladung gilt # Tage.}} Inhaber und Admins brauchen die Zwei-Faktor-Anmeldung.",
+      "pendingEmptyHint": "Lade jemanden ein – die Einladung erscheint dann hier.",
+      "leaveTitle": "Arbeitsbereich verlassen?",
+      "leaveText": "Du verlierst sofort den Zugriff auf diesen Arbeitsbereich. Zurück kommst du nur mit einer neuen Einladung.",
+      "leaveConfirm": "Verlassen"
     }
   },
   "roles": {
@@ -267,23 +264,23 @@
     "MAILBOX_AUTH_FAILED": "Die Anmeldung bei deinem Postfach ist fehlgeschlagen. Bitte verbinde es neu.",
     "MAILBOX_RATE_LIMITED": "Dein Anbieter bremst gerade. Wir senden morgen automatisch weiter.",
     "RECIPIENT_SUPPRESSED": "Diese Adresse ist gesperrt – abgemeldet oder nicht zustellbar.",
-    "PREFLIGHT_PLACEHOLDER": "In {anzahl} Mails steht noch ein offener Platzhalter.",
-    "PREFLIGHT_AUTH_MISSING": "Für Aktionen ab 100 Empfängern braucht deine Domain SPF, DKIM und DMARC. Wir zeigen dir, wie das geht.",
+    "PREFLIGHT_PLACEHOLDER": "{anzahl, plural, one {In # Mail steht noch ein offener Platzhalter.} other {In # Mails steht noch ein offener Platzhalter.}}",
+    "PREFLIGHT_AUTH_MISSING": "Für Aktionen ab {threshold, number} Empfängern braucht deine Domain SPF, DKIM und DMARC. Wir zeigen dir, wie das geht.",
     "AI_BUDGET_EXCEEDED": "Dein KI-Guthaben für diesen Monat ist aufgebraucht.",
     "TRUST_DAILY_LIMIT": "Neue Konten starten mit einem Tageslimit. Wir verteilen deine Aktion auf mehrere Tage.",
     "PLAN_LIMIT": "Dein Tarif erlaubt {limit}. Mehr geht mit einem größeren Tarif.",
-    "SEND_UNVERIFIED": "Bei {anzahl} Mails ist unklar, ob sie rausgegangen sind. Sollen wir sie erneut senden?",
-    "GRAPH_MESSAGE_TOO_LARGE": "Über Microsoft gehen höchstens 3 MB pro Mail. Verkleinere die Anhänge oder schick einen Link.",
+    "SEND_UNVERIFIED": "{anzahl, plural, one {Bei # Mail ist unklar, ob sie rausgegangen ist. Sollen wir sie erneut senden?} other {Bei # Mails ist unklar, ob sie rausgegangen sind. Sollen wir sie erneut senden?}}",
+    "GRAPH_MESSAGE_TOO_LARGE": "Über Microsoft gehen höchstens {mb, number} MB pro Mail. Verkleinere die Anhänge oder schick einen Link.",
     "SEND_BLOCKED_BY_MODE": "Der Versand ist in dieser Umgebung gesperrt (Testbetrieb)."
   },
   "emails": {
     "verify": {
       "subject": "Bitte bestätige deine E-Mail-Adresse",
-      "text": "Hallo {name},\n\nbitte bestätige deine E-Mail-Adresse mit diesem Link:\n{url}\n\nDer Link gilt {hours} Stunden. Wenn du dich nicht registriert hast, kannst du diese E-Mail ignorieren."
+      "text": "Hallo {name},\n\nbitte bestätige deine E-Mail-Adresse mit diesem Link:\n{url}\n\n{hours, plural, one {Der Link gilt # Stunde.} other {Der Link gilt # Stunden.}} Wenn du dich nicht registriert hast, kannst du diese E-Mail ignorieren."
     },
     "magicLink": {
       "subject": "Dein Anmeldelink",
-      "text": "Hallo,\n\nmit diesem Link meldest du dich an:\n{url}\n\nDer Link gilt {minutes} Minuten und funktioniert nur einmal. Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail."
+      "text": "Hallo,\n\nmit diesem Link meldest du dich an:\n{url}\n\n{minutes, plural, one {Der Link gilt # Minute} other {Der Link gilt # Minuten}} und funktioniert nur einmal. Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail."
     },
     "invitation": {
       "subject": "Einladung zu {workspace}",
@@ -291,7 +288,7 @@
     },
     "resetPassword": {
       "subject": "Passwort zurücksetzen",
-      "text": "Hallo {name},\n\nmit diesem Link setzt du dein Passwort zurück:\n{url}\n\nDer Link gilt {minutes} Minuten. Wenn du das nicht angefordert hast, ignoriere diese E-Mail."
+      "text": "Hallo {name},\n\nmit diesem Link setzt du dein Passwort zurück:\n{url}\n\n{minutes, plural, one {Der Link gilt # Minute.} other {Der Link gilt # Minuten.}} Wenn du das nicht angefordert hast, ignoriere diese E-Mail."
     },
     "magicLinkTwoFactor": {
       "subject": "Anmeldung mit Zwei-Faktor-Code",
@@ -324,8 +321,7 @@
     "templates": "Vorlagen",
     "mailboxes": "Postfächer",
     "agents": "Agenten",
-    "settings": "Einstellungen",
-    "admin": "Betreiberbereich"
+    "settings": "Einstellungen"
   },
   "shell": {
     "sidebar": "Seitenleiste",
@@ -384,8 +380,16 @@
         "invite": "Jemanden ins Team einladen"
       }
     },
-    "waiting": "warten auf dich",
-    "untitledConversation": "Neues Gespräch"
+    "waiting": "{count, plural, one {# wartet auf dich} other {# warten auf dich}}",
+    "untitledConversation": "Neues Gespräch",
+    "inboxWithCount": "Posteingang, {count, plural, one {# wartet auf dich} other {# warten auf dich}}",
+    "keys": {
+      "escape": "Esc",
+      "tab": "Tab"
+    },
+    "notifications": "Hinweise",
+    "switchedElsewhere": "Du hast in einem anderen Tab den Arbeitsbereich gewechselt. Lade die Seite neu, damit alles zum selben Arbeitsbereich gehört.",
+    "reload": "Neu laden"
   },
   "settingsNav": {
     "label": "Einstellungen",
@@ -405,6 +409,7 @@
     "formLabel": "Absenderprofil",
     "loading": "Absenderprofil wird geladen …",
     "loadError": "Das Absenderprofil konnte nicht geladen werden.",
+    "refreshError": "Das Absenderprofil konnte gerade nicht neu geladen werden. Deine Eingaben bleiben erhalten.",
     "retry": "Noch einmal laden",
     "readOnly": "Nur Inhaber und Admins können das Absenderprofil ändern.",
     "companyTitle": "Wer schreibt?",
@@ -416,8 +421,16 @@
     "legalFormHint": "Die Rechtsform bestimmt, welche Angaben Pflicht sind.",
     "legalFormChoose": "Bitte wählen …",
     "companyNameHint": "Vollständig mit Rechtsformzusatz, z. B. „Bäckerei Huber GmbH“.",
+    "designationHint": "Wir erkennen keinen Rechtsformzusatz im Namen. Steht er so im Register, passt das – unter deinen Mails nennen wir die Rechtsform dann in einer eigenen Zeile.",
+    "legalFormUnavailable": "Diese Rechtsform gibt es im gewählten Land nicht. Wähle eine andere oder prüfe das Land.",
+    "seatHint": "Ort laut Register, z. B. München – meist der Ort deiner Anschrift.",
+    "supervisoryBoardHint": "Nur nötig, wenn es einen Aufsichtsrat gibt.",
     "registerTitle": "Register und Vertretung",
-    "registerHint": "Pflicht für eingetragene Firmen (z. B. § 35a GmbHG, § 37a HGB).",
+    "registerHint": {
+      "DE": "Pflicht für eingetragene Firmen und Vereine (z. B. § 35a GmbHG, § 37a HGB, §§ 125, 177a HGB).",
+      "AT": "Pflicht für Firmen im Firmenbuch (§ 14 UGB) und für Vereine (ZVR-Zahl).",
+      "CH": "Angaben aus dem Handelsregister (Art. 954a OR, UID)."
+    },
     "directorsHint": "Alle Personen mit Vor- und Nachnamen, durch Komma getrennt.",
     "contactTitle": "Weitere Angaben",
     "contactHint": "Freiwillig – erscheinen nur, wenn du sie ausfüllst.",
@@ -433,7 +446,9 @@
     "fieldErrors": {
       "required": "Bitte ausfüllen.",
       "invalid": "Das Format stimmt nicht.",
-      "tooLong": "Das ist zu lang."
+      "tooLong": "Das ist zu lang.",
+      "corporatePartner": "Haftet eine GmbH, UG, AG oder SE persönlich, wähle „GmbH & Co. KG oder ähnliche“ – dort trägst du die Angaben der Gesellschafterin ein.",
+      "kgaa": "Für eine KGaA wähle „Andere Rechtsform“ – sie hat eigene Pflichtangaben."
     },
     "fields": {
       "legalForm": "Rechtsform",
@@ -450,23 +465,63 @@
       "vatId": "USt-IdNr.",
       "phone": "Telefon",
       "website": "Website",
-      "privacyUrl": "Link zur Datenschutzerklärung"
+      "privacyUrl": "Link zur Datenschutzerklärung",
+      "generalPartnerName": "Persönlich haftende Gesellschafterin",
+      "generalPartnerSeat": "Sitz der Gesellschafterin",
+      "generalPartnerRegisterCourt": "Registergericht der Gesellschafterin",
+      "generalPartnerRegisterNumber": "Registernummer der Gesellschafterin",
+      "seat": "Sitz",
+      "generalPartnerSupervisoryBoardChair": "Vorsitz des Aufsichtsrats der Gesellschafterin"
     },
     "legalForms": {
-      "einzelunternehmen": "Einzelunternehmen (nicht eingetragen)",
-      "freiberufler": "Freiberuflich",
-      "gbr": "GbR",
-      "ek": "Eingetragener Kaufmann (e. K.)",
-      "ohg": "OHG",
-      "kg": "KG",
-      "gmbh_co_kg": "GmbH & Co. KG",
-      "gmbh": "GmbH",
-      "ug": "UG (haftungsbeschränkt)",
-      "ag": "AG",
-      "eg": "Genossenschaft (eG)",
-      "ev": "Eingetragener Verein (e. V.)",
-      "partg": "Partnerschaftsgesellschaft",
-      "other": "Andere Rechtsform"
+      "DE": {
+        "einzelunternehmen": "Einzelunternehmen (nicht eingetragen)",
+        "freiberufler": "Freiberuflich",
+        "gbr": "GbR",
+        "ek": "Eingetragener Kaufmann (e. K.)",
+        "ohg": "OHG",
+        "kg": "KG",
+        "gmbh_co_kg": "GmbH & Co. KG oder ähnliche (z. B. UG, AG, SE & Co. KG)",
+        "gmbh": "GmbH",
+        "ug": "UG (haftungsbeschränkt)",
+        "ag": "AG",
+        "eg": "Genossenschaft (eG)",
+        "ev": "Eingetragener Verein (e. V.)",
+        "partg": "Partnerschaftsgesellschaft",
+        "other": "Andere Rechtsform"
+      },
+      "AT": {
+        "einzelunternehmen": "Einzelunternehmen (nicht eingetragen)",
+        "freiberufler": "Freiberuflich",
+        "gbr": "Gesellschaft bürgerlichen Rechts (GesbR)",
+        "ek": "Eingetragener Unternehmer (e.U.)",
+        "ohg": "Offene Gesellschaft (OG)",
+        "kg": "KG",
+        "gmbh_co_kg": "GmbH & Co KG oder ähnliche (z. B. AG & Co KG)",
+        "gmbh": "GmbH",
+        "ug": "UG (haftungsbeschränkt)",
+        "ag": "AG",
+        "eg": "Genossenschaft (eGen)",
+        "ev": "Verein",
+        "partg": "Partnerschaftsgesellschaft",
+        "other": "Andere Rechtsform"
+      },
+      "CH": {
+        "einzelunternehmen": "Einzelunternehmen",
+        "freiberufler": "Freiberuflich",
+        "gbr": "Einfache Gesellschaft",
+        "ek": "Eingetragener Kaufmann (e. K.)",
+        "ohg": "Kollektivgesellschaft",
+        "kg": "Kommanditgesellschaft",
+        "gmbh_co_kg": "GmbH & Co. KG",
+        "gmbh": "GmbH (Sàrl)",
+        "ug": "UG (haftungsbeschränkt)",
+        "ag": "Aktiengesellschaft (AG, SA)",
+        "eg": "Genossenschaft",
+        "ev": "Verein",
+        "partg": "Partnerschaftsgesellschaft",
+        "other": "Andere Rechtsform"
+      }
     },
     "countries": {
       "DE": "Deutschland",
@@ -485,35 +540,68 @@
     "registerCourt": {
       "DE": "Registergericht",
       "AT": "Firmenbuchgericht",
-      "CH": "Handelsregisteramt"
+      "CH": "Handelsregisteramt",
+      "DEev": "Registergericht",
+      "ATev": "Vereinsbehörde",
+      "CHev": "Handelsregisteramt"
     },
     "registerCourtHint": {
       "DE": "z. B. Amtsgericht München",
       "AT": "z. B. Handelsgericht Wien",
-      "CH": "z. B. Handelsregisteramt Zürich"
+      "CH": "z. B. Handelsregisteramt Zürich",
+      "DEev": "z. B. Amtsgericht München",
+      "ATev": "z. B. Landespolizeidirektion Wien – freiwillig",
+      "CHev": "z. B. Handelsregisteramt Zürich – nur, wenn der Verein eingetragen ist"
     },
     "registerNumber": {
       "DE": "Registernummer",
       "AT": "Firmenbuchnummer",
-      "CH": "UID"
+      "CH": "UID",
+      "DEev": "Vereinsregisternummer",
+      "ATev": "ZVR-Zahl",
+      "CHev": "UID"
     },
     "registerNumberHint": {
       "DE": "z. B. HRB 123456",
       "AT": "z. B. FN 123456a",
-      "CH": "z. B. CHE-123.456.789"
+      "CH": "z. B. CHE-123.456.789",
+      "DEev": "z. B. VR 12345",
+      "ATev": "z. B. 123456789",
+      "CHev": "z. B. CHE-123.456.789",
+      "DEhra": "z. B. HRA 12345",
+      "DEeg": "z. B. GnR 123",
+      "DEpartg": "z. B. PR 123"
     },
     "directors": {
       "management": "Geschäftsführung",
       "board": "Vorstand",
-      "partners": "Gesellschafter"
+      "partners": "Gesellschafter",
+      "generalPartnerManagement": "Vertretung der Gesellschafterin (Geschäftsführung oder Vorstand)",
+      "boardOfDirectors": "Verwaltungsrat",
+      "administration": "Verwaltung",
+      "representatives": "Vertretungsberechtigte Personen"
     },
     "vatId": {
       "DE": "USt-IdNr.",
       "AT": "UID-Nummer",
       "CH": "MWST-Nummer"
     },
-    "preview": {
-      "seat": "Sitz: {city}"
+    "generalPartnerHint": "Die Komplementär-GmbH mit vollständiger Firma, z. B. „Huber Verwaltungs GmbH“.",
+    "generalPartnerDesignationHint": "Wir erkennen keine Rechtsform im Namen der Gesellschafterin – prüf, ob die Firma vollständig ist, z. B. „Huber Verwaltungs GmbH“.",
+    "generalPartnerRegisterCourt": {
+      "DE": "Registergericht der Gesellschafterin",
+      "AT": "Firmenbuchgericht der Gesellschafterin",
+      "CH": "Handelsregisteramt der Gesellschafterin"
+    },
+    "generalPartnerRegisterNumber": {
+      "DE": "Registernummer der Gesellschafterin",
+      "AT": "Firmenbuchnummer der Gesellschafterin",
+      "CH": "UID der Gesellschafterin"
+    },
+    "generalPartnerRegisterNumberHint": {
+      "DE": "z. B. HRB 123456",
+      "AT": "z. B. FN 123456a",
+      "CH": "z. B. CHE-123.456.789"
     }
   },
   "profile": {
@@ -534,7 +622,7 @@
     "passwordHint": "Danach wirst du auf allen anderen Geräten abgemeldet.",
     "currentPassword": "Aktuelles Passwort",
     "newPassword": "Neues Passwort",
-    "newPasswordHint": "Mindestens {min} Zeichen.",
+    "newPasswordHint": "{min, plural, one {Mindestens # Zeichen.} other {Mindestens # Zeichen.}}",
     "changePassword": "Passwort ändern",
     "passwordChanged": "Passwort geändert. Andere Geräte sind abgemeldet."
   },
@@ -552,7 +640,11 @@
     "backToAgents": "Zu den Agenten",
     "backToCampaigns": "Zu den Aufträgen",
     "backToMailboxes": "Zu den Postfächern",
-    "untitled": "Ohne Titel"
+    "untitled": "Ohne Titel",
+    "viewPrices": "Preise ansehen",
+    "readPrivacy": "Datenschutzerklärung lesen",
+    "toProfile": "Zum Profil",
+    "toStart": "Zur Startseite"
   },
   "placeholders": {
     "inbox": {
@@ -758,7 +850,7 @@
       "title": "Benachrichtigungen",
       "description": "Wann und wie die Plattform dir Bescheid gibt.",
       "soonTitle": "Benachrichtigungen folgen",
-      "soonText": "Du stellst bald je Art ein, ob du in der App oder per Mail informiert wirst – höchstens eine Mail je Viertelstunde.",
+      "soonText": "Du stellst bald je Art ein, ob du in der App oder per Mail informiert wirst – {minutes, plural, one {höchstens eine Mail je Minute} other {höchstens eine Mail je # Minuten}}, der Rest wird gebündelt.",
       "items": [
         "Freigabe nötig",
         "Wichtige Antwort",
@@ -964,7 +1056,8 @@
         "title": "Versand",
         "text": "Live verfolgen, pausieren, fortsetzen"
       }
-    }
+    },
+    "goalTooShort": "Beschreib dein Ziel in ein paar Worten, dann geht es weiter."
   },
   "templates": {
     "title": "Vorlagen",
@@ -1046,22 +1139,22 @@
     "providers": {
       "gmx": {
         "name": "GMX",
-        "kind": "IMAP und SMTP",
+        "kind": "Mit E-Mail-Adresse und Passwort",
         "hint": "Aktiviere in den GMX-Einstellungen unter „E-Mail-Programme“ den Zugriff per IMAP."
       },
       "webde": {
         "name": "WEB.DE",
-        "kind": "IMAP und SMTP",
+        "kind": "Mit E-Mail-Adresse und Passwort",
         "hint": "Aktiviere in den WEB.DE-Einstellungen unter „POP3/IMAP Abruf“ den Zugriff per IMAP."
       },
       "tonline": {
         "name": "T-Online",
-        "kind": "IMAP und SMTP",
+        "kind": "Mit E-Mail-Adresse und Passwort",
         "hint": "T-Online braucht das separate E-Mail-Passwort – nicht das Passwort für das Kundencenter."
       },
       "ionos": {
         "name": "IONOS",
-        "kind": "IMAP und SMTP",
+        "kind": "Mit E-Mail-Adresse und Passwort",
         "hint": "Nimm die Zugangsdaten deines IONOS-Postfachs; IMAP ist bereits aktiv."
       },
       "gmail": {
@@ -1076,13 +1169,13 @@
       },
       "strato": {
         "name": "Strato",
-        "kind": "IMAP und SMTP",
+        "kind": "Mit E-Mail-Adresse und Passwort",
         "hint": "Nimm die Zugangsdaten deines Strato-Postfachs."
       },
       "other": {
         "name": "Anderer Anbieter",
         "kind": "Serverdaten selbst eintragen",
-        "hint": "Du brauchst die Serverdaten für IMAP und SMTP – sie stehen meist in der Hilfe deines Anbieters."
+        "hint": "Du brauchst die Serverdaten für Abruf und Versand – sie stehen meist in der Hilfe deines Anbieters unter „E-Mail-Programme einrichten“."
       }
     }
   },
@@ -1276,5 +1369,70 @@
   "threadDetail": {
     "contactTitle": "Kontakt",
     "contactText": "Name, Firma, Listen und frühere Aufträge des Kontakts erscheinen hier neben dem Verlauf."
+  },
+  "imprint": {
+    "name": "{name}",
+    "legalForm": "Rechtsform: {name}",
+    "address": "{street}, {place}",
+    "seat": "Sitz: {seat}",
+    "register": "{court}, {number}",
+    "zvr": "ZVR-Zahl: {number}",
+    "zvrWithAuthority": "{court}, ZVR-Zahl: {number}",
+    "generalPartner": "Persönlich haftende Gesellschafterin: {name}, Sitz {seat}, {court}, {number}",
+    "management": "Geschäftsführung: {names}",
+    "board": "Vorstand: {names}",
+    "boardOfDirectors": "Verwaltungsrat: {names}",
+    "administration": "Verwaltung: {names}",
+    "representatives": "Vertreten durch: {names}",
+    "partners": "Gesellschafter: {names}",
+    "generalPartnerManagement": "Geschäftsführung bzw. Vorstand der Gesellschafterin: {names}",
+    "supervisoryBoard": "Vorsitz des Aufsichtsrats: {name}",
+    "vatId": "{country, select, AT {UID-Nummer} CH {MWST-Nummer} other {USt-IdNr.}}: {vatId}",
+    "generalPartnerSupervisoryBoard": "Vorsitz des Aufsichtsrats der Gesellschafterin: {name}",
+    "legalForms": {
+      "DE": {
+        "ek": "eingetragener Kaufmann (e. K.)",
+        "ohg": "offene Handelsgesellschaft",
+        "kg": "Kommanditgesellschaft",
+        "gmbh_co_kg": "Personengesellschaft mit einer Kapitalgesellschaft als persönlich haftender Gesellschafterin",
+        "gmbh": "Gesellschaft mit beschränkter Haftung",
+        "ug": "Unternehmergesellschaft (haftungsbeschränkt)",
+        "ag": "Aktiengesellschaft",
+        "eg": "eingetragene Genossenschaft",
+        "ev": "eingetragener Verein",
+        "partg": "Partnerschaftsgesellschaft"
+      },
+      "AT": {
+        "ek": "eingetragener Unternehmer (e.U.)",
+        "ohg": "offene Gesellschaft",
+        "kg": "Kommanditgesellschaft",
+        "gmbh_co_kg": "Personengesellschaft mit einer Kapitalgesellschaft als persönlich haftender Gesellschafterin",
+        "gmbh": "Gesellschaft mit beschränkter Haftung",
+        "ug": "Unternehmergesellschaft (haftungsbeschränkt)",
+        "ag": "Aktiengesellschaft",
+        "eg": "eingetragene Genossenschaft",
+        "ev": "Verein",
+        "partg": "Partnerschaftsgesellschaft"
+      },
+      "CH": {
+        "ek": "Einzelunternehmen",
+        "ohg": "Kollektivgesellschaft",
+        "kg": "Kommanditgesellschaft",
+        "gmbh_co_kg": "Kommanditgesellschaft",
+        "gmbh": "Gesellschaft mit beschränkter Haftung",
+        "ug": "Gesellschaft mit beschränkter Haftung",
+        "ag": "Aktiengesellschaft",
+        "eg": "Genossenschaft",
+        "ev": "Verein",
+        "partg": "Kollektivgesellschaft"
+      }
+    }
+  },
+  "publicPages": {
+    "error": {
+      "title": "Das hat gerade nicht geklappt",
+      "text": "Bitte versuchen Sie es in ein paar Minuten noch einmal. Möchten Sie keine Mails mehr erhalten, antworten Sie einfach mit „Abmelden“ auf die Mail.",
+      "retry": "Noch einmal versuchen"
+    }
   }
 }
